@@ -1,0 +1,74 @@
+{
+  "firestoreSchema": {
+    "version": "1.0.0",
+    "description": "Structure Firestore Zero-Cognitive Load pour Mon Assist'Gestion (Bailleurs)",
+    "collections": {
+      "properties": {
+        "description": "Logements gérés par le propriétaire bailleur",
+        "documentId": "prop_{timestamp}",
+        "fields": {
+          "id": { "type": "string", "required": true },
+          "name": { "type": "string", "description": "Nom usuel (ex: 2 Pièces Voltaire)" },
+          "address": { "type": "string", "required": true },
+          "postalCode": { "type": "string", "example": "75011" },
+          "city": { "type": "string", "example": "Paris" },
+          "leaseType": { "type": "string", "enum": ["vide", "meuble"], "description": "Vide = 3 ans, Meublé = 1 an" },
+          "leaseDurationYears": { "type": "number", "example": 1 },
+          "chargesMode": { "type": "string", "enum": ["provisions", "forfait"] },
+          "rentExcl": { "type": "number", "description": "Loyer Hors Charges en €" },
+          "charges": { "type": "number", "description": "Charges mensuelles en €" },
+          "deposit": { "type": "number", "description": "Dépôt de garantie conservé par le bailleur" },
+          "leaseStartDate": { "type": "string", "format": "YYYY-MM-DD" },
+          "irlBaseQuarter": { "type": "string", "example": "T3 2024" },
+          "irlBaseValue": { "type": "number", "example": 144.51 },
+          "dpeRating": { "type": "string", "enum": ["A", "B", "C", "D", "E", "F", "G"], "note": "Si F ou G, révision IRL bloquée par la loi Climat" },
+          "pnoExpiryDate": { "type": "string", "format": "YYYY-MM-DD" },
+          "hasGli": { "type": "boolean" },
+          "gliProvider": { "type": "string", "example": "Visale" },
+          "hasGasHeating": { "type": "boolean", "note": "Active le rappel annuel d'entretien de chaudière" },
+          "hasChimney": { "type": "boolean", "note": "Active le rappel annuel de ramonage" },
+          "tenantName": { "type": "string", "required": true },
+          "tenantEmail": { "type": "string", "required": true },
+          "tenantPhone": { "type": "string", "required": true },
+          "tenantInsuranceExpiry": { "type": "string", "format": "YYYY-MM-DD" },
+          "guarantor": { "type": "string", "optional": true },
+          "createdAt": { "type": "timestamp" }
+        }
+      },
+      "rentRecords": {
+        "description": "Suivi mensuel des échéances de loyers et états d'impayés",
+        "documentId": "rent_{propertyId}_{month}_{year}",
+        "fields": {
+          "id": { "type": "string", "required": true },
+          "propertyId": { "type": "string", "required": true },
+          "month": { "type": "string", "example": "Mars" },
+          "year": { "type": "number", "example": 2025 },
+          "rentAmount": { "type": "number" },
+          "chargesAmount": { "type": "number" },
+          "total": { "type": "number" },
+          "status": {
+            "type": "string",
+            "enum": ["PENDING", "PAID", "LATE_J10", "LATE_J20", "LATE_J35"],
+            "description": "PENDING = 5 du mois, LATE_J10 = Relance amiable, LATE_J20 = LRAR Mise en demeure, LATE_J35 = Déclaration sinistre Visale/GLI"
+          },
+          "paidDate": { "type": "string", "optional": true, "format": "DD/MM/YYYY" },
+          "paymentMethod": { "type": "string", "default": "Virement bancaire" }
+        }
+      },
+      "incidents": {
+        "description": "Déclarations et suivi des sinistres dégâts des eaux ou impayés",
+        "fields": {
+          "id": { "type": "string" },
+          "propertyId": { "type": "string" },
+          "type": { "type": "string", "enum": ["UNPAID", "WATER_DAMAGE", "EQUIPMENT", "OTHER"] },
+          "status": { "type": "string", "enum": ["OPEN", "INSURER_NOTIFIED", "RESOLVED"] },
+          "description": { "type": "string" },
+          "createdAt": { "type": "timestamp" }
+        }
+      }
+    },
+    "securityRules": {
+      "rules": "rules_version = '2'; service cloud.firestore { match /databases/{database}/documents { match /{document=**} { allow read, write: if true; } } }"
+    }
+  }
+}

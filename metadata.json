@@ -1,0 +1,6 @@
+{
+  "name": "Dryos Gestion Propriétaire",
+  "description": "PWA mobile-first d'assistance proactive 'Zero-Cognitive Load' pour les propriétaires bailleurs : pointage de loyers, quittances 1-clic, relances impayés J+10/20/35 et révision IRL.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mon Assist'Gestion - Zero-Cognitive Load</title>
+  <meta name="theme-color" content="#00434A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="./styles.css">
+  <!-- jsPDF pour la génération locale 100% navigateur sans serveur -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div>
+        <span class="brand-badge">Zero-Cognitive Load</span>
+        <h1 class="app-title">Mon Assist'Gestion</h1>
+      </div>
+      <div>
+        <select id="property-select" class="property-selector">
+          <!-- Dynamiquement peuplé -->
+        </select>
+      </div>
+    </header>
+
+    <!-- Top Action Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <span style="font-size: 13px; color: var(--text-muted);">
+        Bien sélectionné : <strong id="active-prop-label" style="color: var(--teal-primary);">2 Pièces Voltaire</strong>
+      </span>
+      <button id="btn-open-tunnel" class="btn btn-teal" style="padding: 8px 14px; font-size: 12px;">
+        + Ajouter un bien
+      </button>
+    </div>
+
+    <!-- Dashboard Proactif : Pile de cartes "À faire aujourd'hui" -->
+    <main id="dashboard-feed">
+      <div class="feed-header">
+        <h2 class="feed-title">À faire aujourd'hui</h2>
+        <p class="feed-subtitle">Décisions immédiates sans surcharge cognitive</p>
+      </div>
+
+      <div id="cards-container" class="cards-list">
+        <!-- Rendu dynamique par le moteur contextuel -->
+      </div>
+    </main>
+  </div>
+
+  <!-- TUNNEL D'ONBOARDING 6 ÉTAPES (1 Écran = 1 Clin d'œil) -->
+  <div id="onboarding-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <div class="step-indicator">
+            Étape <span id="current-step-num">1</span> sur 6
+          </div>
+          <div class="progress-bar-wrap">
+            <div id="tunnel-progress" class="progress-bar-fill" style="width: 16.66%;"></div>
+          </div>
+        </div>
+        <button id="btn-close-tunnel" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted);">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- ÉCRAN 1 : Adresse -->
+        <div id="step-1" class="wizard-step">
+          <h3 class="wizard-question">Où se situe votre bien ?</h3>
+          <p class="wizard-hint">Adresse postale du logement mis en location.</p>
+          <div class="form-group">
+            <label class="form-label">Nom usuel du bien *</label>
+            <input type="text" id="input-name" class="form-input" placeholder="Ex : 2 Pièces Voltaire" autofocus>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Adresse postale *</label>
+            <input type="text" id="input-address" class="form-input" placeholder="Ex : 42 Rue Léon Frot">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+              <label class="form-label">Code postal</label>
+              <input type="text" id="input-cp" class="form-input" value="75011">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Ville</label>
+              <input type="text" id="input-city" class="form-input" value="Paris">
+            </div>
+          </div>
+        </div>
+
+        <!-- ÉCRAN 2 : Type de bail -->
+        <div id="step-2" class="wizard-step hidden">
+          <h3 class="wizard-question">Quel est le type de bail ?</h3>
+          <p class="wizard-hint">Les règles légales et délais de congé sont calculés automatiquement.</p>
+          <div class="choice-grid">
+            <div id="choice-vide" class="choice-btn" onclick="selectLeaseType('vide')">
+              <strong>Vide</strong>
+              <span>Durée 3 ans<br>(Préavis bailleur 6 mois)</span>
+            </div>
+            <div id="choice-meuble" class="choice-btn active" onclick="selectLeaseType('meuble')">
+              <strong>Meublé</strong>
+              <span>Durée 1 an<br>(Préavis bailleur 3 mois)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ÉCRAN 3 : Finances -->
+        <div id="step-3" class="wizard-step hidden">
+          <h3 class="wizard-question">Finances</h3>
+          <p class="wizard-hint">Loyer principal et régime des charges.</p>
+          <div class="form-group">
+            <label class="form-label">Loyer Hors Charges (€) *</label>
+            <input type="number" id="input-rent-hc" class="form-input" value="1200">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Montant des charges (€) *</label>
+            <input type="number" id="input-charges" class="form-input" value="80">
+          </div>
+          <label class="form-label">Régime des charges</label>
+          <div class="choice-grid" style="margin-bottom: 16px;">
+            <div id="choice-provisions" class="choice-btn active" onclick="selectChargesMode('provisions')">
+              <strong>Provisions</strong>
+              <span>Avec régularisation</span>
+            </div>
+            <div id="choice-forfait" class="choice-btn" onclick="selectChargesMode('forfait')">
+              <strong>Forfait</strong>
+              <span>Fixe sans régul</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ÉCRAN 4 : Dates clés & Indice IRL -->
+        <div id="step-4" class="wizard-step hidden">
+          <h3 class="wizard-question">Dates clés</h3>
+          <p class="wizard-hint">Date de signature et indice de référence (IRL).</p>
+          <div class="form-group">
+            <label class="form-label">Date de prise d'effet du bail *</label>
+            <input type="date" id="input-lease-date" class="form-input" value="2024-03-01">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+              <label class="form-label">Trimestre IRL de base</label>
+              <input type="text" id="input-irl-quarter" class="form-input" value="T3 2024">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Valeur indice INSEE</label>
+              <input type="number" step="0.01" id="input-irl-val" class="form-input" value="144.51">
+            </div>
+          </div>
+        </div>
+
+        <!-- ÉCRAN 5 : Conformité en 3 clics -->
+        <div id="step-5" class="wizard-step hidden">
+          <h3 class="wizard-question">Conformité en 3 clics</h3>
+          <p class="wizard-hint">Active les alertes au moment opportun.</p>
+          
+          <div class="switch-item">
+            <span class="switch-label">Y a-t-il du gaz ou du fioul ?</span>
+            <label class="switch">
+              <input type="checkbox" id="switch-gas">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="switch-item">
+            <span class="switch-label">Y a-t-il une cheminée ?</span>
+            <label class="switch">
+              <input type="checkbox" id="switch-chimney">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="form-group" style="margin-top: 14px;">
+            <label class="form-label">Note DPE (Diagnostic de Performance)</label>
+            <select id="select-dpe" class="form-input">
+              <option value="A">Classe A</option>
+              <option value="B">Classe B</option>
+              <option value="C">Classe C</option>
+              <option value="D" selected>Classe D</option>
+              <option value="E">Classe E</option>
+              <option value="F">Classe F (Passoire thermique - IRL bloqué)</option>
+              <option value="G">Classe G (Passoire thermique - IRL bloqué)</option>
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+              <label class="form-label">Assurance PNO (Échéance)</label>
+              <input type="date" id="input-pno-date" class="form-input" value="2025-04-30">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Garantie Loyers (GLI)</label>
+              <select id="select-gli" class="form-input">
+                <option value="Visale">Garantie Visale</option>
+                <option value="Galian">Assurance Galian</option>
+                <option value="Autre">Autre assureur</option>
+                <option value="Aucune">Aucune</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- ÉCRAN 6 : Coordonnées du locataire -->
+        <div id="step-6" class="wizard-step hidden">
+          <h3 class="wizard-question">Coordonnées du locataire</h3>
+          <p class="wizard-hint">Pour adresser les quittances et relances.</p>
+          <div class="form-group">
+            <label class="form-label">Nom & Prénom du locataire *</label>
+            <input type="text" id="input-tenant-name" class="form-input" placeholder="Ex: Sophie Laurent">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Numéro de mobile *</label>
+            <input type="tel" id="input-tenant-phone" class="form-input" placeholder="06 00 00 00 00">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Adresse email *</label>
+            <input type="email" id="input-tenant-email" class="form-input" placeholder="locataire@email.fr">
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-tunnel-prev" class="btn btn-outline" style="display: none;">Précédent</button>
+        <button id="btn-tunnel-next" class="btn btn-teal" style="margin-left: auto;">Suivant &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION SMARTPHONE (Bottom Bar) -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="location.reload()">
+      <span>⚡</span>
+      <span>Actions</span>
+    </button>
+    <button class="nav-item" onclick="openTunnel()">
+      <span>🏠</span>
+      <span>Biens</span>
+    </button>
+    <button class="nav-item" onclick="alert('Mon Assist\'Gestion - Propulsé par DRYOS Immobilier (paris.dryos.fr). 100% déclaratif.')">
+      <span>ℹ️</span>
+      <span>Infos</span>
+    </button>
+  </nav>
+
+  <!-- MOTEUR APPLICATIF JS -->
+  <script type="module">
+    import { AssistGestionEngine } from './engine.js';
+
+    const engine = new AssistGestionEngine();
+    window.engine = engine;
+
+    // État du tunnel
+    let currentStep = 1;
+    let selectedLease = 'meuble';
+    let selectedCharges = 'provisions';
+
+    window.selectLeaseType = (type) => {
+      selectedLease = type;
+      document.getElementById('choice-vide').classList.toggle('active', type === 'vide');
+      document.getElementById('choice-meuble').classList.toggle('active', type === 'meuble');
+    };
+
+    window.selectChargesMode = (mode) => {
+      selectedCharges = mode;
+      document.getElementById('choice-provisions').classList.toggle('active', mode === 'provisions');
+      document.getElementById('choice-forfait').classList.toggle('active', mode === 'forfait');
+    };
+
+    function renderPropertySelect() {
+      const select = document.getElementById('property-select');
+      select.innerHTML = '';
+      engine.properties.forEach((p, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = p.name;
+        select.appendChild(opt);
+      });
+      select.value = engine.currentPropertyIndex;
+      document.getElementById('active-prop-label').textContent = engine.getActiveProperty().name;
+    }
+
+    function renderCards() {
+      const container = document.getElementById('cards-container');
+      container.innerHTML = '';
+      const activeProp = engine.getActiveProperty();
+      const actions = engine.computeActionFeed(activeProp);
+
+      if (actions.length === 0) {
+        container.innerHTML = `
+          <div class="action-card priority-green" style="text-align: center; padding: 28px 16px;">
+            <div style="font-size: 32px; margin-bottom: 8px;">✅</div>
+            <div class="card-title">Tout est parfaitement à jour</div>
+            <p class="card-desc">Aucune décision requise aujourd'hui pour ${activeProp.name}.</p>
+          </div>
+        `;
+        return;
+      }
+
+      actions.forEach(act => {
+        const card = document.createElement('div');
+        card.className = `action-card priority-${act.priority}`;
+
+        const badgeClass = act.priority === 'red' ? 'badge-red' : act.priority === 'orange' ? 'badge-orange' : 'badge-green';
+        const badgeLabel = act.priority === 'red' ? 'Urgent' : 'À traiter';
+
+        let buttonsHtml = '';
+        if (act.actionType === 'RENT_CONFIRM') {
+          buttonsHtml = `
+            <div class="card-actions">
+              <button class="btn btn-teal" onclick="onRentPaid()">Oui, encaissé</button>
+              <button class="btn btn-danger-outline" onclick="onRentUnpaid()">Non (impayé)</button>
+            </div>
+          `;
+        } else if (act.actionType === 'SEND_REMINDER') {
+          buttonsHtml = `
+            <div class="card-actions">
+              <button class="btn btn-danger" onclick="onSendReminder()">Relancer le locataire</button>
+            </div>
+          `;
+        } else if (act.actionType === 'DOWNLOAD_LRAR') {
+          buttonsHtml = `
+            <div class="card-actions">
+              <button class="btn btn-danger" onclick="alert('Génération de la Mise en Demeure LRAR officielle selon les clauses du bail...')">Télécharger la Mise en Demeure LRAR</button>
+            </div>
+          `;
+        } else if (act.actionType === 'CLAIM_INSURANCE') {
+          buttonsHtml = `
+            <div class="card-actions">
+              <button class="btn btn-danger" onclick="alert('Dossier de déclaration de sinistre pré-rempli pour ${activeProp.gliProvider || 'GLI/Visale'}')">Déclarer le sinistre</button>
+            </div>
+          `;
+        } else {
+          buttonsHtml = `
+            <div class="card-actions">
+              <button class="btn btn-teal" onclick="alert('Action enregistrée : ${act.title}')">Traiter</button>
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div class="card-top">
+            <span class="badge ${badgeClass}">${badgeLabel}</span>
+            <span style="font-size: 11px; color: var(--text-muted);">${activeProp.tenantName}</span>
+          </div>
+          <div class="card-title">${act.title}</div>
+          <div class="card-desc">${act.description}</div>
+          ${buttonsHtml}
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    // Gestion de l'encaissement et impayé
+    window.onRentPaid = () => {
+      const activeProp = engine.getActiveProperty();
+      const currentRent = engine.getCurrentRent(activeProp.id);
+      if (currentRent) {
+        engine.validateRent(currentRent.id);
+        renderCards();
+      }
+    };
+
+    window.onRentUnpaid = () => {
+      const activeProp = engine.getActiveProperty();
+      const currentRent = engine.getCurrentRent(activeProp.id);
+      if (currentRent) {
+        engine.markLate(currentRent.id, "LATE_J10");
+        renderCards();
+      }
+    };
+
+    window.onSendReminder = () => {
+      const activeProp = engine.getActiveProperty();
+      const currentRent = engine.getCurrentRent(activeProp.id);
+      const text = `Bonjour ${activeProp.tenantName}, sauf erreur de ma part, le loyer de ${currentRent.month} (${currentRent.total} €) pour votre logement au ${activeProp.address} ne nous est pas parvenu. Merci de procéder au virement. Cordialement.`;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text);
+        alert("Modèle de relance copié dans le presse-papier !\n\n" + text);
+      } else {
+        alert(text);
+      }
+    };
+
+    // Gestion du Tunnel d'onboarding 6 étapes
+    window.openTunnel = () => {
+      currentStep = 1;
+      updateStepView();
+      document.getElementById('onboarding-modal').classList.remove('hidden');
+    };
+
+    document.getElementById('btn-open-tunnel').onclick = window.openTunnel;
+    document.getElementById('btn-close-tunnel').onclick = () => {
+      document.getElementById('onboarding-modal').classList.add('hidden');
+    };
+
+    function updateStepView() {
+      document.getElementById('current-step-num').textContent = currentStep;
+      document.getElementById('tunnel-progress').style.width = `${(currentStep / 6) * 100}%`;
+
+      for (let i = 1; i <= 6; i++) {
+        const el = document.getElementById(`step-${i}`);
+        if (el) el.classList.toggle('hidden', i !== currentStep);
+      }
+
+      document.getElementById('btn-tunnel-prev').style.display = currentStep > 1 ? 'block' : 'none';
+      const nextBtn = document.getElementById('btn-tunnel-next');
+      nextBtn.textContent = currentStep === 6 ? 'Terminer & Activer' : 'Suivant →';
+    }
+
+    document.getElementById('btn-tunnel-prev').onclick = () => {
+      if (currentStep > 1) {
+        currentStep--;
+        updateStepView();
+      }
+    };
+
+    document.getElementById('btn-tunnel-next').onclick = () => {
+      if (currentStep === 1) {
+        const name = document.getElementById('input-name').value.trim();
+        const address = document.getElementById('input-address').value.trim();
+        if (!name || !address) {
+          alert("Veuillez renseigner le nom et l'adresse du bien.");
+          return;
+        }
+      }
+
+      if (currentStep < 6) {
+        currentStep++;
+        updateStepView();
+      } else {
+        // Enregistrement final du bien
+        const newProperty = {
+          id: "prop_" + Date.now(),
+          name: document.getElementById('input-name').value.trim() || "Nouveau bien",
+          address: document.getElementById('input-address').value.trim(),
+          postalCode: document.getElementById('input-cp').value.trim(),
+          city: document.getElementById('input-city').value.trim(),
+          leaseType: selectedLease,
+          leaseDurationYears: selectedLease === 'vide' ? 3 : 1,
+          chargesMode: selectedCharges,
+          rentExcl: parseFloat(document.getElementById('input-rent-hc').value) || 1000,
+          charges: parseFloat(document.getElementById('input-charges').value) || 50,
+          leaseStartDate: document.getElementById('input-lease-date').value,
+          irlBaseQuarter: document.getElementById('input-irl-quarter').value,
+          irlBaseValue: parseFloat(document.getElementById('input-irl-val').value) || 144,
+          dpeRating: document.getElementById('select-dpe').value,
+          pnoExpiryDate: document.getElementById('input-pno-date').value,
+          hasGli: document.getElementById('select-gli').value !== 'Aucune',
+          gliProvider: document.getElementById('select-gli').value,
+          hasGasHeating: document.getElementById('switch-gas').checked,
+          hasChimney: document.getElementById('switch-chimney').checked,
+          tenantName: document.getElementById('input-tenant-name').value.trim() || "Nouveau locataire",
+          tenantPhone: document.getElementById('input-tenant-phone').value.trim(),
+          tenantEmail: document.getElementById('input-tenant-email').value.trim(),
+          tenantInsuranceExpiry: new Date(Date.now() + 365*24*3600*1000).toISOString().split('T')[0]
+        };
+
+        engine.properties.push(newProperty);
+        engine.currentPropertyIndex = engine.properties.length - 1;
+
+        // Appel de loyer initial
+        engine.rents.push({
+          id: `rent_${newProperty.id}_initial`,
+          propertyId: newProperty.id,
+          month: "Mars",
+          year: 2025,
+          total: newProperty.rentExcl + newProperty.charges,
+          status: "PENDING",
+          paymentMethod: "Virement bancaire"
+        });
+
+        engine.save();
+        document.getElementById('onboarding-modal').classList.add('hidden');
+        renderPropertySelect();
+        renderCards();
+      }
+    };
+
+    document.getElementById('property-select').onchange = (e) => {
+      engine.currentPropertyIndex = parseInt(e.target.value, 10);
+      document.getElementById('active-prop-label').textContent = engine.getActiveProperty().name;
+      renderCards();
+    };
+
+    // Initialisation
+    renderPropertySelect();
+    renderCards();
+  </script>
+</body>
+</html>

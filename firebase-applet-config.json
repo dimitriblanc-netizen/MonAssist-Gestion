@@ -1,0 +1,12 @@
+{
+  "projectId": "monassist-gestion",
+  "appId": "1:682933982805:web:d3adc1e4a7171a3c43a6dc",
+  "apiKey": "AIzaSyDsRQX9C1Bwt6yu4YRCqvcQpTtY6C0Got4",
+  "authDomain": "monassist-gestion.firebaseapp.com",
+  "firestoreDatabaseId": "(default)",
+  "storageBucket": "monassist-gestion.firebasestorage.app",
+  "messagingSenderId": "682933982805",
+  "measurementId": "G-QBDRHNDFFX",
+  "oAuthClientId": "",
+  "recaptchaSiteKey": ""
+}
