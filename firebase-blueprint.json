@@ -1,0 +1,82 @@
+{
+  "entities": {
+    "Property": {
+      "title": "Property",
+      "description": "Bien immobilier en gestion locative",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "address": { "type": "string" },
+        "postalCode": { "type": "string" },
+        "city": { "type": "string" },
+        "rentExcl": { "type": "number" },
+        "charges": { "type": "number" },
+        "tenantName": { "type": "string" },
+        "tenantEmail": { "type": "string" }
+      },
+      "required": ["id", "name", "rentExcl", "charges"]
+    },
+    "RentRecord": {
+      "title": "RentRecord",
+      "description": "Appel de loyer mensuel et état de paiement",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "propertyId": { "type": "string" },
+        "month": { "type": "string" },
+        "year": { "type": "number" },
+        "total": { "type": "number" },
+        "status": { "type": "string" }
+      },
+      "required": ["id", "propertyId", "month", "year", "total", "status"]
+    },
+    "ExpenseRecord": {
+      "title": "ExpenseRecord",
+      "description": "Dépense ou charge foncière déductible",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "propertyId": { "type": "string" },
+        "date": { "type": "string" },
+        "label": { "type": "string" },
+        "amount": { "type": "number" },
+        "category": { "type": "string" }
+      },
+      "required": ["id", "propertyId", "amount", "category"]
+    },
+    "DossierDocument": {
+      "title": "DossierDocument",
+      "description": "Document sécurisé dans le coffre-fort numérique du bailleur",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "propertyId": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "fileName": { "type": "string" },
+        "uploadedAt": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["id", "propertyId", "title", "category", "fileName", "uploadedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/properties/{propertyId}": {
+      "schema": "Property",
+      "description": "Biens locatifs isolés du bailleur connecté"
+    },
+    "/users/{userId}/rents/{rentId}": {
+      "schema": "RentRecord",
+      "description": "Pointage des loyers isolés du bailleur connecté"
+    },
+    "/users/{userId}/expenses/{expenseId}": {
+      "schema": "ExpenseRecord",
+      "description": "Dépenses fiscales isolées du bailleur connecté"
+    },
+    "/users/{userId}/documents/{docId}": {
+      "schema": "DossierDocument",
+      "description": "Pièces et attestations du coffre-fort numérique isolées du bailleur"
+    }
+  }
+}

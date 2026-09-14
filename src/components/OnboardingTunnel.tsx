@@ -1,638 +1,976 @@
-import React, { useState } from 'react';
-import { Property, LeaseType, ChargesMode, DpeRating } from '../types';
+import React, { useState, useEffect } from 'react';
+import { Property, LeaseType, DpeRating, TenantInfo } from '../types';
 import { 
   Building2, 
-  MapPin, 
-  FileCheck, 
-  Euro, 
-  Calendar, 
-  Shield, 
   User, 
-  ArrowRight, 
-  ArrowLeft, 
+  Users, 
+  Plus, 
+  Trash2, 
+  ChevronDown, 
+  ChevronUp, 
+  ShieldCheck, 
   Check, 
-  X,
-  Sparkles
+  X, 
+  Sparkles, 
+  Zap, 
+  Info,
+  TrendingUp,
+  KeyRound,
+  FileCheck
 } from 'lucide-react';
 import { AppLogo } from './AppLogo';
 
 interface OnboardingTunnelProps {
   onClose: () => void;
   onComplete: (property: Property) => void;
+  initialProperty?: Property | null;
 }
 
 export const OnboardingTunnel: React.FC<OnboardingTunnelProps> = ({
   onClose,
-  onComplete
+  onComplete,
+  initialProperty
 }) => {
-  const [step, setStep] = useState<number>(1);
-  const totalSteps = 6;
+  const isEditing = !!initialProperty;
 
-  // Step 1: Adresse & Identité
-  const [name, setName] = useState('');
-  const [address, setAddress] = useState('');
-  const [postalCode, setPostalCode] = useState('75011');
-  const [city, setCity] = useState('Paris');
-  const [surface, setSurface] = useState<number>(45);
-  const [rooms, setRooms] = useState<number>(2);
+  // 1. Essentiels du bien
+  const [name, setName] = useState(initialProperty?.name || '');
+  const [leaseType, setLeaseType] = useState<LeaseType>(initialProperty?.leaseType || 'meuble');
+  const [rentExcl, setRentExcl] = useState<number | ''>(
+    initialProperty ? initialProperty.rentExcl : 850
+  );
+  const [charges, setCharges] = useState<number | ''>(
+    initialProperty ? initialProperty.charges : 70
+  );
 
-  // Step 2: Type de bail
-  const [leaseType, setLeaseType] = useState<LeaseType>('meuble');
-  // Déductions automatiques :
-  // Meublé = 1 an, préavis locataire 1 mois
-  // Vide = 3 ans, préavis locataire 3 mois (ou 1 mois si zone tendue)
+  // 2. Caution / Dépôt de garantie intelligent (Loi ALUR)
+  // Meublé = 2x loyer HC | Vide = 1x loyer HC
+  const calculateDefaultDeposit = (type: LeaseType, rent: number | '') => {
+    const numericRent = typeof rent === 'number' ? rent : 0;
+    return type === 'meuble' ? numericRent * 2 : numericRent;
+  };
 
-  // Step 3: Finances
-  const [rentExcl, setRentExcl] = useState<number>(1200);
-  const [charges, setCharges] = useState<number>(100);
-  const [chargesMode, setChargesMode] = useState<ChargesMode>('provisions');
-  const [deposit, setDeposit] = useState<number>(2400);
+  const [deposit, setDeposit] = useState<number | ''>(() => {
+    if (initialProperty && initialProperty.deposit !== undefined) {
+      return initialProperty.deposit;
+    }
+    return 1700; // 850 * 2
+  });
+  const [isDepositManuallySet, setIsDepositManuallySet] = useState(!!initialProperty?.deposit);
 
-  // Step 4: Dates clés & IRL
-  const [leaseStartDate, setLeaseStartDate] = useState(new Date().toISOString().split('T')[0]);
-  const [irlQuarter, setIrlQuarter] = useState('T3 2024');
-  const [irlIndex, setIrlIndex] = useState<number>(144.51);
+  // Mettre à jour automatiquement la caution si le type de bail ou le loyer change (sauf si modifié manuellement)
+  const handleLeaseTypeChange = (newType: LeaseType) => {
+    setLeaseType(newType);
+    if (!isDepositManuallySet) {
+      setDeposit(calculateDefaultDeposit(newType, rentExcl));
+    }
+  };
 
-  // Step 5: Conformité & Technique
-  const [dpeRating, setDpeRating] = useState<DpeRating>('D');
+  const handleRentChange = (newRent: number | '') => {
+    setRentExcl(newRent);
+    if (!isDepositManuallySet) {
+      setDeposit(calculateDefaultDeposit(leaseType, newRent));
+    }
+  };
+
+  // 3. Locataire & Colocation
+  const [isColocation, setIsColocation] = useState<boolean>(
+    initialProperty?.isColocation || (initialProperty?.tenants && initialProperty.tenants.length > 1) || false
+  );
+  const [tenantName, setTenantName] = useState(initialProperty?.tenantName || '');
+  const [tenantEmail, setTenantEmail] = useState(initialProperty?.tenantEmail || '');
+  const [tenantPhone, setTenantPhone] = useState(initialProperty?.tenantPhone || '');
+
+  // Liste des colocataires
+  const [colocataires, setColocataires] = useState<TenantInfo[]>(() => {
+    if (initialProperty?.tenants && initialProperty.tenants.length > 0) {
+      return initialProperty.tenants;
+    }
+    return [
+      { id: '1', name: '', sharePercent: 50, email: '', phone: '' },
+      { id: '2', name: '', sharePercent: 50, email: '', phone: '' }
+    ];
+  });
+
+  const handleAddColoc = () => {
+    const nextId = String(Date.now());
+    const count = colocataires.length + 1;
+    const defaultShare = Math.round(100 / count);
+    setColocataires(prev => [
+      ...prev.map(c => ({ ...c, sharePercent: defaultShare })),
+      { id: nextId, name: '', sharePercent: defaultShare, email: '', phone: '' }
+    ]);
+  };
+
+  const handleRemoveColoc = (id: string) => {
+    if (colocataires.length <= 1) return;
+    const updated = colocataires.filter(c => c.id !== id);
+    const defaultShare = Math.round(100 / updated.length);
+    setColocataires(updated.map(c => ({ ...c, sharePercent: defaultShare })));
+  };
+
+  const handleUpdateColoc = (id: string, field: keyof TenantInfo, value: any) => {
+    setColocataires(prev => prev.map(c => c.id === id ? { ...c, [field]: value } : c));
+  };
+
+  // 4. Section déroulante : Détails facultatifs (sans blocage !)
+  const [showOptionalDetails, setShowOptionalDetails] = useState<boolean>(false);
+  const [address, setAddress] = useState(initialProperty?.address || '');
+  const [city, setCity] = useState(initialProperty?.city || 'Paris');
+  const [postalCode, setPostalCode] = useState(initialProperty?.postalCode || '75011');
+  const [surface, setSurface] = useState<number | ''>(initialProperty?.surface || 32);
+  const [rooms, setRooms] = useState<number | ''>(initialProperty?.rooms || 2);
+  const [floor, setFloor] = useState(initialProperty?.floor || '');
+
+  // PNO : Tacite reconduction par défaut (souvent le cas en réalité)
+  const [pnoTacitRenewal, setPnoTacitRenewal] = useState<boolean>(
+    initialProperty?.pnoTacitRenewal ?? true
+  );
+  const [pnoInsurer, setPnoInsurer] = useState(initialProperty?.pnoInsurer || '');
   const [pnoExpiryDate, setPnoExpiryDate] = useState(
-    new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString().split('T')[0]
+    initialProperty?.pnoExpiryDate || new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString().split('T')[0]
   );
-  const [hasGli, setHasGli] = useState<boolean>(true);
-  const [gliProvider, setGliProvider] = useState<string>('Visale');
-  const [hasGasHeating, setHasGasHeating] = useState<boolean>(false);
-  const [hasChimney, setHasChimney] = useState<boolean>(false);
 
-  // Step 6: Répertoire Locataire
-  const [tenantName, setTenantName] = useState('');
-  const [tenantEmail, setTenantEmail] = useState('');
-  const [tenantPhone, setTenantPhone] = useState('');
-  const [tenantInsuranceExpiry, setTenantInsuranceExpiry] = useState(
-    new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString().split('T')[0]
+  // DPE & IRL
+  const [dpeRating, setDpeRating] = useState<DpeRating>(initialProperty?.dpeRating || 'D');
+  const [leaseStartDate, setLeaseStartDate] = useState(
+    initialProperty?.leaseStartDate || new Date().toISOString().split('T')[0]
   );
-  const [guarantor, setGuarantor] = useState('Garantie Visale (Action Logement)');
+  const [hasRevisionClause, setHasRevisionClause] = useState<boolean>(
+    initialProperty?.hasRevisionClause ?? true
+  );
+  const [irlReferenceQuarter, setIrlReferenceQuarter] = useState<string>(
+    initialProperty?.irlReferenceQuarter || 'T3'
+  );
+  const [lastRevisionDate, setLastRevisionDate] = useState<string>(
+    initialProperty?.lastRevisionDate || ''
+  );
+  const [guarantor, setGuarantor] = useState(initialProperty?.guarantor || '');
 
-  const handleNext = () => {
-    if (step < totalSteps) setStep(step + 1);
-  };
+  // Total calculé
+  const totalRent = (typeof rentExcl === 'number' ? rentExcl : 0) + (typeof charges === 'number' ? charges : 0);
 
-  const handlePrev = () => {
-    if (step > 1) setStep(step - 1);
-  };
-
-  const handleFinish = (e: React.FormEvent) => {
+  // Soumission Ultra Rapide
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !address.trim() || !tenantName.trim()) return;
+    
+    // Le nom du bien est le seul pré-requis direct. S'il est vide, on utilise l'adresse ou un nom par défaut
+    const finalName = name.trim() || address.trim() || 'Logement locatif';
+    const finalAddress = address.trim() || finalName;
 
-    const newProp: Property = {
-      id: `prop_${Date.now()}`,
-      name: name.trim(),
-      address: address.trim(),
-      postalCode: postalCode.trim(),
-      city: city.trim(),
-      isTenseZone: true, // Paris & Petite Couronne
-      surface: Number(surface),
-      rooms: Number(rooms),
+    let finalTenantName = '';
+    let finalTenants: TenantInfo[] = [];
+
+    if (isColocation) {
+      const validColocs = colocataires.filter(c => c.name.trim().length > 0);
+      if (validColocs.length > 0) {
+        finalTenants = validColocs;
+        finalTenantName = validColocs.map(c => c.name.trim()).join(' & ');
+      } else {
+        finalTenants = [{ id: '1', name: 'Colocation (en attente des noms)' }];
+        finalTenantName = 'Colocation en place';
+      }
+    } else {
+      finalTenantName = tenantName.trim() || 'Locataire en place';
+      finalTenants = [{
+        id: '1',
+        name: finalTenantName,
+        email: tenantEmail.trim() || undefined,
+        phone: tenantPhone.trim() || undefined
+      }];
+    }
+
+    const newProperty: Property = {
+      id: initialProperty?.id || `prop_${Date.now()}`,
+      name: finalName,
+      address: finalAddress,
+      city: city.trim() || 'Paris',
+      postalCode: postalCode.trim() || '75000',
+      isTenseZone: true,
+      surface: surface ? Number(surface) : 30,
+      rooms: rooms ? Number(rooms) : 2,
+      floor: floor.trim() || undefined,
+
       leaseType,
+      type: leaseType,
       leaseStartDate,
       leaseDurationYears: leaseType === 'vide' ? 3 : 1,
-      chargesMode,
-      rentExcl: Number(rentExcl),
-      charges: Number(charges),
-      deposit: Number(deposit),
-      irlBaseQuarter: irlQuarter,
-      irlBaseValue: Number(irlIndex),
-      dpeRating,
-      pnoExpiryDate,
-      hasGli,
-      gliProvider: hasGli ? gliProvider : undefined,
-      hasGasHeating,
-      hasChimney,
-      tenantName: tenantName.trim(),
-      tenantEmail: tenantEmail.trim(),
-      tenantPhone: tenantPhone.trim(),
-      tenantInsuranceExpiry,
+      chargesMode: 'provisions',
+
+      rentExcl: Number(rentExcl) || 0,
+      charges: Number(charges) || 0,
+      deposit: deposit !== '' ? Number(deposit) : calculateDefaultDeposit(leaseType, rentExcl),
+
+      // IRL
+      hasRevisionClause,
+      irlReferenceQuarter,
+      lastRevisionDate: lastRevisionDate.trim() || undefined,
+      irlBaseQuarter: initialProperty?.irlBaseQuarter || `${irlReferenceQuarter} 2024`,
+      irlBaseValue: initialProperty?.irlBaseValue || 144.51,
+      irlQuarter: initialProperty?.irlQuarter || `${irlReferenceQuarter} 2024`,
+      irlIndex: initialProperty?.irlIndex || 144.51,
+
+      // Conformité
+      dpeRating: dpeRating || 'D',
+      pnoTacitRenewal,
+      pnoInsurer: pnoInsurer.trim() || undefined,
+      pnoExpiryDate: pnoTacitRenewal ? undefined : pnoExpiryDate,
+      hasGli: !!guarantor.toLowerCase().includes('gli') || !!guarantor.toLowerCase().includes('visale'),
+      gliProvider: guarantor.trim() || undefined,
+      hasGasHeating: false,
+      hasChimney: false,
+
+      // Locataires
+      tenantName: finalTenantName,
+      tenantEmail: !isColocation ? (tenantEmail.trim() || undefined) : finalTenants[0]?.email,
+      tenantPhone: !isColocation ? (tenantPhone.trim() || undefined) : finalTenants[0]?.phone,
+      tenantInsuranceExpiry: initialProperty?.tenantInsuranceExpiry,
+      insuranceValidUntil: initialProperty?.insuranceValidUntil,
       guarantor: guarantor.trim() || undefined,
-      createdAt: new Date().toISOString()
+      isColocation,
+      tenants: finalTenants,
+
+      createdAt: initialProperty?.createdAt || new Date().toISOString()
     };
 
-    onComplete(newProp);
+    onComplete(newProperty);
+    onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00434A]/80 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
       <div 
         id="onboarding-tunnel-card"
-        className="bg-[#FBF7EE] rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-300 flex flex-col"
+        className="bg-[#FBF7EE] rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-hidden shadow-2xl border border-slate-200 flex flex-col my-4"
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Progress header */}
-        <div className="p-4 sm:p-6 border-b border-slate-200 bg-white/70 backdrop-blur-xs flex items-center justify-between rounded-t-3xl">
-          <div className="flex items-center space-x-3">
-            <AppLogo className="w-10 h-10 flex-shrink-0" />
-            <div className="space-y-1">
-              <span className="text-[11px] uppercase tracking-widest text-[#00434A] font-bold">
-                Étape {step} sur {totalSteps} • Configuration du bien
-              </span>
-              <div className="w-36 sm:w-48 h-2 bg-slate-200 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-[#00434A] transition-all duration-300 rounded-full"
-                  style={{ width: `${(step / totalSteps) * 100}%` }}
-                />
-              </div>
-            </div>
-          </div>
+        {/* Header : Clair & Rassurant */}
+        <div className="bg-[#00434A] text-white p-5 sm:p-6 relative">
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer"
+            className="absolute top-4 right-4 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition cursor-pointer"
+            aria-label="Fermer"
           >
             <X className="w-5 h-5" />
           </button>
+
+          <div className="flex items-center space-x-3.5 pr-8">
+            <AppLogo className="w-12 h-12 bg-white rounded-2xl p-1 shadow-md flex-shrink-0" />
+            <div>
+              <div className="flex items-center space-x-2">
+                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-emerald-400 text-[#00434A] tracking-wider">
+                  ⚡ Création Express
+                </span>
+                <span className="text-[10px] text-teal-200 font-semibold flex items-center">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-pulse" />
+                  Zéro blocage
+                </span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white mt-1">
+                {isEditing ? 'Modifier la fiche du bien' : 'Ajouter un bien en location'}
+              </h3>
+              <p className="text-xs text-teal-100 font-medium mt-0.5">
+                Renseignez l'essentiel en 30 secondes. Vous pourrez compléter le reste plus tard à votre rythme.
+              </p>
+            </div>
+          </div>
         </div>
 
-        {/* Step Content */}
-        <div className="p-6 sm:p-8 flex-1">
-          {/* Étape 1 : Adresse & Identité */}
-          {step === 1 && (
-            <div className="space-y-5">
-              <div className="space-y-1">
-                <h3 className="text-2xl font-extrabold text-[#00434A]">
-                  Où se situe le bien loué ?
-                </h3>
-                <p className="text-xs text-slate-600">
-                  Identifiez le logement mis en location par Dryos à Paris ou Petite Couronne.
-                </p>
+        {/* Scrollable Form Body */}
+        <form onSubmit={handleSubmit} className="overflow-y-auto p-5 sm:p-6 space-y-6 flex-1">
+          
+          {/* SECTION 1: LE LOGEMENT & LE TYPE DE BAIL */}
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs space-y-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-7 h-7 rounded-xl bg-teal-50 text-[#00434A] flex items-center justify-center font-bold text-xs">
+                1
               </div>
-
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Nom usuel du bien *
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Ex: 2 Pièces Voltaire"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full text-sm font-semibold p-3 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-[#00434A] focus:outline-none"
-                    autoFocus
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Adresse postale *
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Ex: 42 Rue Léon Frot"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    className="w-full text-sm p-3 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-[#00434A] focus:outline-none"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Code Postal *</label>
-                    <input
-                      type="text"
-                      placeholder="75011"
-                      value={postalCode}
-                      onChange={(e) => setPostalCode(e.target.value)}
-                      className="w-full text-sm p-3 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-[#00434A]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Ville *</label>
-                    <input
-                      type="text"
-                      placeholder="Paris"
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      className="w-full text-sm p-3 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-[#00434A]"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Surface (m²)</label>
-                    <input
-                      type="number"
-                      value={surface}
-                      onChange={(e) => setSurface(parseFloat(e.target.value) || 0)}
-                      className="w-full text-sm p-3 rounded-xl border border-slate-300 bg-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Pièces</label>
-                    <input
-                      type="number"
-                      value={rooms}
-                      onChange={(e) => setRooms(parseInt(e.target.value) || 1)}
-                      className="w-full text-sm p-3 rounded-xl border border-slate-300 bg-white"
-                    />
-                  </div>
-                </div>
+              <div>
+                <h4 className="text-sm font-black text-[#00434A]">
+                  Le Logement
+                </h4>
+                <p className="text-[11px] text-slate-500">
+                  Donnez un nom ou une adresse pour identifier votre bien
+                </p>
               </div>
             </div>
-          )}
 
-          {/* Étape 2 : Type de bail */}
-          {step === 2 && (
-            <div className="space-y-5">
-              <div className="space-y-1">
-                <h3 className="text-2xl font-extrabold text-[#00434A]">
-                  Quel est le type de bail signé ?
-                </h3>
-                <p className="text-xs text-slate-600">
-                  L'application déduit automatiquement les durées légales et les fenêtres de congé.
-                </p>
-              </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-800 mb-1.5">
+                Nom ou adresse du bien <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="Ex: Studio Rue Oberkampf, 2P Voltaire, T3 Belleville..."
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full text-sm font-semibold p-3 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-[#00434A] focus:border-[#00434A] focus:outline-none transition shadow-xs"
+                autoFocus
+              />
+            </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+            {/* Type de bail : Gros sélecteurs visuels */}
+            <div>
+              <label className="block text-xs font-bold text-slate-800 mb-1.5">
+                Type de location
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   type="button"
-                  onClick={() => setLeaseType('meuble')}
-                  className={`p-5 rounded-2xl border-2 text-left transition cursor-pointer flex flex-col justify-between space-y-3 ${
+                  onClick={() => handleLeaseTypeChange('meuble')}
+                  className={`p-3.5 rounded-xl border-2 text-left transition flex items-start space-x-3 cursor-pointer ${
                     leaseType === 'meuble'
-                      ? 'border-[#00434A] bg-white shadow-md'
-                      : 'border-slate-300 bg-white/60 hover:bg-white'
+                      ? 'border-[#00434A] bg-teal-50/60 ring-2 ring-[#00434A]/20'
+                      : 'border-slate-200 bg-white hover:border-slate-300'
                   }`}
                 >
-                  <div className="space-y-1">
-                    <span className="text-xs font-bold text-[#00434A] uppercase tracking-wider block">Option 1</span>
-                    <h4 className="text-lg font-bold text-slate-900">Location Meublée</h4>
-                    <p className="text-xs text-slate-500">
-                      Bail de 1 an renouvelable (ou 9 mois étudiant). Dépôt max : 2 mois de loyer HC.
+                  <span className="text-2xl">🛋️</span>
+                  <div>
+                    <div className="flex items-center space-x-1.5">
+                      <span className="text-xs font-extrabold text-slate-900">Meublé</span>
+                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-teal-100 text-teal-800">
+                        Bail 1 an
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Caution légale ALUR : <strong className="text-slate-800">2 mois de loyer HC</strong>
                     </p>
-                  </div>
-                  <div className="text-[11px] text-teal-800 bg-teal-50 px-2.5 py-1 rounded-md">
-                    ✓ Préavis locataire : 1 mois<br />
-                    ✓ Préavis bailleur : 3 mois
                   </div>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => setLeaseType('vide')}
-                  className={`p-5 rounded-2xl border-2 text-left transition cursor-pointer flex flex-col justify-between space-y-3 ${
+                  onClick={() => handleLeaseTypeChange('vide')}
+                  className={`p-3.5 rounded-xl border-2 text-left transition flex items-start space-x-3 cursor-pointer ${
                     leaseType === 'vide'
-                      ? 'border-[#00434A] bg-white shadow-md'
-                      : 'border-slate-300 bg-white/60 hover:bg-white'
+                      ? 'border-[#00434A] bg-teal-50/60 ring-2 ring-[#00434A]/20'
+                      : 'border-slate-200 bg-white hover:border-slate-300'
                   }`}
                 >
-                  <div className="space-y-1">
-                    <span className="text-xs font-bold text-[#00434A] uppercase tracking-wider block">Option 2</span>
-                    <h4 className="text-lg font-bold text-slate-900">Location Nue / Vide</h4>
-                    <p className="text-xs text-slate-500">
-                      Bail classique de 3 ans. Dépôt max : 1 mois de loyer HC.
+                  <span className="text-2xl">🏢</span>
+                  <div>
+                    <div className="flex items-center space-x-1.5">
+                      <span className="text-xs font-extrabold text-slate-900">Nu / Non meublé</span>
+                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-blue-800">
+                        Bail 3 ans
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Caution légale ALUR : <strong className="text-slate-800">1 mois de loyer HC</strong>
                     </p>
-                  </div>
-                  <div className="text-[11px] text-teal-800 bg-teal-50 px-2.5 py-1 rounded-md">
-                    ✓ Préavis locataire : 1 mois (zone tendue)<br />
-                    ✓ Préavis bailleur : 6 mois
                   </div>
                 </button>
               </div>
             </div>
-          )}
+          </div>
 
-          {/* Étape 3 : Finances & Charges */}
-          {step === 3 && (
-            <div className="space-y-5">
-              <div className="space-y-1">
-                <h3 className="text-2xl font-extrabold text-[#00434A]">
-                  Conditions financières du bail
-                </h3>
-                <p className="text-xs text-slate-600">
-                  Ces montants seront repris pour chaque quittance et pour la déclaration fiscale.
+          {/* SECTION 2: LE LOYER & LA CAUTION INTELLIGENTE */}
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs space-y-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-7 h-7 rounded-xl bg-teal-50 text-[#00434A] flex items-center justify-center font-bold text-xs">
+                2
+              </div>
+              <div>
+                <h4 className="text-sm font-black text-[#00434A]">
+                  Loyer & Caution
+                </h4>
+                <p className="text-[11px] text-slate-500">
+                  La caution est calculée automatiquement selon la Loi ALUR (2 mois si meublé, 1 mois si vide)
                 </p>
               </div>
+            </div>
 
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Loyer nu hors charges (€) *
-                    </label>
-                    <input
-                      type="number"
-                      value={rentExcl}
-                      onChange={(e) => setRentExcl(parseFloat(e.target.value) || 0)}
-                      className="w-full text-base font-bold p-3 rounded-xl border border-slate-300 bg-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Charges (€/mois) *
-                    </label>
-                    <input
-                      type="number"
-                      value={charges}
-                      onChange={(e) => setCharges(parseFloat(e.target.value) || 0)}
-                      className="w-full text-base font-bold p-3 rounded-xl border border-slate-300 bg-white"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Régime des charges locatives
-                  </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setChargesMode('provisions')}
-                      className={`p-3 rounded-xl border text-left text-xs font-semibold cursor-pointer ${
-                        chargesMode === 'provisions' ? 'bg-[#00434A] text-white border-[#00434A]' : 'bg-white border-slate-300 text-slate-700'
-                      }`}
-                    >
-                      Provisions (avec régularisation annuelle)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setChargesMode('forfait')}
-                      className={`p-3 rounded-xl border text-left text-xs font-semibold cursor-pointer ${
-                        chargesMode === 'forfait' ? 'bg-[#00434A] text-white border-[#00434A]' : 'bg-white border-slate-300 text-slate-700'
-                      }`}
-                    >
-                      Forfait fixe (sans régularisation)
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Dépôt de garantie versé à l'entrée (€)
-                  </label>
+            {/* Loyer HC + Charges */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-800 mb-1">
+                  Loyer mensuel hors charges (€) <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
                   <input
                     type="number"
-                    value={deposit}
-                    onChange={(e) => setDeposit(parseFloat(e.target.value) || 0)}
-                    className="w-full text-sm p-3 rounded-xl border border-slate-300 bg-white"
+                    required
+                    min="0"
+                    placeholder="850"
+                    value={rentExcl}
+                    onChange={(e) => handleRentChange(e.target.value === '' ? '' : Number(e.target.value))}
+                    className="w-full text-sm font-bold p-3 pr-8 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-[#00434A] focus:outline-none"
                   />
-                  <span className="text-[11px] text-slate-400 mt-1 block">
-                    Conservé par vous (rappel : l'app ne touche jamais aux fonds, 100% déclaratif).
-                  </span>
+                  <span className="absolute right-3 top-3 text-slate-400 font-bold text-xs">€</span>
                 </div>
               </div>
-            </div>
-          )}
 
-          {/* Étape 4 : Dates clés & Indice IRL */}
-          {step === 4 && (
-            <div className="space-y-5">
-              <div className="space-y-1">
-                <h3 className="text-2xl font-extrabold text-[#00434A]">
-                  Dates clés & Indice de Référence (IRL)
-                </h3>
-                <p className="text-xs text-slate-600">
-                  L'application calculera automatiquement la date anniversaire pour la révision de loyer.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Date de prise d'effet du bail *
-                  </label>
+              <div>
+                <label className="block text-xs font-bold text-slate-800 mb-1">
+                  Provisions pour charges (€)
+                </label>
+                <div className="relative">
                   <input
-                    type="date"
-                    value={leaseStartDate}
-                    onChange={(e) => setLeaseStartDate(e.target.value)}
-                    className="w-full text-sm p-3 rounded-xl border border-slate-300 bg-white"
+                    type="number"
+                    min="0"
+                    placeholder="70"
+                    value={charges}
+                    onChange={(e) => setCharges(e.target.value === '' ? '' : Number(e.target.value))}
+                    className="w-full text-sm font-bold p-3 pr-8 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-[#00434A] focus:outline-none"
                   />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Trimestre IRL de référence (Bail)
-                    </label>
-                    <input
-                      type="text"
-                      value={irlQuarter}
-                      onChange={(e) => setIrlQuarter(e.target.value)}
-                      placeholder="Ex: T3 2024"
-                      className="w-full text-sm p-3 rounded-xl border border-slate-300 bg-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Valeur de l'indice
-                    </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={irlIndex}
-                      onChange={(e) => setIrlIndex(parseFloat(e.target.value) || 0)}
-                      className="w-full text-sm p-3 rounded-xl border border-slate-300 bg-white"
-                    />
-                  </div>
+                  <span className="absolute right-3 top-3 text-slate-400 font-bold text-xs">€</span>
                 </div>
               </div>
             </div>
-          )}
 
-          {/* Étape 5 : Conformité, DPE & Garanties */}
-          {step === 5 && (
-            <div className="space-y-5">
-              <div className="space-y-1">
-                <h3 className="text-2xl font-extrabold text-[#00434A]">
-                  Conformité & Protections
-                </h3>
-                <p className="text-xs text-slate-600">
-                  Gestion des obligations légales (Loi Climat, PNO, GLI, chaudière).
-                </p>
+            {/* Total Mensuel Callout */}
+            <div className="p-3 bg-teal-50/70 border border-teal-200/80 rounded-xl flex items-center justify-between">
+              <span className="text-xs font-extrabold text-[#00434A] flex items-center space-x-1.5">
+                <span>Total appelé au locataire :</span>
+              </span>
+              <span className="text-base font-black text-[#00434A]">
+                {totalRent.toLocaleString('fr-FR')} € <span className="text-[11px] font-medium text-slate-600">/ mois CC</span>
+              </span>
+            </div>
+
+            {/* Caution Évidente avec boutons rapides */}
+            <div className="pt-1">
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
+                  <span>Dépôt de garantie (Caution)</span>
+                  <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800">
+                    {leaseType === 'meuble' ? '💡 Recommandé meublé : 2 mois' : '💡 Recommandé vide : 1 mois'}
+                  </span>
+                </label>
               </div>
 
-              <div className="space-y-4">
+              {/* Suggestions en 1 clic */}
+              <div className="flex flex-wrap gap-2 mb-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const val = (typeof rentExcl === 'number' ? rentExcl : 0) * 2;
+                    setDeposit(val);
+                    setIsDepositManuallySet(true);
+                  }}
+                  className={`text-xs px-2.5 py-1 rounded-lg border font-bold transition cursor-pointer ${
+                    deposit === (typeof rentExcl === 'number' ? rentExcl : 0) * 2
+                      ? 'bg-[#00434A] text-white border-[#00434A]'
+                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                  }`}
+                >
+                  2 mois ({((typeof rentExcl === 'number' ? rentExcl : 0) * 2).toLocaleString('fr-FR')} €)
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const val = (typeof rentExcl === 'number' ? rentExcl : 0);
+                    setDeposit(val);
+                    setIsDepositManuallySet(true);
+                  }}
+                  className={`text-xs px-2.5 py-1 rounded-lg border font-bold transition cursor-pointer ${
+                    deposit === (typeof rentExcl === 'number' ? rentExcl : 0)
+                      ? 'bg-[#00434A] text-white border-[#00434A]'
+                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                  }`}
+                >
+                  1 mois ({((typeof rentExcl === 'number' ? rentExcl : 0)).toLocaleString('fr-FR')} €)
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDeposit(0);
+                    setIsDepositManuallySet(true);
+                  }}
+                  className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition cursor-pointer ${
+                    deposit === 0
+                      ? 'bg-slate-800 text-white border-slate-800'
+                      : 'bg-slate-50 hover:bg-slate-100 text-slate-500 border-slate-200'
+                  }`}
+                >
+                  Sans caution (0 €)
+                </button>
+              </div>
+
+              <div className="relative">
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Montant du dépôt de garantie"
+                  value={deposit}
+                  onChange={(e) => {
+                    setDeposit(e.target.value === '' ? '' : Number(e.target.value));
+                    setIsDepositManuallySet(true);
+                  }}
+                  className="w-full text-sm font-semibold p-2.5 pr-8 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-[#00434A]"
+                />
+                <span className="absolute right-3 top-2.5 text-slate-400 font-bold text-xs">€</span>
+              </div>
+            </div>
+          </div>
+
+          {/* SECTION 3: LOCATAIRE & COLOCATION */}
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="w-7 h-7 rounded-xl bg-teal-50 text-[#00434A] flex items-center justify-center font-bold text-xs">
+                  3
+                </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Classe DPE (Diagnostic de Performance Énergétique)
-                  </label>
-                  <div className="grid grid-cols-7 gap-1.5 text-center text-xs font-bold">
-                    {(['A', 'B', 'C', 'D', 'E', 'F', 'G'] as DpeRating[]).map(letter => (
-                      <button
-                        key={letter}
-                        type="button"
-                        onClick={() => setDpeRating(letter)}
-                        className={`py-2 rounded-lg border transition cursor-pointer ${
-                          dpeRating === letter
-                            ? 'bg-[#00434A] text-white border-[#00434A] ring-2 ring-[#00434A]/30'
-                            : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
-                        }`}
-                      >
-                        {letter}
-                      </button>
-                    ))}
-                  </div>
-                  {(dpeRating === 'F' || dpeRating === 'G') && (
-                    <div className="mt-2 p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center space-x-2">
-                      <span>⚠️ <strong>Passoire thermique (Loi Climat) :</strong> La révision IRL sera automatiquement bloquée par l'application.</span>
-                    </div>
-                  )}
+                  <h4 className="text-sm font-black text-[#00434A]">
+                    Locataire(s) & Colocation
+                  </h4>
+                  <p className="text-[11px] text-slate-500">
+                    Prenez en compte plusieurs locataires ou une colocation en 1 clic
+                  </p>
                 </div>
+              </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Assurance PNO Propriétaire (Échéance)
-                    </label>
-                    <input
-                      type="date"
-                      value={pnoExpiryDate}
-                      onChange={(e) => setPnoExpiryDate(e.target.value)}
-                      className="w-full text-xs p-2.5 rounded-xl border border-slate-300 bg-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Garantie Loyers Impayés (GLI)
-                    </label>
-                    <select
-                      value={gliProvider}
-                      onChange={(e) => setGliProvider(e.target.value)}
-                      className="w-full text-xs p-2.5 rounded-xl border border-slate-300 bg-white"
-                    >
-                      <option value="Visale">Garantie Visale (Action Logement)</option>
-                      <option value="Galian">Assurance GLI (Galian / Autre)</option>
-                      <option value="Garant Physique">Garant physique caution solidaire</option>
-                      <option value="Aucune">Aucune garantie souscrite</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="space-y-2 pt-1">
-                  <label className="flex items-center space-x-2 text-xs font-medium text-slate-800 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={hasGasHeating}
-                      onChange={(e) => setHasGasHeating(e.target.checked)}
-                      className="rounded text-[#00434A] h-4 w-4"
-                    />
-                    <span>Chaudière gaz/fioul individuelle (Entretien annuel obligatoire)</span>
-                  </label>
-
-                  <label className="flex items-center space-x-2 text-xs font-medium text-slate-800 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={hasChimney}
-                      onChange={(e) => setHasChimney(e.target.checked)}
-                      className="rounded text-[#00434A] h-4 w-4"
-                    />
-                    <span>Cheminée fonctionnelle (Ramonage annuel obligatoire)</span>
-                  </label>
-                </div>
+              {/* Toggle Locataire unique vs Colocation */}
+              <div className="flex bg-slate-100 p-1 rounded-xl text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setIsColocation(false)}
+                  className={`px-3 py-1.5 rounded-lg transition flex items-center space-x-1.5 cursor-pointer ${
+                    !isColocation
+                      ? 'bg-white text-[#00434A] shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <User className="w-3.5 h-3.5" />
+                  <span>Seul</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsColocation(true)}
+                  className={`px-3 py-1.5 rounded-lg transition flex items-center space-x-1.5 cursor-pointer ${
+                    isColocation
+                      ? 'bg-[#00434A] text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Users className="w-3.5 h-3.5" />
+                  <span>Colocation</span>
+                </button>
               </div>
             </div>
-          )}
 
-          {/* Étape 6 : Répertoire Locataire */}
-          {step === 6 && (
-            <div className="space-y-5">
-              <div className="space-y-1">
-                <h3 className="text-2xl font-extrabold text-[#00434A]">
-                  Qui est votre locataire en place ?
-                </h3>
-                <p className="text-xs text-slate-600">
-                  Coordonnées stockées pour l'envoi des quittances et relances amiables.
-                </p>
-              </div>
-
+            {/* CAS 1 : LOCATAIRE UNIQUE */}
+            {!isColocation ? (
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Nom et Prénom du locataire *
+                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                    Prénom et Nom du locataire
                   </label>
                   <input
                     type="text"
-                    placeholder="Ex: Camille Rochefort"
+                    placeholder="Ex: Alexandre Martin"
                     value={tenantName}
                     onChange={(e) => setTenantName(e.target.value)}
-                    className="w-full text-sm font-semibold p-3 rounded-xl border border-slate-300 bg-white"
-                    required
+                    className="w-full text-sm font-semibold p-2.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-[#00434A]"
                   />
+                  <span className="text-[11px] text-slate-400 mt-1 block">
+                    (Si vous n'avez pas encore le nom exact, laissez vide : il sera noté « Locataire en place »)
+                  </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Email</label>
+                    <label className="block text-xs font-medium text-slate-700 mb-1">
+                      Email (facultatif)
+                    </label>
                     <input
                       type="email"
-                      placeholder="camille@email.com"
+                      placeholder="alexandre@gmail.com"
                       value={tenantEmail}
                       onChange={(e) => setTenantEmail(e.target.value)}
-                      className="w-full text-sm p-3 rounded-xl border border-slate-300 bg-white"
+                      className="w-full text-xs p-2.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-[#00434A]"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Téléphone mobile</label>
+                    <label className="block text-xs font-medium text-slate-700 mb-1">
+                      Téléphone (facultatif)
+                    </label>
                     <input
                       type="tel"
                       placeholder="06 12 34 56 78"
                       value={tenantPhone}
                       onChange={(e) => setTenantPhone(e.target.value)}
-                      className="w-full text-sm p-3 rounded-xl border border-slate-300 bg-white"
+                      className="w-full text-xs p-2.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-[#00434A]"
                     />
                   </div>
                 </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Échéance de l'assurance habitation locataire (MRH) *
-                  </label>
-                  <input
-                    type="date"
-                    value={tenantInsuranceExpiry}
-                    onChange={(e) => setTenantInsuranceExpiry(e.target.value)}
-                    className="w-full text-sm p-3 rounded-xl border border-slate-300 bg-white"
-                  />
-                  <span className="text-[11px] text-slate-500 mt-1 block">
-                    Un rappel vous sera envoyé 30 jours avant la date d'échéance pour réclamer la nouvelle attestation.
+              </div>
+            ) : (
+              /* CAS 2 : COLOCATION */
+              <div className="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-extrabold text-slate-800 flex items-center space-x-1.5">
+                    <Users className="w-4 h-4 text-teal-600" />
+                    <span>Liste des colocataires ({colocataires.length})</span>
                   </span>
+                  <button
+                    type="button"
+                    onClick={handleAddColoc}
+                    className="text-xs font-bold text-[#00434A] hover:text-teal-700 bg-white border border-slate-200 hover:bg-teal-50 px-2.5 py-1 rounded-lg transition flex items-center space-x-1 cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Ajouter un colocataire</span>
+                  </button>
+                </div>
+
+                <div className="space-y-2.5">
+                  {colocataires.map((coloc, idx) => (
+                    <div key={coloc.id} className="p-3 bg-white rounded-xl border border-slate-200 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-slate-700">
+                          Colocataire {idx + 1}
+                        </span>
+                        {colocataires.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveColoc(coloc.id)}
+                            className="text-rose-500 hover:text-rose-700 p-1 rounded hover:bg-rose-50 transition cursor-pointer"
+                            title="Supprimer ce colocataire"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <div className="sm:col-span-2">
+                          <input
+                            type="text"
+                            placeholder="Prénom & Nom"
+                            value={coloc.name}
+                            onChange={(e) => handleUpdateColoc(coloc.id, 'name', e.target.value)}
+                            className="w-full text-xs font-semibold p-2 rounded-lg border border-slate-300"
+                          />
+                        </div>
+                        <div>
+                          <div className="relative">
+                            <input
+                              type="number"
+                              placeholder="Quote-part"
+                              value={coloc.sharePercent || ''}
+                              onChange={(e) => handleUpdateColoc(coloc.id, 'sharePercent', Number(e.target.value))}
+                              className="w-full text-xs font-bold p-2 pr-6 rounded-lg border border-slate-300"
+                            />
+                            <span className="absolute right-2 top-2 text-slate-400 text-xs font-bold">%</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <input
+                          type="email"
+                          placeholder="Email (facultatif)"
+                          value={coloc.email || ''}
+                          onChange={(e) => handleUpdateColoc(coloc.id, 'email', e.target.value)}
+                          className="w-full text-[11px] p-1.5 rounded-lg border border-slate-200"
+                        />
+                        <input
+                          type="tel"
+                          placeholder="Téléphone (facultatif)"
+                          value={coloc.phone || ''}
+                          onChange={(e) => handleUpdateColoc(coloc.id, 'phone', e.target.value)}
+                          className="w-full text-[11px] p-1.5 rounded-lg border border-slate-200"
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        {/* Footer controls */}
-        <div className="p-6 border-t border-slate-200 bg-white/70 backdrop-blur-xs flex items-center justify-between rounded-b-3xl">
-          {step > 1 ? (
+          {/* SECTION 4 : VOLET DÉROULANT OPTIONNEL (PNO, IRL, DPE) */}
+          <div className="border border-slate-200 rounded-2xl bg-white overflow-hidden shadow-xs">
             <button
               type="button"
-              onClick={handlePrev}
-              className="px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-100 transition flex items-center space-x-1.5 cursor-pointer"
+              onClick={() => setShowOptionalDetails(!showOptionalDetails)}
+              className="w-full p-4 text-left flex items-center justify-between hover:bg-slate-50 transition cursor-pointer"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Précédent</span>
-            </button>
-          ) : (
-            <div />
-          )}
+              <div className="flex items-center space-x-2.5">
+                <div className="p-1.5 rounded-lg bg-teal-50 text-[#00434A]">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <h5 className="text-xs font-extrabold text-[#00434A]">
+                    {showOptionalDetails 
+                      ? 'Masquer les options secondaires' 
+                      : 'Afficher plus de détails (PNO, DPE, IRL... facultatif)'}
+                  </h5>
+                  <p className="text-[11px] text-slate-500">
+                    Pas tout sous la main ? Aucun problème, vous pourrez compléter plus tard !
+                  </p>
+                </div>
+              </div>
 
-          {step < totalSteps ? (
-            <button
-              type="button"
-              onClick={handleNext}
-              className="px-6 py-2.5 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs font-bold transition flex items-center space-x-2 shadow-sm cursor-pointer"
-            >
-              <span>Continuer</span>
-              <ArrowRight className="w-4 h-4" />
+              {showOptionalDetails ? (
+                <ChevronUp className="w-4 h-4 text-slate-400" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-slate-400" />
+              )}
             </button>
-          ) : (
+
+            {showOptionalDetails && (
+              <div className="p-5 border-t border-slate-100 bg-slate-50/50 space-y-5 animate-in slide-in-from-top-2 duration-150">
+                
+                {/* PNO : TACITE RECONDUCTION */}
+                <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h6 className="text-xs font-extrabold text-slate-900 flex items-center space-x-1.5">
+                        <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                        <span>Assurance PNO (Propriétaire Non Occupant)</span>
+                      </h6>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        Obligatoire en copropriété (Loi ALUR)
+                      </p>
+                    </div>
+                  </div>
+
+                  <label className="flex items-start space-x-2.5 cursor-pointer p-2 rounded-lg bg-emerald-50/60 border border-emerald-200/80">
+                    <input
+                      type="checkbox"
+                      checked={pnoTacitRenewal}
+                      onChange={(e) => setPnoTacitRenewal(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
+                    />
+                    <div className="text-xs">
+                      <span className="font-extrabold text-emerald-950 block">
+                        Renouvellement en tacite reconduction annuelle (le plus fréquent)
+                      </span>
+                      <span className="text-[11px] text-emerald-800">
+                        Votre contrat se renouvelle chaque année automatiquement. Vous n'avez pas besoin de chercher ou de saisir une date d'échéance exacte !
+                      </span>
+                    </div>
+                  </label>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                        Compagnie d'assurance (facultatif)
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Ex: Macif, AXA, Allianz, Matmut..."
+                        value={pnoInsurer}
+                        onChange={(e) => setPnoInsurer(e.target.value)}
+                        className="w-full text-xs p-2.5 rounded-lg border border-slate-300 bg-white"
+                      />
+                    </div>
+
+                    {!pnoTacitRenewal && (
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                          Date d'échéance précise
+                        </label>
+                        <input
+                          type="date"
+                          value={pnoExpiryDate}
+                          onChange={(e) => setPnoExpiryDate(e.target.value)}
+                          className="w-full text-xs p-2.5 rounded-lg border border-slate-300 bg-white"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* INDICE IRL : EXPLIQUÉ EN TOUTE SIMPLICITÉ */}
+                <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-2">
+                  <h6 className="text-xs font-extrabold text-slate-900 flex items-center space-x-1.5">
+                    <TrendingUp className="w-4 h-4 text-teal-600" />
+                    <span>Révision annuelle de loyer (Indice IRL)</span>
+                  </h6>
+                  <div className="p-3 rounded-lg bg-teal-50/70 border border-teal-100 text-xs text-slate-700 space-y-1">
+                    <p className="font-bold text-[#00434A]">
+                      ✨ Calcul et rappel 100% automatiques par Dryos
+                    </p>
+                    <p className="text-[11px] text-slate-600">
+                      Vous n'avez aucun calcul à faire. Chaque année à la date anniversaire du bail, l'application vous propose la révision exacte basée sur le dernier indice officiel publié par l'INSEE.
+                    </p>
+                  </div>
+                </div>
+
+                {/* DPE */}
+                <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-2">
+                  <h6 className="text-xs font-extrabold text-slate-900">
+                    Diagnostic DPE
+                  </h6>
+                  <p className="text-[11px] text-slate-500">
+                    Note énergétique du logement (facultatif si vous ne l'avez pas sous la main)
+                  </p>
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {(['A', 'B', 'C', 'D', 'E', 'F', 'G'] as DpeRating[]).map((rating) => (
+                      <button
+                        key={rating}
+                        type="button"
+                        onClick={() => setDpeRating(rating)}
+                        className={`w-8 h-8 rounded-lg font-black text-xs transition cursor-pointer ${
+                          dpeRating === rating
+                            ? 'bg-[#00434A] text-white ring-2 ring-[#00434A]'
+                            : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                        }`}
+                      >
+                        {rating}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ADRESSE DÉTAILLÉE, SURFACE, ÉTAGE */}
+                <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-3">
+                  <h6 className="text-xs font-extrabold text-slate-900">
+                    Adresse postale & Surface
+                  </h6>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="sm:col-span-2">
+                      <input
+                        type="text"
+                        placeholder="Adresse postale (ex: 14 rue de la Roquette)"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        className="w-full text-xs p-2.5 rounded-lg border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Code postal (ex: 75011)"
+                        value={postalCode}
+                        onChange={(e) => setPostalCode(e.target.value)}
+                        className="w-full text-xs p-2.5 rounded-lg border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Ville (ex: Paris)"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        className="w-full text-xs p-2.5 rounded-lg border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        placeholder="Surface (m²)"
+                        value={surface}
+                        onChange={(e) => setSurface(e.target.value === '' ? '' : Number(e.target.value))}
+                        className="w-full text-xs p-2.5 rounded-lg border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Étage / Porte (ex: 3ème gauche)"
+                        value={floor}
+                        onChange={(e) => setFloor(e.target.value)}
+                        className="w-full text-xs p-2.5 rounded-lg border border-slate-300"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* DATE DU BAIL, IRL & GARANT */}
+                <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                        Date de signature / début du bail
+                      </label>
+                      <input
+                        type="date"
+                        value={leaseStartDate}
+                        onChange={(e) => setLeaseStartDate(e.target.value)}
+                        className="w-full text-xs p-2.5 rounded-lg border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                        Trimestre IRL de référence (Bail)
+                      </label>
+                      <select
+                        value={irlReferenceQuarter}
+                        onChange={(e) => setIrlReferenceQuarter(e.target.value)}
+                        className="w-full text-xs p-2.5 rounded-lg border border-slate-300 bg-white font-medium"
+                      >
+                        <option value="T1">T1 (1er trimestre)</option>
+                        <option value="T2">T2 (2ème trimestre)</option>
+                        <option value="T3">T3 (3ème trimestre)</option>
+                        <option value="T4">T4 (4ème trimestre)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                        Date de dernière révision (si déjà révisé)
+                      </label>
+                      <input
+                        type="date"
+                        value={lastRevisionDate}
+                        onChange={(e) => setLastRevisionDate(e.target.value)}
+                        className="w-full text-xs p-2.5 rounded-lg border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                        Garant / Caution solidaire (facultatif)
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Ex: Visale, Parents, Garantme..."
+                        value={guarantor}
+                        onChange={(e) => setGuarantor(e.target.value)}
+                        className="w-full text-xs p-2.5 rounded-lg border border-slate-300"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Clause d'indexation annuelle */}
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-bold text-slate-800 block">
+                        Clause d'indexation annuelle IRL
+                      </span>
+                      <span className="text-[11px] text-slate-500">
+                        Prévue dans le contrat (permet la révision du loyer à date anniversaire)
+                      </span>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={hasRevisionClause}
+                        onChange={(e) => setHasRevisionClause(e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#00434A]"></div>
+                    </label>
+                  </div>
+                </div>
+
+              </div>
+            )}
+          </div>
+
+          {/* BOUTON D'ACTION PRINCIPAL : TOUJOURS ACCESSIBLE */}
+          <div className="pt-2">
             <button
-              type="button"
-              onClick={handleFinish}
-              className="px-6 py-2.5 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs font-bold transition flex items-center space-x-2 shadow-sm cursor-pointer"
+              type="submit"
+              className="w-full py-4 px-6 bg-[#00434A] hover:bg-[#00343a] text-white font-extrabold text-base rounded-2xl transition shadow-lg flex items-center justify-center space-x-2.5 cursor-pointer transform active:scale-[0.99]"
             >
-              <Check className="w-4 h-4" />
-              <span>Valider & Enregistrer le bien</span>
+              <Zap className="w-5 h-5 text-emerald-400" />
+              <span>{isEditing ? 'Enregistrer les modifications' : '⚡ Créer le bien immédiatement'}</span>
             </button>
-          )}
-        </div>
+            <p className="text-center text-[11px] text-slate-500 mt-2">
+              ✅ Tout est prêt dès la création : quittances PDF, pointage des loyers et alertes. Vous pourrez compléter les documents quand vous les aurez !
+            </p>
+          </div>
+
+        </form>
       </div>
     </div>
   );

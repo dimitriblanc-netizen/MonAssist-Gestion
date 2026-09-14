@@ -1,9 +1,9 @@
 {
   "id": "/",
-  "name": "Mon Assist'Gestion - Dryos",
+  "name": "Mon Assist'Gestion",
   "short_name": "Assist'Gestion",
-  "description": "Assistant de gestion locative proactif Zero-Cognitive Load pour bailleurs (gestion.dryos.fr)",
-  "start_url": "/",
+  "description": "Application de gestion locative pour les propriétaires bailleurs - DRYOS Immobilier",
+  "start_url": "/app",
   "scope": "/",
   "display": "standalone",
   "background_color": "#FBF7EE",

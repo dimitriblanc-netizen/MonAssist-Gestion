@@ -35,10 +35,11 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
   const totalRent = property.rentExcl + property.charges;
   
   // Insurance check
-  const insuranceDate = new Date(property.insuranceValidUntil);
+  const insuranceValidStr = property.insuranceValidUntil || property.tenantInsuranceExpiry;
+  const insuranceDate = insuranceValidStr ? new Date(insuranceValidStr) : null;
   const now = new Date();
-  const isInsuranceExpired = insuranceDate < now;
-  const isInsuranceExpiringSoon = !isInsuranceExpired && (insuranceDate.getTime() - now.getTime()) / (1000 * 3600 * 24) < 45;
+  const isInsuranceExpired = insuranceDate ? insuranceDate < now : false;
+  const isInsuranceExpiringSoon = insuranceDate && !isInsuranceExpired && (insuranceDate.getTime() - now.getTime()) / (1000 * 3600 * 24) < 45;
 
   return (
     <div 
@@ -173,9 +174,9 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
             <div className="truncate">
               <span className="font-medium block truncate">Assurance habitation</span>
               <span className="text-[11px]">
-                {isInsuranceExpired 
-                  ? 'Expirée ! Relancer' 
-                  : `Valide jusqu'au ${insuranceDate.toLocaleDateString('fr-FR')}`}
+                {insuranceDate 
+                  ? (isInsuranceExpired ? 'Expirée ! Relancer' : `Valide jusqu'au ${insuranceDate.toLocaleDateString('fr-FR')}`)
+                  : 'À compléter ultérieurement'}
               </span>
             </div>
           </div>
@@ -203,10 +204,21 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
         <button
           id={`btn-calc-irl-${property.id}`}
           onClick={() => onOpenIrlCalc(property)}
-          className="text-xs font-medium text-slate-700 hover:text-teal-700 flex items-center space-x-1.5 py-1.5 px-2.5 rounded-lg hover:bg-slate-200/60 transition cursor-pointer"
+          className={`text-xs font-semibold flex items-center space-x-1.5 py-1.5 px-2.5 rounded-lg transition cursor-pointer ${
+            property.dpeRating === 'F' || property.dpeRating === 'G'
+              ? 'text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200'
+              : 'text-[#00434A] hover:text-teal-800 hover:bg-slate-200/60'
+          }`}
+          title={
+            property.dpeRating === 'F' || property.dpeRating === 'G'
+              ? 'Révision bloquée par la Loi Climat (DPE F/G)'
+              : 'Calculer la révision de loyer IRL'
+          }
         >
-          <TrendingUp className="w-3.5 h-3.5 text-teal-600" />
-          <span>Révision IRL</span>
+          <TrendingUp className="w-3.5 h-3.5" />
+          <span>
+            {property.dpeRating === 'F' || property.dpeRating === 'G' ? 'IRL Bloqué (DPE)' : 'Révision IRL'}
+          </span>
         </button>
 
         <div className="flex items-center space-x-2">

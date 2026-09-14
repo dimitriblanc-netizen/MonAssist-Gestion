@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { generateQuittancePDF } from '../utils/generateReceipt';
 import { generateLrarMiseEnDemeure } from '../utils/generateLrarPdf';
+import { usePrivacy, MaskedValue } from '../context/PrivacyContext';
 
 interface RentSectionProps {
   property: Property;
@@ -106,7 +107,7 @@ export const RentSection: React.FC<RentSectionProps> = ({
 
       {/* Pointing en 1-clic Card */}
       {currentRent && (
-        <div className="bg-[#FBF7EE] rounded-2xl p-6 border-2 border-[#00434A]/20 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-slate-50/90 rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center space-x-2">
               <span className="text-xs uppercase tracking-wider font-bold text-[#00434A]">
@@ -116,10 +117,10 @@ export const RentSection: React.FC<RentSectionProps> = ({
               <span className="text-xs font-semibold text-slate-600">{currentRent.month} {currentRent.year}</span>
             </div>
             <h4 className="text-xl font-bold text-slate-900">
-              Loyer de {property.tenantName} : {currentRent.total.toFixed(2)} €
+              Loyer de <MaskedValue value={property.tenantName} /> : <MaskedValue value={`${currentRent.total.toFixed(2)} €`} />
             </h4>
             <p className="text-xs text-slate-600">
-              ({currentRent.rentAmount} € nu + {currentRent.chargesAmount} € charges) • {currentRent.period}
+              (<MaskedValue value={`${currentRent.rentAmount} €`} /> nu + <MaskedValue value={`${currentRent.chargesAmount} €`} /> charges) • {currentRent.period}
             </p>
           </div>
 
@@ -185,7 +186,7 @@ export const RentSection: React.FC<RentSectionProps> = ({
         <div className="p-4 border-b border-slate-100 flex items-center justify-between">
           <div>
             <h4 className="font-bold text-slate-900 text-sm">Registre des loyers & Historique des quittances</h4>
-            <p className="text-xs text-slate-400">Total encaissé : {totalReceived.toLocaleString('fr-FR')} €</p>
+            <p className="text-xs text-slate-400">Total encaissé : <MaskedValue value={`${totalReceived.toLocaleString('fr-FR')} €`} /></p>
           </div>
 
           <button
@@ -216,9 +217,9 @@ export const RentSection: React.FC<RentSectionProps> = ({
                     {r.month} {r.year}
                     <span className="text-[10px] text-slate-400 block font-normal">{r.period}</span>
                   </td>
-                  <td className="py-3 px-4 text-slate-700">{r.rentAmount.toFixed(2)} €</td>
-                  <td className="py-3 px-4 text-slate-700">{r.chargesAmount.toFixed(2)} €</td>
-                  <td className="py-3 px-4 font-bold text-slate-900">{r.total.toFixed(2)} €</td>
+                  <td className="py-3 px-4 text-slate-700"><MaskedValue value={`${r.rentAmount.toFixed(2)} €`} /></td>
+                  <td className="py-3 px-4 text-slate-700"><MaskedValue value={`${r.chargesAmount.toFixed(2)} €`} /></td>
+                  <td className="py-3 px-4 font-bold text-slate-900"><MaskedValue value={`${r.total.toFixed(2)} €`} /></td>
                   <td className="py-3 px-4">
                     {r.status === 'PAID' ? (
                       <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800">

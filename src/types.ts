@@ -3,53 +3,105 @@ export type PropertyType = LeaseType;
 export type ChargesMode = 'provisions' | 'forfait';
 export type DpeRating = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'VIERGE';
 
+export interface TenantInfo {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  sharePercent?: number; // quote-part loyer (ex: 50%)
+  insuranceExpiry?: string;
+}
+
+export interface VaultFileItem {
+  id?: string;
+  name: string;
+  date?: string;
+  url?: string;
+  dataUrl?: string; // base64 or object URL for real local preview/download
+  size?: string;
+  category?: 'BIEN' | 'LOCATAIRE' | 'ATTESTATION' | 'COMPTA' | 'AUTRE';
+  validUntil?: string;
+  rating?: string;
+  year?: number;
+  amount?: number;
+}
+
 export interface Property {
   id: string;
   name: string; // Ex: "2P Voltaire - Paris 11"
   address: string;
-  postalCode: string;
-  city: string;
-  isTenseZone: boolean; // Zone tendue (Paris & Petite Couronne = true par défaut)
-  surface: number; // m²
-  rooms: number;
+  postalCode?: string;
+  city?: string;
+  isTenseZone?: boolean; // Zone tendue (Paris & Petite Couronne = true par défaut)
+  surface?: number; // m²
+  rooms?: number;
   floor?: string;
 
   // Bail
   leaseType: LeaseType; // 'vide' (3 ans) | 'meuble' (1 an)
   type?: LeaseType; // alias retro-compatible
-  leaseStartDate: string; // YYYY-MM-DD
-  leaseDurationYears: number; // 3 ou 1
-  chargesMode: ChargesMode; // 'provisions' (avec régul) ou 'forfait' (meublé)
+  leaseStartDate?: string; // YYYY-MM-DD
+  leaseDurationYears?: number; // 3 ou 1
+  chargesMode?: ChargesMode; // 'provisions' (avec régul) ou 'forfait' (meublé)
 
   // Finances
   rentExcl: number; // Loyer hors charges (€)
   charges: number; // Provisions ou forfait (€)
-  deposit: number; // Dépôt de garantie (€)
+  deposit?: number; // Dépôt de garantie (€)
 
   // IRL
-  irlBaseQuarter: string; // ex: "T2 2024"
-  irlBaseValue: number; // ex: 145.17
+  hasRevisionClause?: boolean; // Clause d'indexation dans le bail (défaut: true)
+  irlReferenceQuarter?: string; // Trimestre de référence fixé au bail (ex: 'T1', 'T2', 'T3', 'T4')
+  irlBaseQuarter?: string; // ex: "T3 2024"
+  irlBaseValue?: number; // ex: 144.51
   irlQuarter?: string; // alias retro-compatible
   irlIndex?: number; // alias retro-compatible
+  lastRevisionDate?: string; // Date de la dernière révision effective (YYYY-MM-DD)
 
   // Conformité & Technique
-  dpeRating: DpeRating; // Si F ou G -> Loi Climat bloque la révision IRL !
+  dpeRating?: DpeRating; // Si F ou G -> Loi Climat bloque la révision IRL !
   dpeExpiryDate?: string;
-  pnoExpiryDate: string; // Assurance Propriétaire Non Occupant
-  hasGli: boolean; // Présence Garantie Loyers Impayés
+  pnoExpiryDate?: string; // Assurance Propriétaire Non Occupant
+  pnoTacitRenewal?: boolean; // Tacite reconduction annuelle (souvent le cas)
+  pnoInsurer?: string; // Nom assureur ex: "Macif"
+  hasGli?: boolean; // Présence Garantie Loyers Impayés
   gliProvider?: string; // "Visale", "Galian", etc.
-  hasGasHeating: boolean; // Chaudière gaz/fioul -> entretien annuel obligatoire
+  hasGasHeating?: boolean; // Chaudière gaz/fioul -> entretien annuel obligatoire
   boilerCheckDate?: string;
-  hasChimney: boolean; // Ramonage annuel obligatoire
+  hasChimney?: boolean; // Ramonage annuel obligatoire
 
-  // Locataire en place
+  // Locataires (simple ou colocation)
   tenantName: string;
-  tenantEmail: string;
-  tenantPhone: string;
-  tenantInsuranceExpiry: string; // Assurance MRH locataire (obligatoire chaque année)
+  tenantEmail?: string;
+  tenantPhone?: string;
+  tenantInsuranceExpiry?: string; // Assurance MRH locataire
   insuranceValidUntil?: string; // alias retro-compatible
+  insuranceCertificateFile?: string; // Fichier ou nom de pièce d'assurance
+  boilerCertificateFile?: string; // Fichier ou attestation d'entretien chaudière
   guarantor?: string;
   notes?: string;
+
+  // Régularisation annuelle des charges (provisions)
+  lastChargesRegulDate?: string; // Dernière date de décompte transmis
+  lastAnnualChargesActual?: number; // Montant réel constaté lors de la dernière régul (€)
+
+  // Coffre-fort numérique & Dossiers
+  vaultDocuments?: {
+    leaseFile?: VaultFileItem;
+    edlFile?: VaultFileItem;
+    taxeFonciereFile?: VaultFileItem;
+    dpeFile?: VaultFileItem;
+    insuranceFile?: VaultFileItem;
+    boilerFile?: VaultFileItem;
+    tenantIdCardFile?: VaultFileItem;
+    salaryProofFile?: VaultFileItem;
+    cautionFile?: VaultFileItem;
+    extraFiles?: VaultFileItem[];
+  };
+
+  // Colocation / Multi-locataires
+  isColocation?: boolean;
+  tenants?: TenantInfo[];
 
   createdAt: string;
 }

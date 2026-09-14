@@ -1,22 +1,42 @@
 import React, { useState } from 'react';
 import { Property } from '../types';
-import { X, TrendingUp, Calculator, Copy, Check, Info } from 'lucide-react';
+import { 
+  X, 
+  TrendingUp, 
+  Calculator, 
+  Copy, 
+  Check, 
+  Info, 
+  AlertTriangle, 
+  ShieldAlert, 
+  HeartHandshake, 
+  Lock, 
+  Sparkles,
+  ArrowRight,
+  FileText,
+  Clock,
+  CheckCircle2
+} from 'lucide-react';
+import { 
+  computeIrlRevision, 
+  generateIrlNotificationLetter, 
+  OFFICIAL_IRL_SERIES,
+  IrlCalculationResult 
+} from '../utils/irlEngine';
 
 interface IrlCalculatorModalProps {
   property: Property | null;
   onClose: () => void;
-  onApplyNewRent?: (propertyId: string, newRentExcl: number, newQuarter: string, newIndex: number) => void;
+  onApplyNewRent?: (
+    propertyId: string, 
+    newRentExcl: number, 
+    newQuarter: string, 
+    newIndex: number,
+    revisionDate: string
+  ) => void;
 }
 
-const IRL_INDICES: { quarter: string; value: number }[] = [
-  { quarter: 'T3 2024', value: 144.51 },
-  { quarter: 'T2 2024', value: 145.17 },
-  { quarter: 'T1 2024', value: 143.46 },
-  { quarter: 'T4 2023', value: 142.06 },
-  { quarter: 'T3 2023', value: 141.03 },
-  { quarter: 'T2 2023', value: 140.59 },
-  { quarter: 'T1 2023', value: 138.61 }
-];
+type RevisionChoice = 'max' | 'moderate' | 'freeze' | 'custom';
 
 export const IrlCalculatorModal: React.FC<IrlCalculatorModalProps> = ({
   property,
@@ -25,44 +45,101 @@ export const IrlCalculatorModal: React.FC<IrlCalculatorModalProps> = ({
 }) => {
   if (!property) return null;
 
-  // Base rent & base index from property
-  const [currentRent, setCurrentRent] = useState<number>(property.rentExcl);
-  const [oldIndex, setOldIndex] = useState<number>(property.irlIndex || 140.59);
-  const [newQuarter, setNewQuarter] = useState<string>('T2 2024');
-  const [copied, setCopied] = useState<boolean>(false);
+  // Calcul initial via le moteur IRL
+  const initialCalc = computeIrlRevision(property);
 
-  const selectedNewIndexObj = IRL_INDICES.find(i => i.quarter === newQuarter) || IRL_INDICES[0];
+  // États locaux modifiables
+  const [currentRent, setCurrentRent] = useState<number>(property.rentExcl || 0);
+  const [selectedQuarterCode, setSelectedQuarterCode] = useState<'T1' | 'T2' | 'T3' | 'T4'>(initialCalc.quarterCode);
+  const [previousIndex, setPreviousIndex] = useState<number>(initialCalc.previousIndexValue);
+  const [newQuarter, setNewQuarter] = useState<string>(initialCalc.newQuarterLabel);
+  const [hasClause, setHasClause] = useState<boolean>(property.hasRevisionClause !== false);
+  const [dpeRating, setDpeRating] = useState<string>(property.dpeRating || 'D');
+
+  // Choix utilisateur parmi les 3 options pré-calculées + personnalisé
+  const [choice, setChoice] = useState<RevisionChoice>('max');
+  const [customRentValue, setCustomRentValue] = useState<number>(initialCalc.options.moderate.newRentExcl);
+  const [copied, setCopied] = useState<boolean>(false);
+  const [appliedSuccess, setAppliedSuccess] = useState<boolean>(false);
+
+  // Recalcul dynamique si l'utilisateur ajuste manuellement un indice ou un loyer de base
+  const selectedNewIndexObj = OFFICIAL_IRL_SERIES.find(i => i.quarter === newQuarter) || OFFICIAL_IRL_SERIES[0];
   const newIndex = selectedNewIndexObj.value;
 
-  // Calculation formula: Loyer actuel * (Nouvel indice / Ancien indice)
-  const newRentCalculated = oldIndex > 0 ? Number(((currentRent * newIndex) / oldIndex).toFixed(2)) : currentRent;
-  const rentDifference = Number((newRentCalculated - currentRent).toFixed(2));
-  const percentIncrease = oldIndex > 0 ? Number((((newIndex - oldIndex) / oldIndex) * 100).toFixed(2)) : 0;
-  const newTotalRent = Number((newRentCalculated + property.charges).toFixed(2));
+  // Gardes-fous en temps réel
+  const isBlockedDpe = dpeRating === 'F' || dpeRating === 'G';
+  const isBlockedNoClause = !hasClause;
+  const canRevise = !isBlockedDpe && !isBlockedNoClause;
 
-  // Notification letter template
-  const notificationLetter = `Objet : Révision légale annuelle de votre loyer - ${property.address}
+  // Calculs mathématiques stricts
+  // Loyer HC max = Loyer actuel * (Nouvel indice / Ancien indice) arrondi à 2 décimales
+  const maxRentCalculated = previousIndex > 0
+    ? Math.round(((currentRent * newIndex) / previousIndex) * 100) / 100
+    : currentRent;
+  const maxIncrease = Math.round((maxRentCalculated - currentRent) * 100) / 100;
+  const maxPercent = previousIndex > 0
+    ? Math.round((((newIndex - previousIndex) / previousIndex) * 100) * 100) / 100
+    : 0;
 
-Bonjour ${property.tenantName},
+  // Option 2 : 50% de l'IRL
+  const modIncrease = Math.round((maxIncrease * 0.5) * 100) / 100;
+  const modRentCalculated = Math.round((currentRent + modIncrease) * 100) / 100;
+  const modPercent = Math.round((maxPercent * 0.5) * 100) / 100;
 
-Conformément à la clause d'indexation insérée dans votre contrat de bail signé pour le logement situé au ${property.address}, ${property.postalCode} ${property.city}, le loyer fait l'objet d'une révision annuelle basée sur l'Indice de Référence des Loyers (IRL) publié par l'INSEE.
+  // Option 3 : Gel (0%)
+  const freezeRent = currentRent;
 
-Voici les éléments du calcul légal :
-- Loyer mensuel hors charges actuel : ${currentRent.toFixed(2)} €
-- Ancien indice IRL de référence (${property.irlQuarter || 'Précédent'}) : ${oldIndex}
-- Nouvel indice IRL applicable (${newQuarter}) : ${newIndex}
-- Formule légale INSEE : ${currentRent.toFixed(2)} € × (${newIndex} / ${oldIndex})
+  // Loyer effectif retenu selon le choix
+  let effectiveRent = maxRentCalculated;
+  if (choice === 'moderate') effectiveRent = modRentCalculated;
+  else if (choice === 'freeze') effectiveRent = freezeRent;
+  else if (choice === 'custom') effectiveRent = Math.min(customRentValue, maxRentCalculated);
 
-Le nouveau montant de votre loyer hors charges s'élève donc à : ${newRentCalculated.toFixed(2)} € par mois.
-En ajoutant vos provisions pour charges de ${property.charges.toFixed(2)} €, le nouveau montant global à régler sera de ${newTotalRent.toFixed(2)} € par mois.
+  const charges = property.charges || 0;
+  const effectiveTotalRent = Math.round((effectiveRent + charges) * 100) / 100;
+  const effectiveIncrease = Math.round((effectiveRent - currentRent) * 100) / 100;
 
-Cette révision prend effet à compter du prochain loyer. Je vous remercie de bien vouloir ajuster votre ordre de virement bancaire pour la prochaine échéance.
+  // Objet de calcul pour la lettre
+  const calcForLetter: IrlCalculationResult = {
+    ...initialCalc,
+    currentRentExcl: currentRent,
+    previousIndexValue: previousIndex,
+    newIndexValue: newIndex,
+    newQuarterLabel: newQuarter,
+    options: {
+      max: {
+        label: 'Augmentation maximale (100% IRL)',
+        sublabel: 'Plafond légal strict INSEE',
+        newRentExcl: maxRentCalculated,
+        increaseAmount: maxIncrease,
+        percentIncrease: maxPercent,
+        newTotalRent: Math.round((maxRentCalculated + charges) * 100) / 100
+      },
+      moderate: {
+        label: 'Augmentation modérée (50% IRL)',
+        sublabel: 'Geste d\'équilibre avec le locataire',
+        newRentExcl: modRentCalculated,
+        increaseAmount: modIncrease,
+        percentIncrease: modPercent,
+        newTotalRent: Math.round((modRentCalculated + charges) * 100) / 100
+      },
+      freeze: {
+        label: 'Maintien du loyer (0%)',
+        sublabel: 'Gel du loyer cette année',
+        newRentExcl: freezeRent,
+        increaseAmount: 0,
+        percentIncrease: 0,
+        newTotalRent: Math.round((freezeRent + charges) * 100) / 100
+      }
+    }
+  };
 
-Restant à votre entière disposition,
-
-Bien cordialement,
-Votre Propriétaire Bailleur
-(Accompagné par Dryos Immobilier - paris.dryos.fr)`;
+  const notificationLetter = generateIrlNotificationLetter(
+    property,
+    calcForLetter,
+    choice,
+    choice === 'custom' ? effectiveRent : undefined
+  );
 
   const handleCopy = () => {
     navigator.clipboard.writeText(notificationLetter);
@@ -71,167 +148,392 @@ Votre Propriétaire Bailleur
   };
 
   const handleApply = () => {
+    const todayStr = new Date().toISOString().split('T')[0];
     if (onApplyNewRent) {
-      onApplyNewRent(property.id, newRentCalculated, newQuarter, newIndex);
+      onApplyNewRent(property.id, effectiveRent, newQuarter, newIndex, todayStr);
     }
-    onClose();
+    setAppliedSuccess(true);
+    setTimeout(() => {
+      onClose();
+    }, 1200);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
       <div 
         id="irl-calculator-modal"
-        className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200"
+        className="bg-[#FBF7EE] rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col"
       >
-        {/* Modal Header */}
-        <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50 rounded-t-2xl">
+        {/* Header */}
+        <div className="p-5 border-b border-slate-200/80 flex items-center justify-between bg-white rounded-t-3xl sticky top-0 z-10">
           <div className="flex items-center space-x-3">
-            <div className="p-2.5 rounded-xl bg-teal-100 text-teal-700">
+            <div className="w-10 h-10 rounded-2xl bg-[#00434A] text-teal-300 flex items-center justify-center shadow-xs">
               <Calculator className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 text-lg">Calculateur Révision de Loyer (IRL)</h3>
-              <p className="text-xs text-slate-500">
-                Loi du 6 juillet 1989 (art. 17-1) • {property.name} ({property.city})
+              <div className="flex items-center space-x-2">
+                <h3 className="font-black text-slate-900 text-base sm:text-lg">
+                  Révision de Loyer IRL
+                </h3>
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-teal-50 text-teal-800 border border-teal-200">
+                  Loi du 6 juillet 1989 (art. 17-1)
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 font-medium">
+                {property.name || property.address} • Locataire : {property.tenantName}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-200 transition cursor-pointer"
+            className="text-slate-400 hover:text-slate-700 p-2 rounded-xl hover:bg-slate-100 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Modal Content */}
-        <div className="p-6 space-y-6">
+        {/* Content */}
+        <div className="p-5 sm:p-6 space-y-6 flex-1">
 
-          {/* Form input grids */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Loyer nu actuel (€/mois)
-              </label>
-              <input
-                type="number"
-                value={currentRent}
-                onChange={(e) => setCurrentRent(parseFloat(e.target.value) || 0)}
-                className="w-full text-sm font-semibold p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Ancien Indice IRL (Bail)
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={oldIndex}
-                onChange={(e) => setOldIndex(parseFloat(e.target.value) || 0)}
-                className="w-full text-sm font-semibold p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:outline-none"
-              />
-              <span className="text-[11px] text-slate-400 mt-1 block">Réf : {property.irlQuarter}</span>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Nouvel Indice IRL (INSEE)
-              </label>
-              <select
-                value={newQuarter}
-                onChange={(e) => setNewQuarter(e.target.value)}
-                className="w-full text-sm font-semibold p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white"
-              >
-                {IRL_INDICES.map(item => (
-                  <option key={item.quarter} value={item.quarter}>
-                    {item.quarter} ({item.value})
-                  </option>
-                ))}
-              </select>
-              <span className="text-[11px] text-slate-400 mt-1 block">Valeur : {newIndex}</span>
-            </div>
-          </div>
-
-          {/* Result Highlight Card */}
-          <div className="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-xl p-5 border border-teal-200">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <span className="text-xs font-bold text-teal-800 uppercase tracking-wider block">
-                  Nouveau loyer hors charges
-                </span>
-                <div className="text-3xl font-extrabold text-teal-950 mt-1">
-                  {newRentCalculated.toLocaleString('fr-FR')} € <span className="text-sm font-normal text-slate-600">/ mois</span>
-                </div>
-                <div className="flex items-center space-x-2 text-xs text-teal-800 mt-1">
-                  <span className="font-semibold text-emerald-700">+{rentDifference.toFixed(2)} € / mois</span>
-                  <span>({percentIncrease > 0 ? `+${percentIncrease}%` : `${percentIncrease}%`})</span>
-                </div>
+          {/* ========================================================================= */}
+          {/* 1. GARDE-FOUS STRICTS (DPE PASSOIRE THERMIQUE OU ABSENCE DE CLAUSE)       */}
+          {/* ========================================================================= */}
+          {isBlockedDpe && (
+            <div className="bg-rose-50 border-2 border-rose-300 rounded-2xl p-4 text-rose-900 space-y-2">
+              <div className="flex items-center space-x-2.5">
+                <ShieldAlert className="w-5 h-5 text-rose-600 flex-shrink-0" />
+                <h4 className="text-sm font-black uppercase tracking-wide text-rose-800">
+                  Révision formellement interdite (DPE classe {dpeRating})
+                </h4>
               </div>
-
-              <div className="text-right sm:border-l sm:border-teal-200 sm:pl-6">
-                <span className="text-xs font-medium text-slate-600 block">Total charges comprises</span>
-                <div className="text-xl font-bold text-slate-900 mt-0.5">
-                  {newTotalRent.toLocaleString('fr-FR')} €
-                </div>
-                <span className="text-[11px] text-slate-500">avec {property.charges} € de charges</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Legal tip */}
-          <div className="flex items-start space-x-2 text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200">
-            <Info className="w-4 h-4 text-slate-500 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold text-slate-700">Règle légale de révision :</p>
-              <p className="text-[11px] text-slate-500 mt-0.5">
-                La révision n'est pas rétroactive. Elle ne s'applique qu'à compter du jour de la demande formulée au locataire. Le bailleur dispose d'un an après la date d'anniversaire du contrat pour la notifier.
+              <p className="text-xs leading-relaxed text-rose-800">
+                <strong>Loi Climat et Résilience (article 159) :</strong> Depuis le 24 août 2022, il est strictement interdit d'augmenter le loyer des logements classés <strong>F ou G</strong> (« passoires thermiques »). La révision IRL est bloquée jusqu'à la réalisation de travaux de rénovation énergétique certifiés par un nouveau DPE.
               </p>
+              <div className="pt-1 flex items-center justify-between text-[11px] font-semibold text-rose-700">
+                <span>Sanction : Le locataire peut exiger le remboursement immédiat de tout trop-perçu.</span>
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Letter to tenant preview */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                Modèle de notification prêt à l'envoi
-              </label>
+          {isBlockedNoClause && !isBlockedDpe && (
+            <div className="bg-amber-50 border border-amber-300 rounded-2xl p-4 text-amber-900 space-y-2">
+              <div className="flex items-center space-x-2">
+                <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                <h4 className="text-sm font-black text-amber-900">
+                  Absence de clause d'indexation dans le bail
+                </h4>
+              </div>
+              <p className="text-xs leading-relaxed text-amber-800">
+                L'article 17-1 de la loi du 6 juillet 1989 dispose que la révision du loyer n'est possible que si le contrat de bail comporte expressément une <strong>clause d'indexation annuelle</strong>. À défaut de clause, le loyer reste fixé pour toute la durée du bail.
+              </p>
               <button
-                onClick={handleCopy}
-                className="text-xs font-semibold text-teal-700 hover:text-teal-900 flex items-center space-x-1.5 py-1 px-2.5 rounded-md hover:bg-teal-50 transition cursor-pointer"
+                type="button"
+                onClick={() => setHasClause(true)}
+                className="text-xs font-bold text-teal-800 underline hover:text-teal-900 cursor-pointer pt-1 block"
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copied ? 'Copié dans le presse-papier !' : 'Copier le modèle'}</span>
+                Mon bail contient bien une clause d'indexation (activer la révision)
               </button>
             </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* 2. PARAMÈTRES DU CALCUL (Loyer HC, Indices N-1 et N)                      */}
+          {/* ========================================================================= */}
+          <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#00434A]">
+                Données de base du calcul
+              </span>
+              <span className="text-[11px] text-slate-500 font-medium">
+                Uniquement sur le loyer HC (Loi Alur)
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              {/* Loyer actuel HC */}
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                  Loyer HC actuel (€/mois)
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={currentRent}
+                    onChange={(e) => setCurrentRent(parseFloat(e.target.value) || 0)}
+                    disabled={!canRevise}
+                    className="w-full text-sm font-black p-2.5 pl-3 pr-8 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#00434A] focus:outline-none disabled:bg-slate-100"
+                  />
+                  <span className="absolute right-3 top-2.5 text-xs text-slate-400 font-bold">€</span>
+                </div>
+                <span className="text-[10px] text-slate-400 mt-1 block">
+                  + {charges} € de charges
+                </span>
+              </div>
+
+              {/* Ancien indice N-1 */}
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                  IRL de base (Trimestre N-1)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={previousIndex}
+                  onChange={(e) => setPreviousIndex(parseFloat(e.target.value) || 0)}
+                  disabled={!canRevise}
+                  className="w-full text-sm font-black p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#00434A] focus:outline-none disabled:bg-slate-100"
+                />
+                <span className="text-[10px] text-slate-400 mt-1 block truncate">
+                  Réf : {initialCalc.previousQuarterLabel || 'Signature ou N-1'}
+                </span>
+              </div>
+
+              {/* Nouvel indice N */}
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                  IRL applicable (Trimestre N)
+                </label>
+                <select
+                  value={newQuarter}
+                  onChange={(e) => setNewQuarter(e.target.value)}
+                  disabled={!canRevise}
+                  className="w-full text-xs font-bold p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#00434A] focus:outline-none bg-white disabled:bg-slate-100"
+                >
+                  {OFFICIAL_IRL_SERIES.map(item => (
+                    <option key={item.quarter} value={item.quarter}>
+                      {item.quarter} ({item.value})
+                    </option>
+                  ))}
+                </select>
+                <span className="text-[10px] text-emerald-700 font-bold mt-1 block">
+                  Valeur INSEE : {newIndex}
+                </span>
+              </div>
+            </div>
+
+            {/* Formule officielle affichée en toute transparence */}
+            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/80 text-[11px] text-slate-600 flex items-center justify-between">
+              <span className="font-mono">
+                Formule : {currentRent.toFixed(2)} € × ({newIndex} / {previousIndex}) = <strong>{maxRentCalculated.toFixed(2)} €</strong>
+              </span>
+              <span className="text-emerald-700 font-bold">
+                Max légal : +{maxIncrease.toFixed(2)} €/mois (+{maxPercent}%)
+              </span>
+            </div>
+          </div>
+
+          {/* ========================================================================= */}
+          {/* 3. PARCOURS UTILISATEUR : LES 3 CHOIX DU PROPRIÉTAIRE                      */}
+          {/* ========================================================================= */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                Votre décision pour cette révision annuelle
+              </span>
+              <span className="text-[11px] text-slate-500">
+                Choisissez parmi les 3 options pré-calculées
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* Option 1 : Augmentation Maximale */}
+              <button
+                type="button"
+                disabled={!canRevise}
+                onClick={() => setChoice('max')}
+                className={`p-4 rounded-2xl border text-left transition relative cursor-pointer flex flex-col justify-between ${
+                  choice === 'max'
+                    ? 'bg-white border-teal-600 shadow-md ring-2 ring-teal-600/20'
+                    : 'bg-white/80 border-slate-200 hover:bg-white hover:border-slate-300 opacity-90'
+                } disabled:opacity-40 disabled:cursor-not-allowed`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200">
+                      100% IRL (Max)
+                    </span>
+                    {choice === 'max' && <CheckCircle2 className="w-4 h-4 text-teal-600" />}
+                  </div>
+                  <div className="text-lg font-black text-slate-900 mt-1">
+                    {maxRentCalculated.toLocaleString('fr-FR')} € <span className="text-xs font-normal text-slate-500">HC</span>
+                  </div>
+                  <div className="text-[11px] font-bold text-emerald-700 mt-0.5">
+                    +{maxIncrease.toFixed(2)} €/mois (+{maxPercent}%)
+                  </div>
+                </div>
+                <div className="text-[10px] text-slate-400 mt-3 pt-2 border-t border-slate-100">
+                  Total CC : {(maxRentCalculated + charges).toLocaleString('fr-FR')} €
+                </div>
+              </button>
+
+              {/* Option 2 : Augmentation Modérée (50%) */}
+              <button
+                type="button"
+                disabled={!canRevise}
+                onClick={() => setChoice('moderate')}
+                className={`p-4 rounded-2xl border text-left transition relative cursor-pointer flex flex-col justify-between ${
+                  choice === 'moderate'
+                    ? 'bg-white border-[#00434A] shadow-md ring-2 ring-[#00434A]/20'
+                    : 'bg-white/80 border-slate-200 hover:bg-white hover:border-slate-300 opacity-90'
+                } disabled:opacity-40 disabled:cursor-not-allowed`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                      Modérée (50%)
+                    </span>
+                    {choice === 'moderate' && <CheckCircle2 className="w-4 h-4 text-[#00434A]" />}
+                  </div>
+                  <div className="text-lg font-black text-slate-900 mt-1">
+                    {modRentCalculated.toLocaleString('fr-FR')} € <span className="text-xs font-normal text-slate-500">HC</span>
+                  </div>
+                  <div className="text-[11px] font-bold text-emerald-700 mt-0.5">
+                    +{modIncrease.toFixed(2)} €/mois (+{modPercent}%)
+                  </div>
+                </div>
+                <div className="text-[10px] text-slate-500 mt-3 pt-2 border-t border-slate-100">
+                  Geste de conciliation
+                </div>
+              </button>
+
+              {/* Option 3 : Gel / Maintien (0%) */}
+              <button
+                type="button"
+                onClick={() => setChoice('freeze')}
+                className={`p-4 rounded-2xl border text-left transition relative cursor-pointer flex flex-col justify-between ${
+                  choice === 'freeze'
+                    ? 'bg-white border-slate-700 shadow-md ring-2 ring-slate-400/20'
+                    : 'bg-white/80 border-slate-200 hover:bg-white hover:border-slate-300 opacity-90'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                      Maintien (0%)
+                    </span>
+                    {choice === 'freeze' && <CheckCircle2 className="w-4 h-4 text-slate-800" />}
+                  </div>
+                  <div className="text-lg font-black text-slate-900 mt-1">
+                    {freezeRent.toLocaleString('fr-FR')} € <span className="text-xs font-normal text-slate-500">HC</span>
+                  </div>
+                  <div className="text-[11px] font-bold text-slate-500 mt-0.5">
+                    +0 € (Loyer gelé)
+                  </div>
+                </div>
+                <div className="text-[10px] text-slate-500 mt-3 pt-2 border-t border-slate-100">
+                  Fidélise le locataire
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* ========================================================================= */}
+          {/* 4. BILAN SI OUBLI DE PLUSIEURS ANNÉES (NON-RÉTROACTIVITÉ & PRESCRIPTION) */}
+          {/* ========================================================================= */}
+          {initialCalc.isCatchup && initialCalc.catchupExplanation && (
+            <div className="bg-amber-50/90 border border-amber-200 rounded-2xl p-4 text-amber-900 space-y-1.5 animate-fade-in">
+              <div className="flex items-center space-x-2 text-xs font-bold text-amber-900">
+                <Clock className="w-4 h-4 text-amber-700 flex-shrink-0" />
+                <span>Rattrapage d'oubli & Règle de non-rétroactivité :</span>
+              </div>
+              <p className="text-xs text-amber-800 leading-relaxed font-medium">
+                {initialCalc.catchupExplanation}
+              </p>
+              <p className="text-[11px] text-amber-700">
+                💡 <em>Règle légale (loi ALUR) :</em> Le nouveau loyer s'applique immédiatement pour l'avenir, mais la loi interdit tout rappel de loyer rétroactif sur les mois écoulés. L'argent non réclamé dans l'année est définitivement prescrit.
+              </p>
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* 5. ENCADRÉ COACHING & CONSEIL RELATION LOCATAIRE (DEMANDÉ STRICTEMENT)    */}
+          {/* ========================================================================= */}
+          <div className="bg-gradient-to-br from-emerald-50/80 to-teal-50/80 border border-emerald-200/90 rounded-2xl p-4 sm:p-5 space-y-2">
+            <div className="flex items-center space-x-2 text-[#00434A]">
+              <HeartHandshake className="w-5 h-5 text-emerald-700 flex-shrink-0" />
+              <h4 className="text-xs sm:text-sm font-black uppercase tracking-wide text-[#00434A]">
+                Conseil relation locataire
+              </h4>
+            </div>
+            <p className="text-xs text-slate-700 leading-relaxed italic">
+              « La révision n'est jamais obligatoire. Conserver un bon locataire (qui paie à l'heure et prend soin du logement) est souvent plus rentable que d'appliquer une hausse maximale. Réfléchissez au risque de vacance locative : un seul mois de logement vide coûte souvent plus cher que l'augmentation annuelle. »
+            </p>
+          </div>
+
+          {/* ========================================================================= */}
+          {/* 6. MODÈLE DE NOTIFICATION PRÊT À L'ENVOI (COURRIER / MAIL)                 */}
+          {/* ========================================================================= */}
+          <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <FileText className="w-4 h-4 text-[#00434A]" />
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                  Notification officielle prête pour {property.tenantName}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="text-xs font-bold text-[#00434A] hover:text-[#00343a] flex items-center space-x-1.5 py-1 px-3 rounded-lg hover:bg-slate-100 transition cursor-pointer border border-slate-200"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="text-emerald-700">Texte copié !</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5 text-slate-600" />
+                    <span>Copier le modèle</span>
+                  </>
+                )}
+              </button>
+            </div>
+
             <textarea
               readOnly
-              rows={8}
+              rows={7}
               value={notificationLetter}
-              className="w-full text-xs font-mono p-3 rounded-lg border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none"
+              className="w-full text-xs font-mono p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none leading-relaxed"
             />
           </div>
 
         </div>
 
-        {/* Modal Footer */}
-        <div className="p-4 border-t border-slate-200 bg-slate-50 rounded-b-2xl flex items-center justify-between">
+        {/* Footer */}
+        <div className="p-4 sm:p-5 border-t border-slate-200/80 bg-white rounded-b-3xl flex flex-col sm:flex-row items-center justify-between gap-3 sticky bottom-0 z-10">
           <button
+            type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 rounded-lg hover:bg-slate-200 transition cursor-pointer"
+            className="w-full sm:w-auto px-4 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 rounded-xl hover:bg-slate-100 transition cursor-pointer"
           >
-            Fermer
+            Fermer sans modifier
           </button>
-          
-          <button
-            id="btn-apply-irl-update"
-            onClick={handleApply}
-            className="px-4 py-2 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-lg shadow-sm transition flex items-center space-x-1.5 cursor-pointer"
-          >
-            <Check className="w-4 h-4" />
-            <span>Mettre à jour le loyer dans l'app ({newRentCalculated.toFixed(2)} €)</span>
-          </button>
+
+          <div className="w-full sm:w-auto flex items-center space-x-2">
+            <button
+              type="button"
+              id="btn-apply-irl-update"
+              onClick={handleApply}
+              disabled={appliedSuccess || (!canRevise && choice !== 'freeze')}
+              className="w-full sm:w-auto px-5 py-2.5 text-xs font-black text-white bg-[#00434A] hover:bg-[#00343a] rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {appliedSuccess ? (
+                <>
+                  <Check className="w-4 h-4 text-emerald-300" />
+                  <span>Loyer actualisé ({effectiveRent.toFixed(2)} €) !</span>
+                </>
+              ) : (
+                <>
+                  <Check className="w-4 h-4" />
+                  <span>
+                    Valider ce choix ({effectiveRent.toFixed(2)} € HC)
+                  </span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

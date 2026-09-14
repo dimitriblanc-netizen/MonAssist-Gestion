@@ -11,18 +11,24 @@ import {
   Send, 
   Calendar,
   Flame,
-  FileText
+  FileText,
+  Receipt,
+  FolderLock
 } from 'lucide-react';
 
 interface LegalRemindersSectionProps {
   property: Property;
   onOpenIrlModal: (prop: Property) => void;
+  onOpenChargesModal?: (prop: Property) => void;
+  onOpenVaultModal?: (prop: Property) => void;
   onOpenDryosContact: () => void;
 }
 
 export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
   property,
   onOpenIrlModal,
+  onOpenChargesModal,
+  onOpenVaultModal,
   onOpenDryosContact
 }) => {
   // Charges Regularisation state
@@ -45,6 +51,7 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
   const isInsideNoticeWindow = monthsUntilLeaseEnd <= alertWindowMonths && monthsUntilLeaseEnd >= noticeLegalMonths;
 
   const isDpeBlocked = property.dpeRating === 'F' || property.dpeRating === 'G';
+  const isNoClause = property.hasRevisionClause === false;
 
   return (
     <div className="space-y-6">
@@ -63,14 +70,18 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
                   <h4 className="font-bold text-slate-900 text-sm sm:text-base">
                     Indice de Référence des Loyers (IRL)
                   </h4>
-                  <p className="text-xs text-slate-500">Formule légale INSEE art. 17-1</p>
+                  <p className="text-xs text-slate-500">Loi du 6 juillet 1989 art. 17-1</p>
                 </div>
               </div>
 
               <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
-                isDpeBlocked ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'
+                isDpeBlocked 
+                  ? 'bg-rose-100 text-rose-800' 
+                  : isNoClause 
+                    ? 'bg-amber-100 text-amber-800' 
+                    : 'bg-emerald-100 text-emerald-800'
               }`}>
-                {isDpeBlocked ? 'Bloqué (Loi Climat)' : 'Autorisé'}
+                {isDpeBlocked ? 'Bloqué (Loi Climat)' : isNoClause ? 'Clause absente' : 'Indexation possible'}
               </span>
             </div>
 
@@ -90,19 +101,29 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
                   Contacter Dryos pour un audit de rénovation énergétique →
                 </button>
               </div>
+            ) : isNoClause ? (
+              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1.5">
+                <div className="flex items-center space-x-1.5 font-bold">
+                  <AlertTriangle className="w-4 h-4 text-amber-700" />
+                  <span>Clause d'indexation absente du bail</span>
+                </div>
+                <p className="leading-relaxed">
+                  L'article 17-1 de la loi du 6 juillet 1989 dispose que la révision du loyer n'est possible que si le contrat de bail comporte expressément une clause d'indexation. À défaut, le loyer reste fixe.
+                </p>
+              </div>
             ) : (
               <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-2">
                 <div className="flex justify-between">
-                  <span>Loyer nu de référence :</span>
-                  <span className="font-bold">{property.rentExcl} € / mois</span>
+                  <span>Loyer nu de référence (HC) :</span>
+                  <span className="font-bold text-slate-900">{property.rentExcl} € / mois</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Trimestre du bail :</span>
-                  <span className="font-semibold">{property.irlBaseQuarter} (Valeur : {property.irlBaseValue})</span>
+                  <span>Trimestre IRL de référence :</span>
+                  <span className="font-semibold">{property.irlReferenceQuarter || property.irlBaseQuarter || 'T3'}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Nouvel indice INSEE (T3 2024) :</span>
-                  <span className="font-bold text-[#00434A]">144.51 (+2.4%)</span>
+                <div className="flex justify-between text-[#00434A]">
+                  <span>3 options pré-calculées :</span>
+                  <span className="font-bold">100% IRL, 50% modéré ou 0% maintien</span>
                 </div>
               </div>
             )}
@@ -114,7 +135,7 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
               className="w-full py-2.5 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs font-bold transition flex items-center justify-center space-x-1.5 cursor-pointer shadow-xs"
             >
               <TrendingUp className="w-4 h-4 text-teal-300" />
-              <span>Calculer la révision & Télécharger la lettre</span>
+              <span>Simuler la révision & Choisir mon option</span>
             </button>
           )}
         </div>
@@ -234,11 +255,16 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
               </div>
               <button
                 onClick={() => {
-                  alert(`Courrier de régularisation des charges généré avec un solde de ${balance.toFixed(2)} €.`);
+                  if (onOpenChargesModal) {
+                    onOpenChargesModal(property);
+                  } else {
+                    alert(`Courrier de régularisation des charges généré avec un solde de ${balance.toFixed(2)} €.`);
+                  }
                 }}
-                className="mt-2 text-[11px] font-bold text-[#00434A] hover:underline cursor-pointer"
+                className="mt-2 text-[11px] font-bold text-[#00434A] hover:underline cursor-pointer flex items-center space-x-1"
               >
-                Générer le courrier de régularisation →
+                <span>Calculer & générer le décompte légal</span>
+                <span>→</span>
               </button>
             </div>
           </div>
@@ -249,12 +275,23 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
         )}
       </div>
 
-      {/* 4. Contrôles Annuels Obligatoires (Checklist) */}
+      {/* 4. Contrôles Annuels Obligatoires (Checklist) & Coffre-fort */}
       <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs space-y-4">
-        <h4 className="font-bold text-slate-900 text-sm sm:text-base flex items-center space-x-2">
-          <ShieldCheck className="w-5 h-5 text-[#00434A]" />
-          <span>Contrôles réglementaires annuels & Attestations</span>
-        </h4>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <h4 className="font-bold text-slate-900 text-sm sm:text-base flex items-center space-x-2">
+            <ShieldCheck className="w-5 h-5 text-[#00434A]" />
+            <span>Contrôles réglementaires annuels & Attestations</span>
+          </h4>
+          {onOpenVaultModal && (
+            <button
+              onClick={() => onOpenVaultModal(property)}
+              className="self-start sm:self-auto px-3.5 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-[#00434A] border border-teal-200 text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer"
+            >
+              <FolderLock className="w-3.5 h-3.5 text-teal-600" />
+              <span>Ouvrir mon coffre-fort numérique</span>
+            </button>
+          )}
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 text-xs space-y-2">
@@ -270,7 +307,9 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
           <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 text-xs space-y-2">
             <span className="font-bold text-slate-900 block">Assurance PNO Propriétaire</span>
             <p className="text-slate-600 text-[11px]">
-              Échéance : {new Date(property.pnoExpiryDate).toLocaleDateString('fr-FR')}
+              {property.pnoTacitRenewal || !property.pnoExpiryDate
+                ? (property.pnoInsurer ? `Tacite reconduction (${property.pnoInsurer})` : 'Tacite reconduction annuelle')
+                : `Échéance : ${new Date(property.pnoExpiryDate).toLocaleDateString('fr-FR')}`}
             </p>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 inline-block">
               Valide

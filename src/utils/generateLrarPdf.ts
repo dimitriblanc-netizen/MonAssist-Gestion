@@ -88,11 +88,11 @@ export function generateLrarMiseEnDemeure(property: Property, rent: RentRecord, 
   doc.setTextColor(120, 120, 120);
   doc.text('[Signature & Date]', 123, currentY + 32);
 
-  // Mention légale déclarative
+  // Note de bas de page
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
   doc.setTextColor(140, 140, 140);
-  doc.text('Document juridique type généré par Mon Assist\'Gestion (DRYOS Immobilier - paris.dryos.fr). Document purement déclaratif à valider et envoyer directement par le bailleur.', 20, 287);
+  doc.text('Document généré via Mon Assist\'Gestion • DRYOS Immobilier.', 20, 287);
 
   doc.save(`Mise_En_Demeure_LRAR_${property.tenantName.replace(/\s+/g, '_')}_${rent.month}_${rent.year}.pdf`);
 }

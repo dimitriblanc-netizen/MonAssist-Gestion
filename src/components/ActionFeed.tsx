@@ -1,5 +1,6 @@
 import React from 'react';
 import { Property, RentRecord, ActionItem } from '../types';
+import { usePrivacy, MaskedValue } from '../context/PrivacyContext';
 import { 
   AlertCircle, 
   Clock, 
@@ -12,7 +13,9 @@ import {
   Sparkles,
   ChevronRight,
   ShieldCheck,
-  AlertTriangle
+  AlertTriangle,
+  Receipt,
+  FolderLock
 } from 'lucide-react';
 
 interface ActionFeedProps {
@@ -23,6 +26,8 @@ interface ActionFeedProps {
   onOpenReminderModal: (prop: Property, rent: RentRecord) => void;
   onGenerateLrar: (prop: Property, rent: RentRecord) => void;
   onOpenIrlModal: (prop: Property) => void;
+  onOpenChargesModal?: (prop: Property) => void;
+  onOpenVaultModal?: (prop: Property) => void;
   onOpenDryosContact: () => void;
 }
 
@@ -34,8 +39,11 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
   onOpenReminderModal,
   onGenerateLrar,
   onOpenIrlModal,
+  onOpenChargesModal,
+  onOpenVaultModal,
   onOpenDryosContact
 }) => {
+  const { privacyMode, maskText, maskAmount } = usePrivacy();
   const actions: ActionItem[] = [];
 
   const now = new Date();
@@ -113,7 +121,7 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
     }
   }
 
-  // 3. Révision IRL et blocage DPE F/G
+  // 3. Révision IRL et gardes-fous (Loi Climat DPE F/G & Clause d'indexation)
   if (property.dpeRating === 'F' || property.dpeRating === 'G') {
     actions.push({
       id: 'act_irl_blocked_dpe',
@@ -121,23 +129,26 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
       priority: 'ORANGE',
       type: 'IRL_BLOCKED_DPE',
       title: `Loi Climat : Révision de loyer bloquée (DPE classe ${property.dpeRating})`,
-      description: `Le logement est classé passoire thermique. La loi interdit toute revalorisation IRL tant que des travaux d'isolation n'ont pas amélioré la note.`,
-      actionLabel: 'Conseil rénovation Dryos'
+      description: `Le logement est classé passoire thermique. L'article 159 de la Loi Climat interdit formellement toute revalorisation IRL tant que des travaux de rénovation n'ont pas amélioré la note.`,
+      actionLabel: 'Comprendre l\'interdiction légale'
     });
-  } else {
-    // Calcul date anniversaire du bail
-    const leaseDate = new Date(property.leaseStartDate);
-    const monthsSinceStart = (now.getFullYear() - leaseDate.getFullYear()) * 12 + (now.getMonth() - leaseDate.getMonth());
-    if (monthsSinceStart >= 12) {
-      actions.push({
-        id: 'act_irl_due',
-        propertyId: property.id,
-        priority: 'ORANGE',
-        type: 'IRL_ANNIVERSARY',
-        title: `Date anniversaire du bail : Révision IRL annuelle disponible`,
-        description: `Bail signé il y a plus d'un an (base ${property.irlBaseQuarter}). Vous pouvez appliquer l'indice INSEE pour augmenter le loyer.`,
-        actionLabel: 'Calculer la révision IRL'
-      });
+  } else if (property.hasRevisionClause !== false) {
+    // Calcul date anniversaire du bail ou de la dernière révision
+    const refDateStr = property.lastRevisionDate || property.leaseStartDate;
+    if (refDateStr) {
+      const refDate = new Date(refDateStr);
+      const monthsSinceRef = (now.getFullYear() - refDate.getFullYear()) * 12 + (now.getMonth() - refDate.getMonth());
+      if (monthsSinceRef >= 12) {
+        actions.push({
+          id: 'act_irl_due',
+          propertyId: property.id,
+          priority: 'ORANGE',
+          type: 'IRL_ANNIVERSARY',
+          title: `Date anniversaire du bail : Revalorisation IRL`,
+          description: `C'est la date anniversaire de votre bail. Vous pouvez revaloriser votre loyer avec le nouvel indice IRL. Rien ne vous y oblige : c'est l'occasion de faire le point sur votre relation locative.`,
+          actionLabel: 'Consulter les options de révision'
+        });
+      }
     }
   }
 
@@ -168,7 +179,7 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
   }
 
   // 6. Renouvellement PNO Propriétaire (annuel)
-  if (property.pnoExpiryDate) {
+  if (property.pnoExpiryDate && !property.pnoTacitRenewal) {
     const pnoExpiry = new Date(property.pnoExpiryDate);
     const pnoDiffDays = Math.ceil((pnoExpiry.getTime() - now.getTime()) / (1000 * 3600 * 24));
     if (pnoDiffDays <= 0) {
@@ -194,7 +205,48 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
     }
   }
 
-  // 7. Congé bailleur ou renouvellement de bail
+  // 7. Régularisation annuelle des charges (si provisions sur charges)
+  if (property.chargesMode === 'provisions' || (!property.chargesMode && property.leaseType === 'vide')) {
+    // Si pas de régul effectuée cette année ou plus de 11 mois
+    const lastRegul = property.lastChargesRegulDate ? new Date(property.lastChargesRegulDate) : null;
+    const monthsSinceRegul = lastRegul 
+      ? (now.getFullYear() - lastRegul.getFullYear()) * 12 + (now.getMonth() - lastRegul.getMonth())
+      : 12; // par défaut réclamer si jamais fait
+    
+    if (monthsSinceRegul >= 11) {
+      actions.push({
+        id: 'act_charges_regul',
+        propertyId: property.id,
+        priority: 'ORANGE',
+        type: 'CHARGES_REGUL',
+        title: 'Décompte de copropriété reçu ? Régularisation des charges',
+        description: `Comparez les provisions encaissées (${(property.charges * 12).toFixed(0)} €/an) avec le réel de votre syndic en 2 chiffres. L'app calcule le solde et prépare la lettre.`,
+        actionLabel: 'Calculer la régularisation (2 chiffres)'
+      });
+    }
+  }
+
+  // 8. Coffre-fort numérique : pièces vitales manquantes
+  const vault = property.vaultDocuments || {};
+  const missingVitalDocs: string[] = [];
+  if (!vault.leaseFile) missingVitalDocs.push('Bail signé');
+  if (!vault.edlFile) missingVitalDocs.push('EDL');
+  if (!vault.taxeFonciereFile) missingVitalDocs.push('Taxe foncière');
+  if (!vault.dpeFile) missingVitalDocs.push('DPE');
+  
+  if (missingVitalDocs.length > 0) {
+    actions.push({
+      id: 'act_vault_missing',
+      propertyId: property.id,
+      priority: 'GREEN',
+      type: 'CHARGES_REGUL', // réutilise type action
+      title: `Coffre-fort : ${missingVitalDocs.length} document${missingVitalDocs.length > 1 ? 's vitaux' : ' vital'} à sécuriser`,
+      description: `Il vous manque : ${missingVitalDocs.join(', ')}. Déposez-les pour les avoir sous la main en 2 secondes en cas de pépin ou contrôle.`,
+      actionLabel: 'Ouvrir le coffre-fort'
+    });
+  }
+
+  // 9. Congé bailleur ou renouvellement de bail
   const leaseStartDateObj = new Date(property.leaseStartDate);
   const leaseYears = property.leaseDurationYears || (property.leaseType === 'vide' ? 3 : 1);
   const leaseEndDate = new Date(leaseStartDateObj);
@@ -230,7 +282,7 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
             </span>
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Pour <strong>{property.name}</strong> • Locataire : {property.tenantName}
+            Pour <strong>{property.name}</strong> • Locataire : <MaskedValue value={property.tenantName} />
           </p>
         </div>
 
@@ -361,18 +413,61 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
                     </button>
                   )}
 
-                  {(act.type === 'INSURANCE_MRH' || act.type === 'BOILER_CHECK') && (
+                  {act.id === 'act_charges_regul' && (
                     <button
-                      onClick={() => {
-                        const subject = encodeURIComponent(`Rappel obligatoire : ${act.title}`);
-                        const body = encodeURIComponent(`Bonjour ${property.tenantName},\n\nDans le cadre du suivi réglementaire de votre logement au ${property.address}, pourriez-vous me transmettre par retour de mail le justificatif concernant : ${act.title} ?\n\nBien cordialement,\nVotre Propriétaire Bailleur`);
-                        window.location.href = `mailto:${property.tenantEmail}?subject=${subject}&body=${body}`;
-                      }}
-                      className="w-full sm:w-auto px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
+                      onClick={() => onOpenChargesModal && onOpenChargesModal(property)}
+                      className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs font-bold transition shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
                     >
-                      <Send className="w-4 h-4 text-teal-400" />
-                      <span>Envoyer la demande</span>
+                      <Receipt className="w-4 h-4 text-teal-300" />
+                      <span>{act.actionLabel}</span>
                     </button>
+                  )}
+
+                  {act.id === 'act_vault_missing' && (
+                    <button
+                      onClick={() => onOpenVaultModal && onOpenVaultModal(property)}
+                      className="w-full sm:w-auto px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
+                    >
+                      <FolderLock className="w-4 h-4 text-emerald-200" />
+                      <span>{act.actionLabel}</span>
+                    </button>
+                  )}
+
+                  {(act.type === 'INSURANCE_MRH' || act.type === 'BOILER_CHECK') && (
+                    <div className="flex items-center space-x-2 w-full sm:w-auto">
+                      <button
+                        onClick={() => {
+                          const isInsurance = act.type === 'INSURANCE_MRH';
+                          const subject = encodeURIComponent(
+                            isInsurance 
+                              ? `Rappel légal annuel : Attestation d'assurance habitation (${property.address})`
+                              : `Rappel légal annuel : Attestation entretien annuel chaudière (${property.address})`
+                          );
+                          const body = encodeURIComponent(
+                            `Bonjour ${property.tenantName},\n\nSauf erreur de ma part, je n'ai pas encore reçu votre ${
+                              isInsurance ? "attestation d'assurance multirisque habitation (MRH)" : "attestation d'entretien annuel de chaudière"
+                            } pour le logement situé au ${property.address}.\n\nCette démarche est une obligation légale annuelle à la charge du locataire (loi du 6 juillet 1989 art. 7g). Pourriez-vous avoir l'amabilité de me la transmettre par retour de mail ou la déposer sur notre lien sécurisé ?\n\nEn vous remerciant pour votre coopération,\nBien cordialement,\nVotre Propriétaire Bailleur`
+                          );
+                          window.location.href = `mailto:${property.tenantEmail}?subject=${subject}&body=${body}`;
+                        }}
+                        className="flex-1 sm:flex-initial px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
+                        title="Envoyer un rappel par email ou SMS"
+                      >
+                        <Send className="w-3.5 h-3.5 text-teal-400" />
+                        <span>Relancer le locataire</span>
+                      </button>
+
+                      {onOpenVaultModal && (
+                        <button
+                          onClick={() => onOpenVaultModal(property)}
+                          className="px-3 py-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-xs font-bold transition flex items-center space-x-1 cursor-pointer"
+                          title="Déposer directement le document reçu"
+                        >
+                          <FolderLock className="w-3.5 h-3.5 text-slate-500" />
+                          <span className="hidden sm:inline">J'ai reçu le doc</span>
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

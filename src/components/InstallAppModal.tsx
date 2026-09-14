@@ -253,6 +253,31 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
                   </div>
                 </div>
               </div>
+
+              {/* Home Screen Installed Icon Preview */}
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-slate-700 text-white flex items-center justify-between shadow-inner">
+                <div className="pr-3">
+                  <div className="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold mb-1">
+                    <Check className="w-3 h-3" />
+                    <span>Conforme iOS & Android</span>
+                  </div>
+                  <h5 className="text-xs font-bold text-white">
+                    Rendu sur votre écran d'accueil
+                  </h5>
+                  <p className="text-[11px] text-slate-300 mt-0.5">
+                    Le logo officiel DRYOS et le titre <strong className="text-white">Assist'Gestion</strong> s'affichent automatiquement sous l'icône.
+                  </p>
+                </div>
+
+                <div className="flex flex-col items-center flex-shrink-0">
+                  <div className="w-13 h-13 rounded-2xl bg-white p-1 shadow-md border border-white/20 flex items-center justify-center overflow-hidden">
+                    <AppLogo className="w-11 h-11 object-contain" />
+                  </div>
+                  <span className="text-[10px] font-semibold text-slate-200 mt-1 tracking-tight">
+                    Assist'Gestion
+                  </span>
+                </div>
+              </div>
             </div>
           )}
 

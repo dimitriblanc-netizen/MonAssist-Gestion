@@ -71,18 +71,18 @@ export function generateQuittancePDF(property: Property, rent: RentRecord, landl
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
   doc.setTextColor(dryosColor[0], dryosColor[1], dryosColor[2]);
-  doc.text('LOCATAIRE', 115, 58);
+  doc.text(property.isColocation ? 'COLOCATAIRES' : 'LOCATAIRE', 115, 58);
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
+  doc.setFontSize(10);
   doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.text(property.tenantName, 115, 66);
+  doc.text(property.tenantName || 'Locataire en place', 115, 66);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.setTextColor(grayText[0], grayText[1], grayText[2]);
-  doc.text(property.address, 115, 72);
-  doc.text(`${property.postalCode} ${property.city}`, 115, 78);
+  doc.text(property.address || property.name, 115, 72);
+  doc.text(`${property.postalCode || ''} ${property.city || ''}`.trim() || 'Paris', 115, 78);
   if (property.tenantPhone) {
     doc.text(`Tél : ${property.tenantPhone}`, 115, 84);
   }
@@ -99,8 +99,10 @@ export function generateQuittancePDF(property: Property, rent: RentRecord, landl
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.setTextColor(grayText[0], grayText[1], grayText[2]);
-  doc.text(`Adresse : ${property.address}, ${property.postalCode} ${property.city} ${property.floor ? `(${property.floor})` : ''}`, 26, 113);
-  doc.text(`Type : Location ${(property.leaseType || property.type) === 'meuble' ? 'Meublée' : 'Vide'} | Surface : ${property.surface} m² (${property.rooms} pièce${property.rooms > 1 ? 's' : ''})`, 26, 119);
+  const surfaceStr = property.surface ? ` | Surface : ${property.surface} m²` : '';
+  const roomsStr = property.rooms ? ` (${property.rooms} p.)` : '';
+  doc.text(`Adresse : ${property.address || property.name}${property.city ? `, ${property.postalCode || ''} ${property.city}` : ''} ${property.floor ? `(${property.floor})` : ''}`, 26, 113);
+  doc.text(`Type : Location ${(property.leaseType || property.type) === 'meuble' ? 'Meublée' : 'Vide'}${surfaceStr}${roomsStr}${property.isColocation ? ' | Colocation' : ''}`, 26, 119);
 
   // Period banner
   doc.setFillColor(241, 245, 249);

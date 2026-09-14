@@ -1,8 +1,54 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-\\.]+$');
+    }
+
+    // Default catch-all: DENY ALL by default (Zero-Trust)
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
+    }
+
+    // Strictly isolated landlord workspace
+    // No landlord can access, read, or write another landlord's dossier or tenant data
+    match /users/{userId} {
+      allow read, write: if isOwner(userId) && isValidId(userId);
+
+      // Properties collection
+      match /properties/{propertyId} {
+        allow read, write: if isOwner(userId) && isValidId(propertyId);
+      }
+
+      // Rents collection
+      match /rents/{rentId} {
+        allow read, write: if isOwner(userId) && isValidId(rentId);
+      }
+
+      // Expenses collection
+      match /expenses/{expenseId} {
+        allow read, write: if isOwner(userId) && isValidId(expenseId);
+      }
+
+      // Digital Vault & Documents collection
+      match /documents/{docId} {
+        allow read, write: if isOwner(userId) && isValidId(docId);
+      }
+
+      // Any nested subcollections strictly bound to the authenticated owner
+      match /{allSubcollections=**} {
+        allow read, write: if isOwner(userId);
+      }
     }
   }
 }

@@ -138,7 +138,7 @@ export function generateTaxReportPdf(
     doc.text(`  Déduction intégrale des charges (${totalDeductible.toFixed(2)} €) + Amortissement comptable de l'immeuble.`, 26, y + 36);
   }
 
-  // Avertissement légal obligatoire (100% déclaratif, pas de carte G)
+  // Note indicative
   y = 250;
   doc.setDrawColor(220, 220, 220);
   doc.line(20, y, 190, y);
@@ -146,8 +146,8 @@ export function generateTaxReportPdf(
   doc.setFont('helvetica', 'italic');
   doc.setFontSize(8);
   doc.setTextColor(120, 120, 120);
-  doc.text('AVERTISSEMENT LÉGAL ET FISCAL (MON ASSIST\'GESTION / DRYOS) :', 20, y + 6);
-  const disclaimer = `Ce document est un état déclaratif fourni à titre de synthèse indicative selon les données saisies par le bailleur. Conformément à la législation et en l'absence de Carte G (gestion), DRYOS Immobilier n'intervient à aucun titre dans la gestion comptable ou fiscale des biens. Le propriétaire demeure seul responsable de ses déclarations auprès de la DGFIP. Rapprochez-vous de votre expert-comptable ou centre des impôts pour validation.`;
+  doc.text('NOTE D\'INFORMATION (MON ASSIST\'GESTION • DRYOS) :', 20, y + 6);
+  const disclaimer = `Ce document est une synthèse récapitulative indicative établie sur la base des encaissements et dépenses enregistrés par le propriétaire bailleur. Il constitue une aide à la préparation de vos déclarations fiscales.`;
   const splitDisclaimer = doc.splitTextToSize(disclaimer, 170);
   doc.text(splitDisclaimer, 20, y + 11);
 

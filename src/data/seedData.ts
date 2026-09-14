@@ -31,7 +31,17 @@ export const INITIAL_PROPERTIES: Property[] = [
     tenantEmail: 'camille.rochefort@example.com',
     tenantPhone: '06 45 89 12 34',
     tenantInsuranceExpiry: '2025-08-31',
+    insuranceCertificateFile: 'attestation_assurance_habitation_2024_2025.pdf',
+    boilerCertificateFile: 'entretien_chaudiere_gaz_oct_2024.pdf',
     guarantor: 'Visale (Action Logement)',
+    vaultDocuments: {
+      leaseFile: { name: 'Bail_meuble_loi_alur_signe.pdf', date: '2024-09-01' },
+      edlFile: { name: 'EDL_entree_avec_photos_chiffrees.pdf', date: '2024-09-01' },
+      taxeFonciereFile: { name: 'Avis_taxe_fonciere_2024.pdf', year: 2024, amount: 890 },
+      dpeFile: { name: 'Diagnostic_DPE_lettre_D.pdf', rating: 'D', date: '2023-05-12' },
+      insuranceFile: { name: 'Attestation_MRH_Camille_Rochefort.pdf', validUntil: '2025-08-31' },
+      boilerFile: { name: 'Attestation_Entretien_Chaudiere_2024.pdf', date: '2024-10-15' }
+    },
     createdAt: '2024-09-01'
   },
   {

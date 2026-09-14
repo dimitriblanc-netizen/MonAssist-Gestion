@@ -100,7 +100,7 @@ export const FinanceSection: React.FC<FinanceSectionProps> = ({
             Bilan Financier & Déclarations Fiscales ({selectedYear})
           </h3>
           <p className="text-xs text-slate-500">
-            {property.leaseType === 'vide' ? 'Revenus Fonciers (2044 / Micro)' : 'LMNP (Micro-BIC ou Réel)'} • 100% Déclaratif
+            {property.leaseType === 'vide' ? 'Régime Revenus Fonciers (2044 / Micro)' : 'Régime LMNP (Micro-BIC ou Réel)'}
           </p>
         </div>
 
