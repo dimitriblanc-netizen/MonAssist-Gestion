@@ -203,14 +203,83 @@ export interface DocumentRecord {
   url?: string;
 }
 
-// Retro-compatible DryosSupportTicket
+// DryosSupportTicket
 export interface DryosSupportTicket {
   id: string;
-  propertyId: string;
-  type: 'PREAVIS_RECU' | 'RECHERCHE_LOCATAIRE' | 'LITIGE_JURIDIQUE' | 'QUESTION_FISCALE' | 'AUTRE';
+  propertyId?: string;
+  propertyName?: string;
+  userId?: string;
+  userEmail?: string;
+  userName?: string;
+  type: 'PREAVIS_RECU' | 'RECHERCHE_LOCATAIRE' | 'LITIGE_JURIDIQUE' | 'QUESTION_FISCALE' | 'GESTION_IMPAYES' | 'MISE_EN_LOCATION' | 'AUTRE';
   status: 'OUVERT' | 'EN_COURS' | 'CLOS' | 'TRANSMIS';
   createdAt: string;
   subject: string;
   message: string;
   contactPhone?: string;
+}
+
+// DRYOS Agency Admin Account Types
+export type MandateType = 'AUTONOME' | 'MISE_EN_LOCATION' | 'GESTION_COMPLETE';
+export type AccountStatus = 'ACTIVE' | 'INVITATION_ENVOYEE' | 'EN_ATTENTE_CONFIGURATION' | 'SUSPENDU';
+
+export interface LandlordAccount {
+  id: string; // unique ID or normalized email
+  email: string;
+  fullName: string;
+  phone?: string;
+  address?: string;
+  mandateType: MandateType;
+  status: AccountStatus;
+  createdAt: string;
+  notes?: string;
+  properties: Property[];
+  rents: RentRecord[];
+  expenses: ExpenseRecord[];
+  invitationSentAt?: string;
+  configuredByAdmin?: boolean;
+}
+
+export interface AccountSetupFormData {
+  // Landlord
+  fullName: string;
+  email: string;
+  phone: string;
+  mandateType: MandateType;
+  agencyNotes?: string;
+
+  // Property
+  propertyName: string;
+  address: string;
+  postalCode: string;
+  city: string;
+  surface: number;
+  rooms: number;
+  floor: string;
+  leaseType: LeaseType;
+  rentExcl: number;
+  charges: number;
+  chargesMode: ChargesMode;
+  deposit: number;
+  dpeRating: DpeRating;
+  dpeExpiryDate?: string;
+  irlBaseQuarter?: string;
+  irlBaseValue?: number;
+  hasRevisionClause?: boolean;
+
+  // Tenant
+  tenantName: string;
+  tenantEmail: string;
+  tenantPhone: string;
+  leaseStartDate: string;
+  leaseDurationYears: number;
+  gliProvider?: string;
+  guarantor?: string;
+
+  // Documents
+  hasSignedLeaseDoc?: boolean;
+  hasEdleDoc?: boolean;
+  hasDdtDoc?: boolean;
+  hasInsuranceDoc?: boolean;
+  hasAgencyInvoiceDoc?: boolean;
 }

@@ -112,6 +112,29 @@ export async function seedDemoDataForUser(userId: string): Promise<{
   };
 }
 
+/**
+ * Clears all personal data (properties, rents, expenses) for a user
+ */
+export async function clearUserDataFromDb(userId: string): Promise<void> {
+  const userPath = `users/${userId}`;
+  try {
+    const propSnap = await getDocs(collection(db, userPath, COLL_PROPERTIES));
+    for (const d of propSnap.docs) {
+      await deleteDoc(d.ref);
+    }
+    const rentSnap = await getDocs(collection(db, userPath, COLL_RENTS));
+    for (const d of rentSnap.docs) {
+      await deleteDoc(d.ref);
+    }
+    const expSnap = await getDocs(collection(db, userPath, COLL_EXPENSES));
+    for (const d of expSnap.docs) {
+      await deleteDoc(d.ref);
+    }
+  } catch (err) {
+    console.warn(`Error clearing data for user ${userId}:`, err);
+  }
+}
+
 // Property mutations
 export async function saveProperty(property: Property, userId?: string | null): Promise<void> {
   const targetUid = userId || auth.currentUser?.uid;

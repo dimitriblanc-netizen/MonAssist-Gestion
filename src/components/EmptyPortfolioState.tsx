@@ -4,17 +4,22 @@ import {
   CheckCircle2, 
   Receipt, 
   Scale, 
-  ArrowRight
+  ArrowRight,
+  Sparkles
 } from 'lucide-react';
 
 interface EmptyPortfolioStateProps {
   userName?: string | null;
   onAddFirstProperty: () => void;
+  isAdmin?: boolean;
+  onLoadTestData?: () => void;
 }
 
 export const EmptyPortfolioState: React.FC<EmptyPortfolioStateProps> = ({
   userName,
-  onAddFirstProperty
+  onAddFirstProperty,
+  isAdmin,
+  onLoadTestData
 }) => {
   const firstName = userName ? userName.split(' ')[0] : 'Propriétaire';
 
@@ -43,7 +48,7 @@ export const EmptyPortfolioState: React.FC<EmptyPortfolioStateProps> = ({
           </p>
 
           {/* Primary CTA */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
             <button
               id="btn-empty-add-property"
               onClick={onAddFirstProperty}
@@ -54,6 +59,33 @@ export const EmptyPortfolioState: React.FC<EmptyPortfolioStateProps> = ({
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
+
+          {/* Admin Test Mode Quick Loader */}
+          {isAdmin && onLoadTestData && (
+            <div className="mb-8 p-4 sm:p-5 rounded-2xl bg-purple-50 border border-purple-200 text-left flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <Sparkles className="w-5 h-5 text-purple-200" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-black text-purple-950 uppercase tracking-wide">
+                    Espace Bailleur Personnel (Mode Test DRYOS)
+                  </h4>
+                  <p className="text-xs text-purple-700">
+                    Chargez 3 biens de test complets (loyer payé, impayé avec relance, passoire DPE) pour tester immédiatement toutes les fonctionnalités.
+                  </p>
+                </div>
+              </div>
+              <button
+                id="btn-empty-load-test-data"
+                onClick={onLoadTestData}
+                className="px-4 py-2.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-extrabold shadow-sm transition cursor-pointer flex items-center justify-center space-x-1.5 shrink-0"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Charger 3 biens de test</span>
+              </button>
+            </div>
+          )}
 
           {/* Feature Highlights Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left pt-6 border-t border-slate-100">

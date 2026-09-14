@@ -3,7 +3,8 @@ import {
   Property, 
   RentRecord, 
   ExpenseRecord, 
-  PaymentStatus 
+  PaymentStatus,
+  LandlordAccount 
 } from './types';
 import { 
   initializeData, 
@@ -13,8 +14,11 @@ import {
   saveExpense, 
   deleteExpenseFromDb,
   getCachedActivePropertyId,
-  setCachedActivePropertyId
+  setCachedActivePropertyId,
+  seedDemoDataForUser,
+  clearUserDataFromDb
 } from './services/dataService';
+import { isUserAdmin } from './services/adminService';
 import { auth, onAuthStateChanged, logoutUser, User } from './firebase';
 import { AppLogo } from './components/AppLogo';
 import { Header } from './components/Header';
@@ -32,6 +36,7 @@ import { VaultModal } from './components/VaultModal';
 import { DryosAgencyModal } from './components/DryosAgencyModal';
 import { AuthModal } from './components/AuthModal';
 import { EmptyPortfolioState } from './components/EmptyPortfolioState';
+import { AdminConsole } from './components/AdminConsole';
 import { generateQuittancePDF } from './utils/generateReceipt';
 import { generateLrarMiseEnDemeure } from './utils/generateLrarPdf';
 import { NotificationBanner } from './components/NotificationBanner';
@@ -59,7 +64,9 @@ import {
   LogIn,
   Info,
   FolderLock,
-  ShieldCheck
+  ShieldCheck,
+  Eye,
+  UserCheck
 } from 'lucide-react';
 
 export default function App() {
@@ -80,27 +87,68 @@ export default function App() {
   // Active sub-tab (including Vault & Dossiers)
   const [activeTab, setActiveTab] = useState<'ACTIONS' | 'RENTS' | 'LEGAL' | 'FINANCE' | 'EXIT' | 'VAULT'>('ACTIONS');
 
+  // Check standalone mode (PWA installed on device)
+  const isDeviceStandalone = pwa.isStandalone || 
+    (typeof window !== 'undefined' && (
+      window.matchMedia('(display-mode: standalone)').matches || 
+      (window.navigator as any).standalone === true ||
+      localStorage.getItem('dryos_pwa_installed') === 'true'
+    ));
+
+  // Admin & Impersonation state
+  const [isAdminView, setIsAdminView] = useState<boolean>(false);
+  const [previewingClient, setPreviewingClient] = useState<LandlordAccount | null>(null);
+
   // Routing: 'landing' (/) vs 'app' (/app)
   const [currentRoute, setCurrentRoute] = useState<'landing' | 'app'>(() => {
-    const pathname = window.location.pathname;
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-    if (pathname.startsWith('/app') || isStandalone) {
+    const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
+    const isStandalone = typeof window !== 'undefined' && (
+      window.matchMedia('(display-mode: standalone)').matches || 
+      (window.navigator as any).standalone === true ||
+      localStorage.getItem('dryos_pwa_installed') === 'true'
+    );
+    const hasEnteredApp = typeof localStorage !== 'undefined' && localStorage.getItem('dryos_has_entered_app') === 'true';
+    if (pathname.startsWith('/app') || isStandalone || hasEnteredApp) {
       return 'app';
     }
     return 'landing';
   });
 
   const navigateTo = (route: 'landing' | 'app') => {
+    // If installed as standalone app, landing is strictly locked out
+    if (isDeviceStandalone && route === 'landing') {
+      setCurrentRoute('app');
+      return;
+    }
+    if (route === 'app') {
+      localStorage.setItem('dryos_has_entered_app', 'true');
+    }
     setCurrentRoute(route);
     const targetPath = route === 'app' ? '/app' : '/';
-    if (window.location.pathname !== targetPath) {
+    if (typeof window !== 'undefined' && window.location.pathname !== targetPath) {
       window.history.pushState({ route }, '', targetPath);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Lock out landing page if standalone or logged in
+  useEffect(() => {
+    if (isDeviceStandalone || currentUser) {
+      if (currentRoute !== 'app') {
+        setCurrentRoute('app');
+      }
+      if (typeof window !== 'undefined' && window.location.pathname !== '/app') {
+        window.history.replaceState({ route: 'app' }, '', '/app');
+      }
+    }
+  }, [isDeviceStandalone, currentUser, currentRoute]);
+
   useEffect(() => {
     const handlePopState = () => {
+      if (isDeviceStandalone) {
+        setCurrentRoute('app');
+        return;
+      }
       if (window.location.pathname.startsWith('/app')) {
         setCurrentRoute('app');
       } else {
@@ -109,7 +157,7 @@ export default function App() {
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+  }, [isDeviceStandalone]);
 
   // Modals state
   const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
@@ -176,7 +224,51 @@ export default function App() {
     setCachedActivePropertyId(prop.id, currentUser?.uid);
   };
 
-  const activeProperty = properties.find(p => p.id === activePropertyId) || properties[0] || null;
+  // Test data seeding & wiping for Admin's personal test workspace
+  const handleLoadTestData = async () => {
+    if (!currentUser) return;
+    try {
+      setLoading(true);
+      const data = await seedDemoDataForUser(currentUser.uid);
+      setProperties(data.properties);
+      setRents(data.rents);
+      setExpenses(data.expenses);
+      if (data.properties.length > 0) {
+        setActivePropertyId(data.properties[0].id);
+        setCachedActivePropertyId(data.properties[0].id, currentUser.uid);
+      }
+    } catch (err) {
+      console.error('Error loading test data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClearTestData = async () => {
+    if (!currentUser) return;
+    const confirmed = window.confirm("Confirmez-vous la réinitialisation de votre espace personnel ? (Vos comptes clients en agence ne seront absolument pas touchés)");
+    if (!confirmed) return;
+
+    try {
+      setLoading(true);
+      await clearUserDataFromDb(currentUser.uid);
+      setProperties([]);
+      setRents([]);
+      setExpenses([]);
+      setActivePropertyId(null);
+    } catch (err) {
+      console.error('Error clearing personal test data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Delegated data when previewing a client account from Admin Console
+  const displayedProperties = previewingClient ? (previewingClient.properties || []) : properties;
+  const displayedRents = previewingClient ? (previewingClient.rents || []) : rents;
+  const displayedExpenses = previewingClient ? (previewingClient.expenses || []) : expenses;
+  const activeProperty = displayedProperties.find(p => p.id === activePropertyId) || displayedProperties[0] || null;
+  const isAdmin = isUserAdmin(currentUser);
 
   // Handlers for Data Mutations
   const handleCompleteOnboarding = async (newProp: Property) => {
@@ -328,8 +420,8 @@ export default function App() {
     );
   }
 
-  // Showcase & Download Landing Page (gestion.dryos.fr /)
-  if (currentRoute === 'landing') {
+  // Showcase & Download Landing Page (gestion.dryos.fr /) - strictly inaccessible if installed or authenticated
+  if (currentRoute === 'landing' && !isDeviceStandalone && !currentUser) {
     return (
       <>
         <LandingPage
@@ -342,7 +434,7 @@ export default function App() {
             }
           }}
           canInstall={pwa.isInstallable}
-          isInstalled={pwa.isStandalone}
+          isInstalled={isDeviceStandalone}
           onOpenAgencyContact={() => setShowAgencyModal(true)}
         />
 
@@ -358,6 +450,7 @@ export default function App() {
           onInstall={pwa.triggerInstall}
           isInstallable={pwa.isInstallable}
           isIos={pwa.isIos}
+          isStandalone={isDeviceStandalone}
         />
       </>
     );
@@ -371,75 +464,196 @@ export default function App() {
           onOpenAgencyContact={() => setShowAgencyModal(true)}
           onAddProperty={() => setShowOnboarding(true)}
           onDownloadAppClick={() => pwa.setShowInstallModal(true)}
-          onNavigateToLanding={() => navigateTo('landing')}
+          onNavigateToLanding={() => isDeviceStandalone ? setActiveTab('ACTIONS') : navigateTo('landing')}
+          onResetToAppHome={() => {
+            setIsAdminView(false);
+            setPreviewingClient(null);
+            setActiveTab('ACTIONS');
+          }}
           onOpenAuth={() => setShowAuthModal(true)}
           onLogout={handleLogout}
           onOpenSecurity={() => setShowSecurityModal(true)}
           currentUser={currentUser}
           firebaseConnected={firebaseConnected}
-          totalProperties={properties.length}
-          isStandalone={pwa.isStandalone}
+          totalProperties={displayedProperties.length}
+          isStandalone={isDeviceStandalone}
+          isAdmin={isAdmin}
+          isAdminViewActive={isAdminView}
+          onToggleAdmin={() => {
+            setPreviewingClient(null);
+            setIsAdminView(prev => !prev);
+          }}
+          onLoadTestData={handleLoadTestData}
+          onClearTestData={handleClearTestData}
         />
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 pb-24 sm:pb-8 space-y-4 sm:space-y-6">
 
-        {/* The Standout "Télécharger l'app ici" Hero Banner */}
-        <InstallHeroBanner
-          onOpenInstallModal={() => pwa.setShowInstallModal(true)}
-          onTriggerInstall={pwa.triggerInstall}
-          isInstallable={pwa.isInstallable}
-          isStandalone={pwa.isStandalone}
-          isIos={pwa.isIos}
-        />
-
-        {/* Not Logged In: Show Clean Client Login Invitation */}
-        {!currentUser && (
-          <div className="max-w-xl mx-auto my-10 p-6 sm:p-10 bg-white rounded-3xl border border-slate-200/90 shadow-sm text-center">
-            <div className="flex justify-center mb-5">
-              <AppLogo className="h-16 w-auto object-contain" />
+        {/* Client Impersonation / Preview Top Banner */}
+        {previewingClient && (
+          <div className="bg-gradient-to-r from-purple-900 to-indigo-950 text-white px-4 py-3 sm:px-5 sm:py-4 rounded-3xl shadow-lg border border-purple-400/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-2xl bg-purple-500/30 border border-purple-400/30 flex items-center justify-center text-purple-200 shrink-0">
+                <Eye className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-purple-300">
+                    Mode Consultation Compte Client
+                  </span>
+                  <span className="text-[10px] font-extrabold bg-purple-400/20 text-purple-200 px-2 py-0.5 rounded-md border border-purple-300/30">
+                    {previewingClient.mandateType === 'MISE_EN_LOCATION' ? 'Mise en location DRYOS' : previewingClient.mandateType === 'GESTION_COMPLETE' ? 'Gestion Sérénité' : 'Autonome'}
+                  </span>
+                </div>
+                <p className="text-sm font-bold text-white">
+                  {previewingClient.fullName} <span className="text-xs font-normal text-purple-200">({previewingClient.email})</span>
+                </p>
+              </div>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black text-[#00434A] tracking-tight mb-2">
-              Connectez-vous à votre espace
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto mb-6 leading-relaxed">
-              Accédez à votre espace gestionnaire pour administrer vos biens immobiliers et suivre vos loyers en temps réel.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+
+            <button
+              onClick={() => {
+                setPreviewingClient(null);
+                setIsAdminView(true);
+              }}
+              className="px-4 py-2.5 rounded-xl bg-white hover:bg-purple-100 text-purple-950 font-extrabold text-xs shadow-md transition cursor-pointer flex items-center space-x-2 self-start sm:self-auto"
+            >
+              <span>← Revenir à la console admin</span>
+            </button>
+          </div>
+        )}
+
+        {/* Admin Personal Workspace Top Banner */}
+        {isAdmin && !previewingClient && !isAdminView && (
+          <div className="bg-gradient-to-r from-[#00343a] via-[#00434A] to-[#004f58] text-white px-4 py-3 sm:px-5 sm:py-3.5 rounded-2xl shadow-sm border border-teal-600/40 flex flex-col md:flex-row md:items-center justify-between gap-3 animate-in fade-in">
+            <div className="flex items-start sm:items-center space-x-3">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0 animate-ping mt-1 sm:mt-0" />
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-black uppercase tracking-wider text-teal-300 text-xs">
+                    Mon Espace Bailleur Personnel • Dimitri Blanc
+                  </span>
+                  <span className="text-[10px] bg-teal-800/90 text-teal-100 px-2 py-0.5 rounded-md font-bold border border-teal-600/40">
+                    {properties.length} lot{properties.length > 1 ? 's' : ''} actif{properties.length > 1 ? 's' : ''}
+                  </span>
+                </div>
+                <p className="text-xs text-teal-100/90 mt-0.5">
+                  Vous êtes sur votre espace bailleur dédié. Vous pouvez tester librement baux, quittances, impayés, régularisations et IRL.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
               <button
-                id="btn-gate-google-login"
-                onClick={() => setShowAuthModal(true)}
-                className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-[#00434A] hover:bg-[#00343a] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2 cursor-pointer"
+                id="btn-banner-load-test-data"
+                onClick={handleLoadTestData}
+                className="px-3 py-1.5 rounded-xl bg-teal-700/90 hover:bg-teal-600 text-teal-100 font-bold text-xs transition cursor-pointer border border-teal-500/30 flex items-center space-x-1.5 shadow-2xs"
+                title="Charger 3 biens de test complets (à jour, impayé, passoire DPE)"
               >
-                <span>Accéder à mon compte</span>
-                <ArrowRight className="w-4 h-4" />
+                <Sparkles className="w-3.5 h-3.5 text-teal-300" />
+                <span>Charger 3 tests</span>
+              </button>
+
+              {properties.length > 0 && (
+                <button
+                  id="btn-banner-clear-test-data"
+                  onClick={handleClearTestData}
+                  className="px-2.5 py-1.5 rounded-xl bg-rose-950/60 hover:bg-rose-900 text-rose-200 font-bold text-xs transition cursor-pointer border border-rose-800/40"
+                  title="Vider les biens de mon compte personnel"
+                >
+                  Vider
+                </button>
+              )}
+
+              <button
+                id="btn-banner-back-to-admin"
+                onClick={() => setIsAdminView(true)}
+                className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-teal-50 text-[#00434A] font-black text-xs shadow-sm transition cursor-pointer flex items-center space-x-1.5"
+              >
+                <span>Console Agence</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
         )}
 
-        {/* Logged in with 0 properties: Display Welcoming Empty State */}
-        {currentUser && properties.length === 0 && (
-          <EmptyPortfolioState
-            userName={currentUser.displayName || currentUser.email}
-            onAddFirstProperty={() => setShowOnboarding(true)}
+        {/* If Admin Console is activated */}
+        {isAdminView ? (
+          <AdminConsole
+            onSelectClientToView={(account) => {
+              setPreviewingClient(account);
+              setIsAdminView(false);
+              if (account.properties && account.properties.length > 0) {
+                setActivePropertyId(account.properties[0].id);
+              }
+            }}
+            onExitAdmin={() => setIsAdminView(false)}
+            adminEmail={currentUser?.email || 'dimitri.blanc@dryos.fr'}
+            onLoadTestData={handleLoadTestData}
+            onClearTestData={handleClearTestData}
+            personalPropertiesCount={properties.length}
           />
-        )}
-
-        {/* If properties exist: Display selector and content */}
-        {properties.length > 0 && activeProperty && (
+        ) : (
           <>
-            {/* Active Property Selector (cached in localStorage) */}
-            <PropertySelector
-              properties={properties}
-              activeProperty={activeProperty}
-              onSelectProperty={handleSelectProperty}
-              onOpenOnboarding={() => setShowOnboarding(true)}
-              onEditProperty={(prop) => setEditingProperty(prop)}
+            {/* The Standout "Télécharger l'app ici" Hero Banner */}
+            <InstallHeroBanner
+              onOpenInstallModal={() => pwa.setShowInstallModal(true)}
+              onTriggerInstall={pwa.triggerInstall}
+              isInstallable={pwa.isInstallable}
+              isStandalone={isDeviceStandalone}
+              isIos={pwa.isIos}
             />
 
-            {/* Smartphone Push & Proactive Alert Banner */}
-            <NotificationBanner properties={properties} rents={rents} />
+            {/* Not Logged In: Show Clean Client Login Invitation */}
+            {!currentUser && !previewingClient && (
+              <div className="max-w-xl mx-auto my-10 p-6 sm:p-10 bg-white rounded-3xl border border-slate-200/90 shadow-sm text-center">
+                <div className="flex justify-center mb-5">
+                  <AppLogo className="h-16 w-auto object-contain" />
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-[#00434A] tracking-tight mb-2">
+                  Connectez-vous à votre espace
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto mb-6 leading-relaxed">
+                  Accédez à votre espace gestionnaire pour administrer vos biens immobiliers et suivre vos loyers en temps réel.
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <button
+                    id="btn-gate-google-login"
+                    onClick={() => setShowAuthModal(true)}
+                    className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-[#00434A] hover:bg-[#00343a] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2 cursor-pointer"
+                  >
+                    <span>Accéder à mon compte</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Logged in with 0 properties: Display Welcoming Empty State */}
+            {currentUser && !previewingClient && displayedProperties.length === 0 && (
+              <EmptyPortfolioState
+                userName={currentUser.displayName || currentUser.email}
+                onAddFirstProperty={() => setShowOnboarding(true)}
+                isAdmin={isAdmin}
+                onLoadTestData={handleLoadTestData}
+              />
+            )}
+
+            {/* If properties exist: Display selector and content */}
+            {displayedProperties.length > 0 && activeProperty && (
+              <>
+                {/* Active Property Selector (cached in localStorage) */}
+                <PropertySelector
+                  properties={displayedProperties}
+                  activeProperty={activeProperty}
+                  onSelectProperty={handleSelectProperty}
+                  onOpenOnboarding={() => setShowOnboarding(true)}
+                  onEditProperty={(prop) => setEditingProperty(prop)}
+                />
+
+                {/* Smartphone Push & Proactive Alert Banner */}
+                <NotificationBanner properties={displayedProperties} rents={displayedRents} />
 
             {/* Sub-Navigation Tabs (DESKTOP ONLY: On mobile, bottom navigation is used) */}
             <div className="hidden sm:block border-b border-slate-200/80 bg-white rounded-2xl shadow-xs px-2 pt-2">
@@ -604,7 +818,7 @@ export default function App() {
             {activeTab === 'RENTS' && (
               <RentSection
                 property={activeProperty}
-                rents={rents}
+                rents={displayedRents}
                 onValidateRent={handleValidateRent}
                 onRejectRent={handleRejectRent}
                 onSetLateStatus={handleSetLateStatus}
@@ -628,8 +842,8 @@ export default function App() {
             {activeTab === 'FINANCE' && (
               <FinanceSection
                 property={activeProperty}
-                rents={rents}
-                expenses={expenses}
+                rents={displayedRents}
+                expenses={displayedExpenses}
                 onAddExpense={handleAddExpense}
                 onDeleteExpense={handleDeleteExpense}
               />
@@ -654,6 +868,8 @@ export default function App() {
             )}
           </>
         )}
+      </>
+    )}
 
       </main>
 
@@ -686,7 +902,7 @@ export default function App() {
 
       {showAgencyModal && (
         <DryosAgencyModal
-          properties={properties}
+          properties={displayedProperties}
           onClose={() => setShowAgencyModal(false)}
           onSubmitTicket={() => setShowAgencyModal(false)}
         />
@@ -738,7 +954,7 @@ export default function App() {
         onInstall={pwa.triggerInstall}
         isInstallable={pwa.isInstallable}
         isIos={pwa.isIos}
-        isStandalone={pwa.isStandalone}
+        isStandalone={isDeviceStandalone}
       />
 
       {/* Security & RGPD Modal */}
@@ -746,9 +962,9 @@ export default function App() {
         isOpen={showSecurityModal}
         onClose={() => setShowSecurityModal(false)}
         currentUser={currentUser}
-        properties={properties}
-        rents={rents}
-        expenses={expenses}
+        properties={displayedProperties}
+        rents={displayedRents}
+        expenses={displayedExpenses}
         onPurgeData={handlePurgeData}
       />
 
@@ -763,7 +979,25 @@ export default function App() {
             <span className="text-slate-500">Espace de gestion locative pour bailleurs</span>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+            {/* Agency Admin Access Shortcut */}
+            <button
+              id="btn-footer-admin-toggle"
+              onClick={() => {
+                if (!currentUser) {
+                  setShowAuthModal(true);
+                } else {
+                  setPreviewingClient(null);
+                  setIsAdminView(prev => !prev);
+                }
+              }}
+              className="text-purple-700 hover:text-purple-900 font-bold flex items-center space-x-1 cursor-pointer bg-purple-50 hover:bg-purple-100 px-2.5 py-1 rounded-lg border border-purple-200"
+              title="Console réservée agence DRYOS (dimitri.blanc@dryos.fr)"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
+              <span>Accès Agence DRYOS</span>
+            </button>
+
             <button
               onClick={() => setShowSecurityModal(true)}
               className="text-slate-500 hover:text-slate-800 flex items-center space-x-1 cursor-pointer"
@@ -771,7 +1005,7 @@ export default function App() {
               <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
               <span>Confidentialité & Sécurité</span>
             </button>
-            <span className="text-slate-300">•</span>
+            <span className="text-slate-300 hidden sm:inline">•</span>
             <button
               onClick={() => setShowAgencyModal(true)}
               className="font-bold text-[#00434A] hover:underline cursor-pointer"
@@ -782,8 +1016,8 @@ export default function App() {
         </div>
       </footer>
 
-      {/* Mobile Bottom Navigation Bar (Smartphone First) - Only when properties exist */}
-      {properties.length > 0 && (
+      {/* Mobile Bottom Navigation Bar (Smartphone First) - Only when properties exist and not in admin console */}
+      {displayedProperties.length > 0 && !isAdminView && (
         <nav 
           id="mobile-bottom-nav"
           className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 py-2 pb-5 flex items-center justify-around shadow-[0_-4px_12px_rgba(0,0,0,0.05)]"
