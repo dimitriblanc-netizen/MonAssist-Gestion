@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf';
 import { Property, RentRecord } from '../types';
+import { BRAND_COLORS, STATUS_COLORS } from '../theme/colors';
 
 export function generateLrarMiseEnDemeure(property: Property, rent: RentRecord, landlordName = 'Le Bailleur') {
   const doc = new jsPDF({
@@ -13,7 +14,7 @@ export function generateLrarMiseEnDemeure(property: Property, rent: RentRecord, 
   // En-tête Expéditeur
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
-  doc.setTextColor(0, 67, 74); // Teal #00434A
+  doc.setTextColor(BRAND_COLORS.navy.rgb[0], BRAND_COLORS.navy.rgb[1], BRAND_COLORS.navy.rgb[2]);
   doc.text(landlordName, 20, 25);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(40, 40, 40);
@@ -21,7 +22,7 @@ export function generateLrarMiseEnDemeure(property: Property, rent: RentRecord, 
   doc.text('Accompagné par Mon Assist\'Gestion (DRYOS)', 20, 37);
 
   // Destinataire
-  doc.setFillColor(251, 247, 238); // Cream #FBF7EE
+  doc.setFillColor(BRAND_COLORS.cream.rgb[0], BRAND_COLORS.cream.rgb[1], BRAND_COLORS.cream.rgb[2]);
   doc.roundedRect(110, 20, 80, 32, 2, 2, 'F');
   doc.setFont('helvetica', 'bold');
   doc.text('LETTRE RECOMMANDÉE AVEC AR', 115, 27);
@@ -36,7 +37,7 @@ export function generateLrarMiseEnDemeure(property: Property, rent: RentRecord, 
   // Objet
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.setTextColor(185, 28, 28); // Rouge avertissement
+  doc.setTextColor(STATUS_COLORS.urgent.textRgb[0], STATUS_COLORS.urgent.textRgb[1], STATUS_COLORS.urgent.textRgb[2]);
   doc.text('OBJET : MISE EN DEMEURE DE PAYER SOUS HUITAINE (Clause résolutoire)', 20, 70);
 
   // Corps juridique

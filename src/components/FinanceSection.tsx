@@ -117,7 +117,7 @@ export const FinanceSection: React.FC<FinanceSectionProps> = ({
           <button
             id="btn-export-tax-pdf"
             onClick={() => generateTaxReportPdf(property, rents, expenses, selectedYear)}
-            className="px-4 py-2 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs font-bold transition flex items-center space-x-1.5 shadow-xs cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-navy hover:bg-navy-800 text-white text-xs font-bold transition flex items-center space-x-1.5 shadow-xs cursor-pointer"
           >
             <FileDown className="w-4 h-4" />
             <span>Télécharger Bilan PDF</span>
@@ -127,11 +127,11 @@ export const FinanceSection: React.FC<FinanceSectionProps> = ({
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-[#FBF7EE] p-5 rounded-2xl border border-[#00434A]/20 space-y-1">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#00434A]">
+        <div className="bg-navy-50 p-5 rounded-2xl border border-navy-200 space-y-1">
+          <span className="text-xs font-bold uppercase tracking-wider text-navy">
             Loyers bruts encaissés
           </span>
-          <div className="text-2xl font-extrabold text-[#00434A]">
+          <div className="text-2xl font-extrabold text-navy">
             {totalIncome.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €
           </div>
           <span className="text-[11px] text-slate-500 block">
@@ -155,7 +155,7 @@ export const FinanceSection: React.FC<FinanceSectionProps> = ({
           <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
             Résultat net imposable
           </span>
-          <div className={`text-2xl font-extrabold ${netResult < 0 ? 'text-amber-700' : 'text-emerald-700'}`}>
+          <div className={`text-2xl font-extrabold ${netResult < 0 ? 'text-status-warning-text' : 'text-status-ok-text'}`}>
             {netResult.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €
           </div>
           <span className="text-[11px] text-slate-500 block">
@@ -246,7 +246,7 @@ export const FinanceSection: React.FC<FinanceSectionProps> = ({
                   onChange={handleFileUpload}
                   className="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-200 file:text-slate-800 cursor-pointer"
                 />
-                {uploading && <span className="text-[11px] text-[#00434A]">Compression locale en cours...</span>}
+                {uploading && <span className="text-[11px] text-navy">Compression locale en cours...</span>}
               </div>
 
               <div>
@@ -271,7 +271,7 @@ export const FinanceSection: React.FC<FinanceSectionProps> = ({
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs font-bold cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-navy hover:bg-navy-800 text-white text-xs font-bold cursor-pointer"
               >
                 Enregistrer la dépense
               </button>
@@ -317,7 +317,7 @@ export const FinanceSection: React.FC<FinanceSectionProps> = ({
                     <td className="py-3 px-4 text-right">
                       <button
                         onClick={() => onDeleteExpense(e.id)}
-                        className="text-slate-400 hover:text-rose-600 p-1.5 transition cursor-pointer"
+                        className="text-slate-400 hover:text-status-urgent-text p-1.5 transition cursor-pointer"
                         title="Supprimer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />

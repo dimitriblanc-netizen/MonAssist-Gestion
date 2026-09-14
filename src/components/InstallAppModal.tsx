@@ -65,11 +65,11 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
       <div 
-        className="relative bg-[#FBF7EE] border border-slate-200 rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden flex flex-col my-4 max-h-[92vh]"
+        className="relative bg-sand border border-slate-200 rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden flex flex-col my-4 max-h-[92vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with gradient & App Identity */}
-        <div className="bg-[#00434A] text-white p-5 sm:p-6 relative">
+        <div className="bg-navy text-white p-5 sm:p-6 relative">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition cursor-pointer"
@@ -82,19 +82,19 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
             <AppLogo className="w-14 h-14 bg-white rounded-2xl p-1 shadow-md flex-shrink-0" />
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-teal-400/20 text-teal-200 tracking-wider">
+                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-emerald-brand/20 text-emerald-light tracking-wider">
                   Application Officielle
                 </span>
-                <span className="text-[10px] text-teal-300 font-semibold flex items-center">
-                  <span className="w-1.5 h-1.5 rounded-full bg-teal-400 mr-1 animate-pulse" />
+                <span className="text-[10px] text-emerald-light font-semibold flex items-center">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-brand mr-1 animate-pulse" />
                   PWA Haute Précision
                 </span>
               </div>
               <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white mt-1">
                 Mon Assist'Gestion
               </h3>
-              <p className="text-xs text-teal-100 font-medium flex items-center space-x-1 mt-0.5">
-                <Globe className="w-3.5 h-3.5 text-teal-300" />
+              <p className="text-xs text-slate-200 font-medium flex items-center space-x-1 mt-0.5">
+                <Globe className="w-3.5 h-3.5 text-emerald-light" />
                 <span>gestion.dryos.fr</span>
               </p>
             </div>
@@ -107,7 +107,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
             onClick={() => setActiveTab('MOBILE')}
             className={`flex items-center space-x-1.5 pb-2.5 px-3 border-b-2 transition cursor-pointer ${
               activeTab === 'MOBILE'
-                ? 'border-[#00434A] text-[#00434A]'
+                ? 'border-navy text-navy'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -119,7 +119,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
             onClick={() => setActiveTab('DESKTOP')}
             className={`flex items-center space-x-1.5 pb-2.5 px-3 border-b-2 transition cursor-pointer ${
               activeTab === 'DESKTOP'
-                ? 'border-[#00434A] text-[#00434A]'
+                ? 'border-navy text-navy'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -131,7 +131,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
             onClick={() => setActiveTab('DOMAIN')}
             className={`flex items-center space-x-1.5 pb-2.5 px-3 border-b-2 transition cursor-pointer ${
               activeTab === 'DOMAIN'
-                ? 'border-[#00434A] text-[#00434A]'
+                ? 'border-navy text-navy'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -145,14 +145,14 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
 
           {/* Quick 1-Click Install if supported (Chrome/Android/Edge) */}
           {isInstallable && (
-            <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl shadow-xs">
+            <div className="bg-status-ok-bg border border-status-ok-border p-4 rounded-2xl shadow-xs">
               <div className="flex items-start justify-between">
                 <div>
-                  <h4 className="text-sm font-bold text-emerald-950 flex items-center space-x-1.5">
-                    <Sparkles className="w-4 h-4 text-emerald-600" />
+                  <h4 className="text-sm font-bold text-status-ok-text flex items-center space-x-1.5">
+                    <Sparkles className="w-4 h-4 text-status-ok" />
                     <span>Installation automatique disponible !</span>
                   </h4>
-                  <p className="text-xs text-emerald-800 mt-1">
+                  <p className="text-xs text-status-ok-text mt-1">
                     Votre navigateur supporte l'installation immédiate en 1 clic sur votre écran.
                   </p>
                 </div>
@@ -162,7 +162,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
                   const success = await onTriggerInstall();
                   if (success) onClose();
                 }}
-                className="mt-3 w-full py-3 px-4 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm rounded-xl transition flex items-center justify-center space-x-2 shadow-md cursor-pointer"
+                className="mt-3 w-full py-3 px-4 bg-emerald-brand hover:bg-emerald-600 text-white font-extrabold text-sm rounded-xl transition flex items-center justify-center space-x-2 shadow-md cursor-pointer"
               >
                 <Download className="w-4 h-4" />
                 <span>Télécharger & Installer l'app en 1 clic</span>
@@ -180,7 +180,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
                     🍎
                   </div>
                   <div>
-                    <h4 className="text-sm font-extrabold text-[#00434A]">
+                    <h4 className="text-sm font-extrabold text-navy">
                       Sur iPhone & iPad (Safari)
                     </h4>
                     <p className="text-[11px] text-slate-500">
@@ -191,7 +191,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
 
                 <div className="space-y-2.5 text-xs text-slate-700">
                   <div className="flex items-start space-x-3 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                    <div className="w-6 h-6 rounded-full bg-[#00434A] text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                    <div className="w-6 h-6 rounded-full bg-navy text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
                       1
                     </div>
                     <div>
@@ -201,14 +201,14 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
                       <p className="text-[11px] text-slate-500 flex items-center space-x-1 mt-0.5">
                         <span>Icône rectangle avec flèche vers le haut</span>
                         <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-white border border-slate-200 text-slate-800 font-bold">
-                          <Share className="w-3 h-3 mr-1 text-sky-600" /> Partager
+                          <Share className="w-3 h-3 mr-1 text-navy" /> Partager
                         </span>
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start space-x-3 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                    <div className="w-6 h-6 rounded-full bg-[#00434A] text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                    <div className="w-6 h-6 rounded-full bg-navy text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
                       2
                     </div>
                     <div>
@@ -222,7 +222,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
                   </div>
 
                   <div className="flex items-start space-x-3 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                    <div className="w-6 h-6 rounded-full bg-[#00434A] text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                    <div className="w-6 h-6 rounded-full bg-navy text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
                       3
                     </div>
                     <div>
@@ -244,7 +244,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
                     🤖
                   </div>
                   <div>
-                    <h4 className="text-sm font-extrabold text-[#00434A]">
+                    <h4 className="text-sm font-extrabold text-navy">
                       Sur Android (Chrome / Samsung Internet)
                     </h4>
                     <p className="text-[11px] text-slate-500">
@@ -257,7 +257,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
               {/* Home Screen Installed Icon Preview */}
               <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-slate-700 text-white flex items-center justify-between shadow-inner">
                 <div className="pr-3">
-                  <div className="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold mb-1">
+                  <div className="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded-full bg-emerald-brand/20 text-emerald-light text-[10px] font-bold mb-1">
                     <Check className="w-3 h-3" />
                     <span>Conforme iOS & Android</span>
                   </div>
@@ -285,8 +285,8 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
           {activeTab === 'DESKTOP' && (
             <div className="space-y-4">
               <div className="bg-white p-5 rounded-2xl border border-slate-200 text-center space-y-3">
-                <h4 className="text-sm font-black text-[#00434A] flex items-center justify-center space-x-1.5">
-                  <QrCode className="w-4 h-4 text-emerald-600" />
+                <h4 className="text-sm font-black text-navy flex items-center justify-center space-x-1.5">
+                  <QrCode className="w-4 h-4 text-emerald-brand" />
                   <span>Scanner pour installer sur votre smartphone</span>
                 </h4>
                 <p className="text-xs text-slate-600 max-w-xs mx-auto">
@@ -311,8 +311,8 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
               </div>
 
               <div className="bg-white p-4 rounded-2xl border border-slate-200 space-y-2">
-                <h4 className="text-xs font-bold text-[#00434A] flex items-center space-x-1.5">
-                  <Laptop className="w-3.5 h-3.5 text-teal-700" />
+                <h4 className="text-xs font-bold text-navy flex items-center space-x-1.5">
+                  <Laptop className="w-3.5 h-3.5 text-navy" />
                   <span>Installer sur votre PC / Mac (Chrome, Edge, Brave)</span>
                 </h4>
                 <p className="text-xs text-slate-600">
@@ -326,19 +326,19 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
           {activeTab === 'DOMAIN' && (
             <div className="space-y-3 text-xs text-slate-700">
               <div className="bg-white p-4 rounded-2xl border border-slate-200 space-y-3">
-                <div className="flex items-center space-x-2 text-[#00434A]">
-                  <Globe className="w-4 h-4 text-emerald-600" />
+                <div className="flex items-center space-x-2 text-navy">
+                  <Globe className="w-4 h-4 text-emerald-brand" />
                   <h4 className="text-sm font-extrabold">
                     Domaine officiel : gestion.dryos.fr
                   </h4>
                 </div>
                 
-                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1">
-                  <div className="flex items-center space-x-1.5 text-emerald-900 font-bold">
-                    <Check className="w-4 h-4 text-emerald-600" />
+                <div className="p-3 bg-status-ok-bg border border-status-ok-border rounded-xl space-y-1">
+                  <div className="flex items-center space-x-1.5 text-status-ok-text font-bold">
+                    <Check className="w-4 h-4 text-status-ok" />
                     <span>Projet Firebase déjà relié à gestion.dryos.fr !</span>
                   </div>
-                  <p className="text-[11px] text-emerald-800">
+                  <p className="text-[11px] text-status-ok-text">
                     Votre application est maintenant connectée à votre projet Firebase <strong>monassist-gestion</strong> (MonAssist'Gestion) avec le domaine <strong>gestion.dryos.fr</strong>.
                   </p>
                 </div>
@@ -346,7 +346,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
                 <div className="space-y-2 bg-slate-50 p-3 rounded-xl border border-slate-200 font-mono text-[11px]">
                   <div>
                     <span className="text-slate-500">URL d'accueil :</span>{' '}
-                    <span className="text-[#00434A] font-bold">https://gestion.dryos.fr</span>
+                    <span className="text-navy font-bold">https://gestion.dryos.fr</span>
                   </div>
                   <div>
                     <span className="text-slate-500">Projet Firebase :</span>{' '}
@@ -369,7 +369,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
 
               {/* Copy Direct URL */}
               <div className="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200">
-                <span className="font-mono text-xs text-[#00434A] font-bold truncate mr-2">
+                <span className="font-mono text-xs text-navy font-bold truncate mr-2">
                   https://gestion.dryos.fr
                 </span>
                 <button
@@ -378,7 +378,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
                 >
                   {copied ? (
                     <>
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <Check className="w-3.5 h-3.5 text-status-ok" />
                       <span>Copié !</span>
                     </>
                   ) : (
@@ -410,7 +410,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
         <div className="bg-white border-t border-slate-200 p-4 px-6 flex items-center justify-between">
           <div className="text-[11px] text-slate-500">
             {isStandalone ? (
-              <span className="text-emerald-700 font-bold flex items-center">
+              <span className="text-status-ok-text font-bold flex items-center">
                 <Check className="w-3.5 h-3.5 mr-1" />
                 Déjà installée sur cet appareil
               </span>

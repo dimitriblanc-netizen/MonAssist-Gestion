@@ -101,19 +101,19 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
       <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-6">
         
         {/* Header */}
-        <div className="p-5 sm:p-6 bg-gradient-to-r from-[#00434A] to-[#005e68] text-white flex items-center justify-between">
+        <div className="p-5 sm:p-6 bg-navy text-white flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="p-2 rounded-xl bg-white/10 text-teal-300">
+            <div className="p-2 rounded-xl bg-white/10 text-emerald-light">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
               <h3 className="font-black text-lg sm:text-xl tracking-tight flex items-center space-x-2">
                 <span>Centre de Sécurité & Confidentialité</span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-400/20 text-teal-200 border border-teal-300/30">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-brand/20 text-emerald-light border border-emerald-brand/30">
                   RGPD Conforme
                 </span>
               </h3>
-              <p className="text-xs text-teal-100/90 mt-0.5">
+              <p className="text-xs text-slate-200 mt-0.5">
                 Chiffrement Zero-Trust, protection des données locataires et droits d'accès
               </p>
             </div>
@@ -133,7 +133,7 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="space-y-0.5">
               <div className="flex items-center space-x-2">
-                {privacyMode ? <EyeOff className="w-4 h-4 text-teal-600" /> : <Eye className="w-4 h-4 text-slate-500" />}
+                {privacyMode ? <EyeOff className="w-4 h-4 text-navy" /> : <Eye className="w-4 h-4 text-slate-500" />}
                 <span className="text-sm font-bold text-slate-900">Mode Discret (Anti-regards indiscrets)</span>
               </div>
               <p className="text-xs text-slate-500">
@@ -144,7 +144,7 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
               onClick={togglePrivacyMode}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 self-start sm:self-auto cursor-pointer shadow-2xs ${
                 privacyMode 
-                  ? 'bg-teal-700 text-white hover:bg-teal-800' 
+                  ? 'bg-navy text-white hover:bg-navy-800' 
                   : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-100'
               }`}
             >
@@ -155,58 +155,58 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
           {/* Pillars of Security Grid */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center space-x-1.5">
-              <Lock className="w-3.5 h-3.5 text-[#00434A]" />
+              <Lock className="w-3.5 h-3.5 text-navy" />
               <span>Garanties de protection de vos données</span>
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="p-3.5 rounded-xl border border-slate-200 bg-white space-y-1.5">
-                <div className="flex items-center space-x-2 text-[#00434A]">
+                <div className="flex items-center space-x-2 text-navy">
                   <Database className="w-4 h-4" />
                   <span className="text-xs font-bold text-slate-900">Cloisonnement Zero-Trust</span>
                 </div>
                 <p className="text-[11px] text-slate-500 leading-relaxed">
                   Règles Firestore strictes : aucun autre utilisateur ni tiers ne peut lire ou modifier vos biens ou locataires.
                 </p>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md inline-block">
+                <span className="text-[10px] font-bold text-status-ok-text bg-status-ok-bg border border-status-ok-border px-2 py-0.5 rounded-md inline-block">
                   ✓ Règles actives & vérifiées
                 </span>
               </div>
 
               <div className="p-3.5 rounded-xl border border-slate-200 bg-white space-y-1.5">
-                <div className="flex items-center space-x-2 text-[#00434A]">
+                <div className="flex items-center space-x-2 text-navy">
                   <Key className="w-4 h-4" />
                   <span className="text-xs font-bold text-slate-900">Chiffrement AES-256 & TLS 1.3</span>
                 </div>
                 <p className="text-[11px] text-slate-500 leading-relaxed">
                   Toutes vos communications sont chiffrées en transit et vos données stockées sous clé sécurisée au repos.
                 </p>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md inline-block">
+                <span className="text-[10px] font-bold text-status-ok-text bg-status-ok-bg border border-status-ok-border px-2 py-0.5 rounded-md inline-block">
                   ✓ Chiffrement matériel
                 </span>
               </div>
 
               <div className="p-3.5 rounded-xl border border-slate-200 bg-white space-y-1.5">
-                <div className="flex items-center space-x-2 text-[#00434A]">
+                <div className="flex items-center space-x-2 text-navy">
                   <Server className="w-4 h-4" />
                   <span className="text-xs font-bold text-slate-900">Hébergement Souverain Européen</span>
                 </div>
                 <p className="text-[11px] text-slate-500 leading-relaxed">
                   Serveurs situés en Europe occidentale (zone RGPD), conformes aux normes ISO 27001 et SOC 2.
                 </p>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md inline-block">
+                <span className="text-[10px] font-bold text-status-ok-text bg-status-ok-bg border border-status-ok-border px-2 py-0.5 rounded-md inline-block">
                   ✓ Région europe-west3
                 </span>
               </div>
 
               <div className="p-3.5 rounded-xl border border-slate-200 bg-white space-y-1.5">
-                <div className="flex items-center space-x-2 text-[#00434A]">
+                <div className="flex items-center space-x-2 text-navy">
                   <FileCheck className="w-4 h-4" />
                   <span className="text-xs font-bold text-slate-900">Non-revente de vos données</span>
                 </div>
                 <p className="text-[11px] text-slate-500 leading-relaxed">
                   DRYOS n'exploite, ne vend ni ne cède vos données à aucun courtier, démarcheur publicitaire ou organisme tiers.
                 </p>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md inline-block">
+                <span className="text-[10px] font-bold text-status-ok-text bg-status-ok-bg border border-status-ok-border px-2 py-0.5 rounded-md inline-block">
                   ✓ Strict usage privatif
                 </span>
               </div>
@@ -216,40 +216,40 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
           {/* RGPD Section: Portability and Right to be forgotten */}
           <div className="pt-2 border-t border-slate-200 space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center space-x-1.5">
-              <Download className="w-3.5 h-3.5 text-[#00434A]" />
+              <Download className="w-3.5 h-3.5 text-navy" />
               <span>Vos droits RGPD (Articles 17 et 20)</span>
             </h4>
 
-            <div className="p-4 rounded-2xl bg-teal-50/50 border border-teal-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="p-4 rounded-2xl bg-navy-50 border border-navy-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h5 className="text-xs font-bold text-[#00434A]">Portabilité intégrale de vos dossiers</h5>
+                <h5 className="text-xs font-bold text-navy">Portabilité intégrale de vos dossiers</h5>
                 <p className="text-[11px] text-slate-600 mt-0.5">
                   Téléchargez une archive complète en un clic contenant l'historique de vos biens, loyers, quittances et charges.
                 </p>
               </div>
               <button
                 onClick={handleExportAllData}
-                className="px-3.5 py-2 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs font-bold transition flex items-center space-x-2 self-start sm:self-auto cursor-pointer shadow-xs whitespace-nowrap"
+                className="px-3.5 py-2 rounded-xl bg-navy hover:bg-navy-800 text-white text-xs font-bold transition flex items-center space-x-2 self-start sm:self-auto cursor-pointer shadow-xs whitespace-nowrap"
               >
-                <Download className="w-3.5 h-3.5 text-teal-300" />
+                <Download className="w-3.5 h-3.5 text-emerald-light" />
                 <span>Exporter mon dossier complet (JSON)</span>
               </button>
             </div>
 
             {downloadSuccess && (
-              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center space-x-2 animate-fadeIn">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <div className="p-3 rounded-xl bg-status-ok-bg border border-status-ok-border text-status-ok-text text-xs font-bold flex items-center space-x-2 animate-fadeIn">
+                <CheckCircle2 className="w-4 h-4 text-status-ok" />
                 <span>Votre dossier complet a été exporté et téléchargé avec succès !</span>
               </div>
             )}
 
             {/* Right to be forgotten */}
             {onPurgeData && (
-              <div className="p-4 rounded-2xl bg-rose-50/50 border border-rose-200/80 space-y-2">
+              <div className="p-4 rounded-2xl bg-status-urgent-bg border border-status-urgent-border space-y-2">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h5 className="text-xs font-bold text-rose-900">Droit à l'oubli & Purge des données personnelles</h5>
-                    <p className="text-[11px] text-rose-700/80 mt-0.5">
+                    <h5 className="text-xs font-bold text-status-urgent-text">Droit à l'oubli & Purge des données personnelles</h5>
+                    <p className="text-[11px] text-status-urgent-text/80 mt-0.5">
                       Supprime immédiatement toutes vos données enregistrées sur cette instance. Cette action est irréversible.
                     </p>
                   </div>
@@ -258,22 +258,22 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
                 {!purgeConfirmStep ? (
                   <button
                     onClick={() => setPurgeConfirmStep(true)}
-                    className="mt-2 text-xs font-bold text-rose-700 hover:text-rose-900 underline flex items-center space-x-1 cursor-pointer"
+                    className="mt-2 text-xs font-bold text-status-urgent-text hover:text-status-urgent underline flex items-center space-x-1 cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Demander la purge de mes données</span>
                   </button>
                 ) : (
-                  <div className="mt-2 p-3 rounded-xl bg-white border border-rose-300 space-y-2 animate-fadeIn">
-                    <p className="text-xs font-bold text-rose-800 flex items-center space-x-1.5">
-                      <AlertTriangle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+                  <div className="mt-2 p-3 rounded-xl bg-white border border-status-urgent-border space-y-2 animate-fadeIn">
+                    <p className="text-xs font-bold text-status-urgent-text flex items-center space-x-1.5">
+                      <AlertTriangle className="w-4 h-4 text-status-urgent flex-shrink-0" />
                       <span>Êtes-vous absolument certain ? Tous les biens et pointages seront effacés.</span>
                     </p>
                     <div className="flex items-center space-x-2 pt-1">
                       <button
                         onClick={handleExecutePurge}
                         disabled={isPurging}
-                        className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition cursor-pointer shadow-xs disabled:opacity-50"
+                        className="px-3 py-1.5 rounded-lg bg-status-urgent hover:bg-red-700 text-white text-xs font-bold transition cursor-pointer shadow-xs disabled:opacity-50"
                       >
                         {isPurging ? 'Purge en cours...' : 'Oui, effacer définitivement mes données'}
                       </button>
@@ -296,7 +296,7 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
         <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs font-bold transition cursor-pointer shadow-xs"
+            className="px-5 py-2.5 rounded-xl bg-navy hover:bg-navy-800 text-white text-xs font-bold transition cursor-pointer shadow-xs"
           >
             Fermer le centre de sécurité
           </button>

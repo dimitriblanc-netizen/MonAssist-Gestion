@@ -162,12 +162,12 @@ export const IrlCalculatorModal: React.FC<IrlCalculatorModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
       <div 
         id="irl-calculator-modal"
-        className="bg-[#FBF7EE] rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col"
+        className="bg-slate-50 rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col"
       >
         {/* Header */}
         <div className="p-5 border-b border-slate-200/80 flex items-center justify-between bg-white rounded-t-3xl sticky top-0 z-10">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#00434A] text-teal-300 flex items-center justify-center shadow-xs">
+            <div className="w-10 h-10 rounded-2xl bg-navy text-emerald-light flex items-center justify-center shadow-xs">
               <Calculator className="w-5 h-5" />
             </div>
             <div>
@@ -175,7 +175,7 @@ export const IrlCalculatorModal: React.FC<IrlCalculatorModalProps> = ({
                 <h3 className="font-black text-slate-900 text-base sm:text-lg">
                   Révision de Loyer IRL
                 </h3>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-teal-50 text-teal-800 border border-teal-200">
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-navy-50 text-navy border border-navy-200">
                   Loi du 6 juillet 1989 (art. 17-1)
                 </span>
               </div>
@@ -199,37 +199,37 @@ export const IrlCalculatorModal: React.FC<IrlCalculatorModalProps> = ({
           {/* 1. GARDE-FOUS STRICTS (DPE PASSOIRE THERMIQUE OU ABSENCE DE CLAUSE)       */}
           {/* ========================================================================= */}
           {isBlockedDpe && (
-            <div className="bg-rose-50 border-2 border-rose-300 rounded-2xl p-4 text-rose-900 space-y-2">
+            <div className="bg-status-urgent-bg border-2 border-status-urgent-border rounded-2xl p-4 text-status-urgent-text space-y-2">
               <div className="flex items-center space-x-2.5">
-                <ShieldAlert className="w-5 h-5 text-rose-600 flex-shrink-0" />
-                <h4 className="text-sm font-black uppercase tracking-wide text-rose-800">
+                <ShieldAlert className="w-5 h-5 text-status-urgent flex-shrink-0" />
+                <h4 className="text-sm font-black uppercase tracking-wide text-status-urgent-text">
                   Révision formellement interdite (DPE classe {dpeRating})
                 </h4>
               </div>
-              <p className="text-xs leading-relaxed text-rose-800">
+              <p className="text-xs leading-relaxed text-status-urgent-text">
                 <strong>Loi Climat et Résilience (article 159) :</strong> Depuis le 24 août 2022, il est strictement interdit d'augmenter le loyer des logements classés <strong>F ou G</strong> (« passoires thermiques »). La révision IRL est bloquée jusqu'à la réalisation de travaux de rénovation énergétique certifiés par un nouveau DPE.
               </p>
-              <div className="pt-1 flex items-center justify-between text-[11px] font-semibold text-rose-700">
+              <div className="pt-1 flex items-center justify-between text-[11px] font-semibold text-status-urgent-text">
                 <span>Sanction : Le locataire peut exiger le remboursement immédiat de tout trop-perçu.</span>
               </div>
             </div>
           )}
 
           {isBlockedNoClause && !isBlockedDpe && (
-            <div className="bg-amber-50 border border-amber-300 rounded-2xl p-4 text-amber-900 space-y-2">
+            <div className="bg-status-warning-bg border border-status-warning-border rounded-2xl p-4 text-status-warning-text space-y-2">
               <div className="flex items-center space-x-2">
-                <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0" />
-                <h4 className="text-sm font-black text-amber-900">
+                <AlertTriangle className="w-5 h-5 text-status-warning flex-shrink-0" />
+                <h4 className="text-sm font-black text-status-warning-text">
                   Absence de clause d'indexation dans le bail
                 </h4>
               </div>
-              <p className="text-xs leading-relaxed text-amber-800">
+              <p className="text-xs leading-relaxed text-status-warning-text">
                 L'article 17-1 de la loi du 6 juillet 1989 dispose que la révision du loyer n'est possible que si le contrat de bail comporte expressément une <strong>clause d'indexation annuelle</strong>. À défaut de clause, le loyer reste fixé pour toute la durée du bail.
               </p>
               <button
                 type="button"
                 onClick={() => setHasClause(true)}
-                className="text-xs font-bold text-teal-800 underline hover:text-teal-900 cursor-pointer pt-1 block"
+                className="text-xs font-bold text-navy underline hover:text-navy-800 cursor-pointer pt-1 block"
               >
                 Mon bail contient bien une clause d'indexation (activer la révision)
               </button>
@@ -241,7 +241,7 @@ export const IrlCalculatorModal: React.FC<IrlCalculatorModalProps> = ({
           {/* ========================================================================= */}
           <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#00434A]">
+              <span className="text-xs font-bold uppercase tracking-wider text-navy">
                 Données de base du calcul
               </span>
               <span className="text-[11px] text-slate-500 font-medium">
@@ -262,7 +262,7 @@ export const IrlCalculatorModal: React.FC<IrlCalculatorModalProps> = ({
                     value={currentRent}
                     onChange={(e) => setCurrentRent(parseFloat(e.target.value) || 0)}
                     disabled={!canRevise}
-                    className="w-full text-sm font-black p-2.5 pl-3 pr-8 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#00434A] focus:outline-none disabled:bg-slate-100"
+                    className="w-full text-sm font-black p-2.5 pl-3 pr-8 rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy focus:outline-none disabled:bg-slate-100"
                   />
                   <span className="absolute right-3 top-2.5 text-xs text-slate-400 font-bold">€</span>
                 </div>
@@ -282,7 +282,7 @@ export const IrlCalculatorModal: React.FC<IrlCalculatorModalProps> = ({
                   value={previousIndex}
                   onChange={(e) => setPreviousIndex(parseFloat(e.target.value) || 0)}
                   disabled={!canRevise}
-                  className="w-full text-sm font-black p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#00434A] focus:outline-none disabled:bg-slate-100"
+                  className="w-full text-sm font-black p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy focus:outline-none disabled:bg-slate-100"
                 />
                 <span className="text-[10px] text-slate-400 mt-1 block truncate">
                   Réf : {initialCalc.previousQuarterLabel || 'Signature ou N-1'}
@@ -298,7 +298,7 @@ export const IrlCalculatorModal: React.FC<IrlCalculatorModalProps> = ({
                   value={newQuarter}
                   onChange={(e) => setNewQuarter(e.target.value)}
                   disabled={!canRevise}
-                  className="w-full text-xs font-bold p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#00434A] focus:outline-none bg-white disabled:bg-slate-100"
+                  className="w-full text-xs font-bold p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy focus:outline-none bg-white disabled:bg-slate-100"
                 >
                   {OFFICIAL_IRL_SERIES.map(item => (
                     <option key={item.quarter} value={item.quarter}>
@@ -306,7 +306,7 @@ export const IrlCalculatorModal: React.FC<IrlCalculatorModalProps> = ({
                     </option>
                   ))}
                 </select>
-                <span className="text-[10px] text-emerald-700 font-bold mt-1 block">
+                <span className="text-[10px] text-status-ok-text font-bold mt-1 block">
                   Valeur INSEE : {newIndex}
                 </span>
               </div>
@@ -317,7 +317,7 @@ export const IrlCalculatorModal: React.FC<IrlCalculatorModalProps> = ({
               <span className="font-mono">
                 Formule : {currentRent.toFixed(2)} € × ({newIndex} / {previousIndex}) = <strong>{maxRentCalculated.toFixed(2)} €</strong>
               </span>
-              <span className="text-emerald-700 font-bold">
+              <span className="text-status-ok-text font-bold">
                 Max légal : +{maxIncrease.toFixed(2)} €/mois (+{maxPercent}%)
               </span>
             </div>
@@ -344,21 +344,21 @@ export const IrlCalculatorModal: React.FC<IrlCalculatorModalProps> = ({
                 onClick={() => setChoice('max')}
                 className={`p-4 rounded-2xl border text-left transition relative cursor-pointer flex flex-col justify-between ${
                   choice === 'max'
-                    ? 'bg-white border-teal-600 shadow-md ring-2 ring-teal-600/20'
+                    ? 'bg-white border-navy shadow-md ring-2 ring-navy/20'
                     : 'bg-white/80 border-slate-200 hover:bg-white hover:border-slate-300 opacity-90'
                 } disabled:opacity-40 disabled:cursor-not-allowed`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200">
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-navy-50 text-navy border border-navy-200">
                       100% IRL (Max)
                     </span>
-                    {choice === 'max' && <CheckCircle2 className="w-4 h-4 text-teal-600" />}
+                    {choice === 'max' && <CheckCircle2 className="w-4 h-4 text-navy" />}
                   </div>
                   <div className="text-lg font-black text-slate-900 mt-1">
                     {maxRentCalculated.toLocaleString('fr-FR')} € <span className="text-xs font-normal text-slate-500">HC</span>
                   </div>
-                  <div className="text-[11px] font-bold text-emerald-700 mt-0.5">
+                  <div className="text-[11px] font-bold text-status-ok-text mt-0.5">
                     +{maxIncrease.toFixed(2)} €/mois (+{maxPercent}%)
                   </div>
                 </div>
@@ -374,21 +374,21 @@ export const IrlCalculatorModal: React.FC<IrlCalculatorModalProps> = ({
                 onClick={() => setChoice('moderate')}
                 className={`p-4 rounded-2xl border text-left transition relative cursor-pointer flex flex-col justify-between ${
                   choice === 'moderate'
-                    ? 'bg-white border-[#00434A] shadow-md ring-2 ring-[#00434A]/20'
+                    ? 'bg-white border-navy shadow-md ring-2 ring-navy/20'
                     : 'bg-white/80 border-slate-200 hover:bg-white hover:border-slate-300 opacity-90'
                 } disabled:opacity-40 disabled:cursor-not-allowed`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-status-ok-bg text-status-ok-text border border-status-ok-border">
                       Modérée (50%)
                     </span>
-                    {choice === 'moderate' && <CheckCircle2 className="w-4 h-4 text-[#00434A]" />}
+                    {choice === 'moderate' && <CheckCircle2 className="w-4 h-4 text-navy" />}
                   </div>
                   <div className="text-lg font-black text-slate-900 mt-1">
                     {modRentCalculated.toLocaleString('fr-FR')} € <span className="text-xs font-normal text-slate-500">HC</span>
                   </div>
-                  <div className="text-[11px] font-bold text-emerald-700 mt-0.5">
+                  <div className="text-[11px] font-bold text-status-ok-text mt-0.5">
                     +{modIncrease.toFixed(2)} €/mois (+{modPercent}%)
                   </div>
                 </div>
@@ -432,15 +432,15 @@ export const IrlCalculatorModal: React.FC<IrlCalculatorModalProps> = ({
           {/* 4. BILAN SI OUBLI DE PLUSIEURS ANNÉES (NON-RÉTROACTIVITÉ & PRESCRIPTION) */}
           {/* ========================================================================= */}
           {initialCalc.isCatchup && initialCalc.catchupExplanation && (
-            <div className="bg-amber-50/90 border border-amber-200 rounded-2xl p-4 text-amber-900 space-y-1.5 animate-fade-in">
-              <div className="flex items-center space-x-2 text-xs font-bold text-amber-900">
-                <Clock className="w-4 h-4 text-amber-700 flex-shrink-0" />
+            <div className="bg-status-warning-bg border border-status-warning-border rounded-2xl p-4 text-status-warning-text space-y-1.5 animate-fade-in">
+              <div className="flex items-center space-x-2 text-xs font-bold text-status-warning-text">
+                <Clock className="w-4 h-4 text-status-warning flex-shrink-0" />
                 <span>Rattrapage d'oubli & Règle de non-rétroactivité :</span>
               </div>
-              <p className="text-xs text-amber-800 leading-relaxed font-medium">
+              <p className="text-xs text-status-warning-text leading-relaxed font-medium">
                 {initialCalc.catchupExplanation}
               </p>
-              <p className="text-[11px] text-amber-700">
+              <p className="text-[11px] text-status-warning-text">
                 💡 <em>Règle légale (loi ALUR) :</em> Le nouveau loyer s'applique immédiatement pour l'avenir, mais la loi interdit tout rappel de loyer rétroactif sur les mois écoulés. L'argent non réclamé dans l'année est définitivement prescrit.
               </p>
             </div>
@@ -449,10 +449,10 @@ export const IrlCalculatorModal: React.FC<IrlCalculatorModalProps> = ({
           {/* ========================================================================= */}
           {/* 5. ENCADRÉ COACHING & CONSEIL RELATION LOCATAIRE (DEMANDÉ STRICTEMENT)    */}
           {/* ========================================================================= */}
-          <div className="bg-gradient-to-br from-emerald-50/80 to-teal-50/80 border border-emerald-200/90 rounded-2xl p-4 sm:p-5 space-y-2">
-            <div className="flex items-center space-x-2 text-[#00434A]">
-              <HeartHandshake className="w-5 h-5 text-emerald-700 flex-shrink-0" />
-              <h4 className="text-xs sm:text-sm font-black uppercase tracking-wide text-[#00434A]">
+          <div className="bg-navy-50 border border-navy-200 rounded-2xl p-4 sm:p-5 space-y-2">
+            <div className="flex items-center space-x-2 text-navy">
+              <HeartHandshake className="w-5 h-5 text-navy flex-shrink-0" />
+              <h4 className="text-xs sm:text-sm font-black uppercase tracking-wide text-navy">
                 Conseil relation locataire
               </h4>
             </div>
@@ -467,7 +467,7 @@ export const IrlCalculatorModal: React.FC<IrlCalculatorModalProps> = ({
           <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <FileText className="w-4 h-4 text-[#00434A]" />
+                <FileText className="w-4 h-4 text-navy" />
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
                   Notification officielle prête pour {property.tenantName}
                 </span>
@@ -475,12 +475,12 @@ export const IrlCalculatorModal: React.FC<IrlCalculatorModalProps> = ({
               <button
                 type="button"
                 onClick={handleCopy}
-                className="text-xs font-bold text-[#00434A] hover:text-[#00343a] flex items-center space-x-1.5 py-1 px-3 rounded-lg hover:bg-slate-100 transition cursor-pointer border border-slate-200"
+                className="text-xs font-bold text-navy hover:text-navy-800 flex items-center space-x-1.5 py-1 px-3 rounded-lg hover:bg-slate-100 transition cursor-pointer border border-slate-200"
               >
                 {copied ? (
                   <>
-                    <Check className="w-3.5 h-3.5 text-emerald-600" />
-                    <span className="text-emerald-700">Texte copié !</span>
+                    <Check className="w-3.5 h-3.5 text-status-ok" />
+                    <span className="text-status-ok-text">Texte copié !</span>
                   </>
                 ) : (
                   <>
@@ -517,11 +517,11 @@ export const IrlCalculatorModal: React.FC<IrlCalculatorModalProps> = ({
               id="btn-apply-irl-update"
               onClick={handleApply}
               disabled={appliedSuccess || (!canRevise && choice !== 'freeze')}
-              className="w-full sm:w-auto px-5 py-2.5 text-xs font-black text-white bg-[#00434A] hover:bg-[#00343a] rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-5 py-2.5 text-xs font-black text-white bg-navy hover:bg-navy-800 rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {appliedSuccess ? (
                 <>
-                  <Check className="w-4 h-4 text-emerald-300" />
+                  <Check className="w-4 h-4 text-emerald-light" />
                   <span>Loyer actualisé ({effectiveRent.toFixed(2)} €) !</span>
                 </>
               ) : (

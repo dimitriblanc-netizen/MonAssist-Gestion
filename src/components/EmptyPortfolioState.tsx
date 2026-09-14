@@ -28,18 +28,18 @@ export const EmptyPortfolioState: React.FC<EmptyPortfolioStateProps> = ({
       {/* Welcome Card */}
       <div className="bg-white rounded-3xl border border-slate-200/90 shadow-sm p-6 sm:p-10 text-center relative overflow-hidden">
         {/* Subtle decorative background gradient */}
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-teal-50/60 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-emerald-light/30 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-slate-50/60 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10">
           {/* Badge */}
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold mb-6">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-status-ok-bg border border-status-ok-border text-status-ok-text text-xs font-bold mb-6">
+            <span className="w-2 h-2 rounded-full bg-status-ok animate-pulse" />
             <span>Espace personnel connecté</span>
           </div>
 
           {/* Title */}
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#00434A] tracking-tight mb-3">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-navy tracking-tight mb-3">
             Bienvenue sur votre espace, {firstName} !
           </h2>
 
@@ -52,9 +52,9 @@ export const EmptyPortfolioState: React.FC<EmptyPortfolioStateProps> = ({
             <button
               id="btn-empty-add-property"
               onClick={onAddFirstProperty}
-              className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-[#00434A] hover:bg-[#00343a] text-white text-sm sm:text-base font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center space-x-2 cursor-pointer"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-navy hover:bg-navy-800 text-white text-sm sm:text-base font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center space-x-2 cursor-pointer"
             >
-              <Plus className="w-5 h-5 text-teal-300" />
+              <Plus className="w-5 h-5 text-emerald-light" />
               <span>Ajouter mon premier bien</span>
               <ArrowRight className="w-4 h-4" />
             </button>
@@ -62,16 +62,16 @@ export const EmptyPortfolioState: React.FC<EmptyPortfolioStateProps> = ({
 
           {/* Admin Test Mode Quick Loader */}
           {isAdmin && onLoadTestData && (
-            <div className="mb-8 p-4 sm:p-5 rounded-2xl bg-purple-50 border border-purple-200 text-left flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+            <div className="mb-8 p-4 sm:p-5 rounded-2xl bg-navy-50 border border-navy-200 text-left flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                  <Sparkles className="w-5 h-5 text-purple-200" />
+                <div className="w-10 h-10 rounded-xl bg-navy text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <Sparkles className="w-5 h-5 text-emerald-light" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-black text-purple-950 uppercase tracking-wide">
+                  <h4 className="text-xs font-black text-navy uppercase tracking-wide">
                     Espace Bailleur Personnel (Mode Test DRYOS)
                   </h4>
-                  <p className="text-xs text-purple-700">
+                  <p className="text-xs text-slate-600">
                     Chargez 3 biens de test complets (loyer payé, impayé avec relance, passoire DPE) pour tester immédiatement toutes les fonctionnalités.
                   </p>
                 </div>
@@ -79,7 +79,7 @@ export const EmptyPortfolioState: React.FC<EmptyPortfolioStateProps> = ({
               <button
                 id="btn-empty-load-test-data"
                 onClick={onLoadTestData}
-                className="px-4 py-2.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-extrabold shadow-sm transition cursor-pointer flex items-center justify-center space-x-1.5 shrink-0"
+                className="px-4 py-2.5 rounded-xl bg-navy hover:bg-navy-800 text-white text-xs font-extrabold shadow-sm transition cursor-pointer flex items-center justify-center space-x-1.5 shrink-0"
               >
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>Charger 3 biens de test</span>
@@ -90,7 +90,7 @@ export const EmptyPortfolioState: React.FC<EmptyPortfolioStateProps> = ({
           {/* Feature Highlights Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left pt-6 border-t border-slate-100">
             <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100">
-              <div className="w-8 h-8 rounded-xl bg-teal-100 text-[#00434A] flex items-center justify-center mb-2.5">
+              <div className="w-8 h-8 rounded-xl bg-navy-100 text-navy flex items-center justify-center mb-2.5">
                 <CheckCircle2 className="w-4 h-4" />
               </div>
               <h3 className="text-xs font-bold text-slate-900 mb-1">Pointage en 1 clic</h3>
@@ -100,7 +100,7 @@ export const EmptyPortfolioState: React.FC<EmptyPortfolioStateProps> = ({
             </div>
 
             <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100">
-              <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center mb-2.5">
+              <div className="w-8 h-8 rounded-xl bg-status-ok-bg border border-status-ok-border text-status-ok-text flex items-center justify-center mb-2.5">
                 <Receipt className="w-4 h-4" />
               </div>
               <h3 className="text-xs font-bold text-slate-900 mb-1">Quittance instantanée</h3>
@@ -110,7 +110,7 @@ export const EmptyPortfolioState: React.FC<EmptyPortfolioStateProps> = ({
             </div>
 
             <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100">
-              <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center mb-2.5">
+              <div className="w-8 h-8 rounded-xl bg-status-warning-bg border border-status-warning-border text-status-warning-text flex items-center justify-center mb-2.5">
                 <Scale className="w-4 h-4" />
               </div>
               <h3 className="text-xs font-bold text-slate-900 mb-1">Surveillance juridique</h3>

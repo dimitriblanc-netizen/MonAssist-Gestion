@@ -31,7 +31,7 @@ export const PropertySelector: React.FC<PropertySelectorProps> = ({
     <div className="bg-white px-3.5 py-3 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       {/* Selector & Property Identity */}
       <div className="flex items-center space-x-3 min-w-0 flex-1">
-        <div className="w-10 h-10 rounded-xl bg-[#00434A]/10 text-[#00434A] flex items-center justify-center font-bold flex-shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-navy-50 text-navy flex items-center justify-center font-bold flex-shrink-0">
           <Building className="w-5 h-5" />
         </div>
         <div className="min-w-0 flex-1">
@@ -39,13 +39,11 @@ export const PropertySelector: React.FC<PropertySelectorProps> = ({
             <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
               Bien sélectionné
             </span>
-            <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-md ${
-              activeProperty.leaseType === 'meuble' ? 'bg-amber-50 text-amber-800' : 'bg-blue-50 text-blue-800'
-            }`}>
+            <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-md bg-slate-100 text-slate-700">
               {activeProperty.leaseType === 'meuble' ? 'Meublé (1 an)' : 'Vide (3 ans)'}
             </span>
             {activeProperty.isColocation && (
-              <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-md bg-teal-50 text-teal-800">
+              <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-md bg-navy-50 text-navy">
                 👥 Colocation
               </span>
             )}
@@ -59,7 +57,7 @@ export const PropertySelector: React.FC<PropertySelectorProps> = ({
                 const found = properties.find(p => p.id === e.target.value);
                 if (found) onSelectProperty(found);
               }}
-              className="text-sm font-black text-[#00434A] bg-transparent border-none cursor-pointer focus:outline-none w-full truncate pr-4"
+              className="text-sm font-black text-navy bg-transparent border-none cursor-pointer focus:outline-none w-full truncate pr-4"
             >
               {properties.map(p => (
                 <option key={p.id} value={p.id}>
@@ -83,7 +81,7 @@ export const PropertySelector: React.FC<PropertySelectorProps> = ({
             <Edit3 className="w-3.5 h-3.5 text-slate-500" />
             <span>Modifier / Compléter</span>
             {score < 100 && (
-              <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800">
+              <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-status-ok-bg text-status-ok-text border border-status-ok-border">
                 {score}%
               </span>
             )}
@@ -93,9 +91,9 @@ export const PropertySelector: React.FC<PropertySelectorProps> = ({
         <button
           id="btn-add-property-tunnel"
           onClick={onOpenOnboarding}
-          className="px-3 py-1.5 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-xs font-bold text-white transition flex items-center space-x-1.5 cursor-pointer shadow-xs"
+          className="px-3 py-1.5 rounded-xl bg-navy hover:bg-navy-800 text-xs font-bold text-white transition flex items-center space-x-1.5 cursor-pointer shadow-xs"
         >
-          <Plus className="w-3.5 h-3.5 text-emerald-400" />
+          <Plus className="w-3.5 h-3.5 text-emerald-light" />
           <span>Nouveau bien</span>
         </button>
       </div>

@@ -48,16 +48,16 @@ export const TenantExitSection: React.FC<TenantExitSectionProps> = ({
   return (
     <div className="space-y-6">
       {/* DRYOS CONVERSION HERO BANNER */}
-      <div className="bg-[#00434A] rounded-2xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
+      <div className="bg-navy rounded-2xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
         <div className="relative z-10 max-w-2xl space-y-3">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-teal-800/80 text-teal-200 text-xs font-semibold">
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-navy-800/80 text-emerald-light text-xs font-semibold">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Passerelle DRYOS Immobilier</span>
           </div>
           <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
             Votre locataire vous a donné son préavis ?
           </h3>
-          <p className="text-xs sm:text-sm text-teal-100/90 leading-relaxed">
+          <p className="text-xs sm:text-sm text-navy-100 leading-relaxed">
             Évitez la vacance locative ! DRYOS prend en charge 100% de la nouvelle mise en location : shooting photo professionnel, diffusion sur les portails majeurs, sélection rigoureuse des dossiers de solvabilité, rédaction du bail officiel et état des lieux d'entrée. Toujours au forfait fixe unique, sans engagement de gestion mensuelle.
           </p>
 
@@ -65,7 +65,7 @@ export const TenantExitSection: React.FC<TenantExitSectionProps> = ({
             <button
               id="btn-relouer-dryos"
               onClick={onOpenDryosModal}
-              className="px-5 py-3 rounded-xl bg-[#FBF7EE] hover:bg-white text-[#00434A] font-extrabold text-xs sm:text-sm transition shadow-md flex items-center space-x-2 cursor-pointer"
+              className="px-5 py-3 rounded-xl bg-white hover:bg-slate-50 text-navy font-extrabold text-xs sm:text-sm transition shadow-md flex items-center space-x-2 cursor-pointer"
             >
               <span>Relouer mon bien avec DRYOS</span>
               <ArrowRight className="w-4 h-4" />
@@ -75,7 +75,7 @@ export const TenantExitSection: React.FC<TenantExitSectionProps> = ({
               href="https://paris.dryos.fr"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-3 rounded-xl border border-teal-600/80 hover:bg-teal-800 text-xs font-semibold text-teal-100 transition"
+              className="px-4 py-3 rounded-xl border border-navy-600 hover:bg-navy-800 text-xs font-semibold text-navy-100 transition"
             >
               Voir les tarifs transparents (paris.dryos.fr)
             </a>
@@ -89,7 +89,7 @@ export const TenantExitSection: React.FC<TenantExitSectionProps> = ({
         {/* 1. Calculateur de Préavis (Zone Tendue) */}
         <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs space-y-4">
           <div className="flex items-center space-x-2.5">
-            <div className="p-2 rounded-xl bg-[#00434A]/10 text-[#00434A]">
+            <div className="p-2 rounded-xl bg-navy-50 text-navy">
               <Clock className="w-5 h-5" />
             </div>
             <div>
@@ -118,7 +118,7 @@ export const TenantExitSection: React.FC<TenantExitSectionProps> = ({
             <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
               <div className="flex justify-between">
                 <span>Délai légal de préavis :</span>
-                <span className="font-bold text-[#00434A]">
+                <span className="font-bold text-navy">
                   {noticeMonths} mois {property.isTenseZone ? '(Zone Tendue de droit)' : ''}
                 </span>
               </div>
@@ -136,7 +136,7 @@ export const TenantExitSection: React.FC<TenantExitSectionProps> = ({
         {/* 2. Restitution du Dépôt de Garantie & Pénalités */}
         <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs space-y-4">
           <div className="flex items-center space-x-2.5">
-            <div className="p-2 rounded-xl bg-amber-50 text-amber-800">
+            <div className="p-2 rounded-xl bg-status-warning-bg text-status-warning-text border border-status-warning-border">
               <Scale className="w-5 h-5" />
             </div>
             <div>
@@ -157,7 +157,7 @@ export const TenantExitSection: React.FC<TenantExitSectionProps> = ({
                   type="button"
                   onClick={() => setHasDeviations(false)}
                   className={`p-2.5 rounded-xl border font-semibold cursor-pointer ${
-                    !hasDeviations ? 'bg-[#00434A] text-white border-[#00434A]' : 'bg-white border-slate-300 text-slate-700'
+                    !hasDeviations ? 'bg-navy text-white border-navy' : 'bg-white border-slate-300 text-slate-700'
                   }`}
                 >
                   Conforme à l'entrée
@@ -166,7 +166,7 @@ export const TenantExitSection: React.FC<TenantExitSectionProps> = ({
                   type="button"
                   onClick={() => setHasDeviations(true)}
                   className={`p-2.5 rounded-xl border font-semibold cursor-pointer ${
-                    hasDeviations ? 'bg-[#00434A] text-white border-[#00434A]' : 'bg-white border-slate-300 text-slate-700'
+                    hasDeviations ? 'bg-navy text-white border-navy' : 'bg-white border-slate-300 text-slate-700'
                   }`}
                 >
                   Dégradations constatées
@@ -183,11 +183,11 @@ export const TenantExitSection: React.FC<TenantExitSectionProps> = ({
               </div>
               <div className="flex justify-between">
                 <span>Date limite impérative :</span>
-                <span className="font-bold text-rose-700">{depositDeadline.toLocaleDateString('fr-FR')}</span>
+                <span className="font-bold text-status-urgent-text">{depositDeadline.toLocaleDateString('fr-FR')}</span>
               </div>
               <div className="flex justify-between pt-1 border-t border-slate-200">
                 <span>Pénalité légale en cas de retard :</span>
-                <span className="font-bold text-rose-800">
+                <span className="font-bold text-status-urgent-text">
                   + {monthlyPenalty.toFixed(2)} € / mois entamé (10% du loyer HC)
                 </span>
               </div>

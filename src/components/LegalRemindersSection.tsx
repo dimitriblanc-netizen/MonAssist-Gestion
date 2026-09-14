@@ -63,7 +63,7 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2.5">
-                <div className="p-2 rounded-xl bg-[#00434A]/10 text-[#00434A]">
+                <div className="p-2 rounded-xl bg-navy-50 text-navy">
                   <TrendingUp className="w-5 h-5" />
                 </div>
                 <div>
@@ -76,19 +76,19 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
 
               <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
                 isDpeBlocked 
-                  ? 'bg-rose-100 text-rose-800' 
+                  ? 'bg-status-urgent-bg text-status-urgent-text border border-status-urgent-border' 
                   : isNoClause 
-                    ? 'bg-amber-100 text-amber-800' 
-                    : 'bg-emerald-100 text-emerald-800'
+                    ? 'bg-status-warning-bg text-status-warning-text border border-status-warning-border' 
+                    : 'bg-status-ok-bg text-status-ok-text border border-status-ok-border'
               }`}>
                 {isDpeBlocked ? 'Bloqué (Loi Climat)' : isNoClause ? 'Clause absente' : 'Indexation possible'}
               </span>
             </div>
 
             {isDpeBlocked ? (
-              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-900 space-y-1.5">
+              <div className="p-3.5 rounded-xl bg-status-urgent-bg border border-status-urgent-border text-xs text-status-urgent-text space-y-1.5">
                 <div className="flex items-center space-x-1.5 font-bold">
-                  <AlertTriangle className="w-4 h-4 text-rose-600" />
+                  <AlertTriangle className="w-4 h-4 text-status-urgent" />
                   <span>Passoire thermique (DPE {property.dpeRating})</span>
                 </div>
                 <p className="leading-relaxed">
@@ -96,15 +96,15 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
                 </p>
                 <button
                   onClick={onOpenDryosContact}
-                  className="font-bold text-teal-800 hover:underline inline-block pt-1 cursor-pointer"
+                  className="font-bold text-navy hover:underline inline-block pt-1 cursor-pointer"
                 >
                   Contacter Dryos pour un audit de rénovation énergétique →
                 </button>
               </div>
             ) : isNoClause ? (
-              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1.5">
+              <div className="p-3.5 rounded-xl bg-status-warning-bg border border-status-warning-border text-xs text-status-warning-text space-y-1.5">
                 <div className="flex items-center space-x-1.5 font-bold">
-                  <AlertTriangle className="w-4 h-4 text-amber-700" />
+                  <AlertTriangle className="w-4 h-4 text-status-warning" />
                   <span>Clause d'indexation absente du bail</span>
                 </div>
                 <p className="leading-relaxed">
@@ -121,7 +121,7 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
                   <span>Trimestre IRL de référence :</span>
                   <span className="font-semibold">{property.irlReferenceQuarter || property.irlBaseQuarter || 'T3'}</span>
                 </div>
-                <div className="flex justify-between text-[#00434A]">
+                <div className="flex justify-between text-navy">
                   <span>3 options pré-calculées :</span>
                   <span className="font-bold">100% IRL, 50% modéré ou 0% maintien</span>
                 </div>
@@ -132,9 +132,9 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
           {!isDpeBlocked && (
             <button
               onClick={() => onOpenIrlModal(property)}
-              className="w-full py-2.5 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs font-bold transition flex items-center justify-center space-x-1.5 cursor-pointer shadow-xs"
+              className="w-full py-2.5 rounded-xl bg-navy hover:bg-navy-800 text-white text-xs font-bold transition flex items-center justify-center space-x-1.5 cursor-pointer shadow-xs"
             >
-              <TrendingUp className="w-4 h-4 text-teal-300" />
+              <TrendingUp className="w-4 h-4 text-emerald-light" />
               <span>Simuler la révision & Choisir mon option</span>
             </button>
           )}
@@ -145,7 +145,7 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2.5">
-                <div className="p-2 rounded-xl bg-amber-50 text-amber-800">
+                <div className="p-2 rounded-xl bg-status-warning-bg text-status-warning-text border border-status-warning-border">
                   <Clock className="w-5 h-5" />
                 </div>
                 <div>
@@ -159,7 +159,7 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
               </div>
 
               <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
-                isInsideNoticeWindow ? 'bg-amber-100 text-amber-800 animate-pulse' : 'bg-slate-100 text-slate-700'
+                isInsideNoticeWindow ? 'bg-status-warning-bg text-status-warning-text border border-status-warning-border animate-pulse' : 'bg-slate-100 text-slate-700'
               }`}>
                 Échéance bail : {leaseEndDate.toLocaleDateString('fr-FR')}
               </span>
@@ -182,7 +182,7 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
 
           <button
             onClick={onOpenDryosContact}
-            className="w-full py-2.5 rounded-xl border border-slate-300 hover:border-[#00434A] text-slate-800 text-xs font-bold transition flex items-center justify-center space-x-1.5 cursor-pointer"
+            className="w-full py-2.5 rounded-xl border border-slate-300 hover:border-navy text-slate-800 text-xs font-bold transition flex items-center justify-center space-x-1.5 cursor-pointer"
           >
             <span>Assistance préavis & Relocation DRYOS</span>
           </button>
@@ -193,7 +193,7 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
       <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2.5">
-            <div className="p-2 rounded-xl bg-[#00434A]/10 text-[#00434A]">
+            <div className="p-2 rounded-xl bg-navy-50 text-navy">
               <Scale className="w-5 h-5" />
             </div>
             <div>
@@ -246,7 +246,7 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
             <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
               <span className="text-xs font-semibold text-slate-600">Solde de régularisation :</span>
               <div className="flex items-baseline space-x-2 mt-1">
-                <span className={`text-xl font-extrabold ${balance >= 0 ? 'text-emerald-700' : 'text-amber-800'}`}>
+                <span className={`text-xl font-extrabold ${balance >= 0 ? 'text-status-ok-text' : 'text-status-warning-text'}`}>
                   {balance >= 0 ? `+ ${balance.toFixed(2)} €` : `${balance.toFixed(2)} €`}
                 </span>
                 <span className="text-[11px] text-slate-500">
@@ -261,7 +261,7 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
                     alert(`Courrier de régularisation des charges généré avec un solde de ${balance.toFixed(2)} €.`);
                   }
                 }}
-                className="mt-2 text-[11px] font-bold text-[#00434A] hover:underline cursor-pointer flex items-center space-x-1"
+                className="mt-2 text-[11px] font-bold text-navy hover:underline cursor-pointer flex items-center space-x-1"
               >
                 <span>Calculer & générer le décompte légal</span>
                 <span>→</span>
@@ -279,15 +279,15 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
       <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <h4 className="font-bold text-slate-900 text-sm sm:text-base flex items-center space-x-2">
-            <ShieldCheck className="w-5 h-5 text-[#00434A]" />
+            <ShieldCheck className="w-5 h-5 text-navy" />
             <span>Contrôles réglementaires annuels & Attestations</span>
           </h4>
           {onOpenVaultModal && (
             <button
               onClick={() => onOpenVaultModal(property)}
-              className="self-start sm:self-auto px-3.5 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-[#00434A] border border-teal-200 text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer"
+              className="self-start sm:self-auto px-3.5 py-1.5 rounded-xl bg-navy-50 hover:bg-navy-100 text-navy border border-navy-200 text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer"
             >
-              <FolderLock className="w-3.5 h-3.5 text-teal-600" />
+              <FolderLock className="w-3.5 h-3.5 text-navy" />
               <span>Ouvrir mon coffre-fort numérique</span>
             </button>
           )}
@@ -299,7 +299,7 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
             <p className="text-slate-600 text-[11px]">
               Échéance : {new Date(property.tenantInsuranceExpiry).toLocaleDateString('fr-FR')}
             </p>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 inline-block">
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-status-ok-bg text-status-ok-text border border-status-ok-border inline-block">
               À jour
             </span>
           </div>
@@ -311,7 +311,7 @@ export const LegalRemindersSection: React.FC<LegalRemindersSectionProps> = ({
                 ? (property.pnoInsurer ? `Tacite reconduction (${property.pnoInsurer})` : 'Tacite reconduction annuelle')
                 : `Échéance : ${new Date(property.pnoExpiryDate).toLocaleDateString('fr-FR')}`}
             </p>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 inline-block">
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-status-ok-bg text-status-ok-text border border-status-ok-border inline-block">
               Valide
             </span>
           </div>

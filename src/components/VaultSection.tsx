@@ -279,12 +279,12 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
       
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-between shadow-sm animate-fadeIn">
+        <div className="p-3.5 rounded-2xl bg-status-ok-bg border border-status-ok-border text-status-ok-text text-xs font-bold flex items-center justify-between shadow-xs animate-fadeIn">
           <div className="flex items-center space-x-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-status-ok flex-shrink-0" />
             <span>{toastMessage}</span>
           </div>
-          <button onClick={() => setToastMessage(null)} className="text-emerald-600 hover:text-emerald-800">
+          <button onClick={() => setToastMessage(null)} className="text-status-ok hover:text-status-ok-text">
             Fermer
           </button>
         </div>
@@ -292,16 +292,16 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
 
       {/* Hero Dossier Banner */}
       <div className="bg-white rounded-3xl p-5 sm:p-7 border border-slate-200/90 shadow-xs relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-teal-50/50 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-light/40 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
         
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center space-x-2.5">
-              <span className="p-2 rounded-xl bg-[#00434A]/10 text-[#00434A]">
+              <span className="p-2 rounded-xl bg-navy-50 text-navy">
                 <FolderLock className="w-6 h-6" />
               </span>
               <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#00434A] block">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-navy block">
                   Coffre-fort numérique & Dossier locatif
                 </span>
                 <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
@@ -317,11 +317,11 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
 
             <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
               <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-bold">
-                <Lock className="w-3.5 h-3.5 text-teal-700" />
+                <Lock className="w-3.5 h-3.5 text-navy" />
                 <span>Zero-Trust Cloisonné</span>
               </span>
-              <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-teal-50 text-teal-800 font-bold border border-teal-200/60">
-                <Shield className="w-3.5 h-3.5 text-teal-600" />
+              <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-light/30 text-navy font-bold border border-emerald-brand/20">
+                <Shield className="w-3.5 h-3.5 text-emerald-brand" />
                 <span>Conforme RGPD Art. 32</span>
               </span>
               <span className="text-slate-400 text-xs hidden sm:inline">•</span>
@@ -336,7 +336,7 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
             <div>
               <div className="flex items-center justify-between text-xs font-bold mb-1.5">
                 <span className="text-slate-700">Conformité légale du dossier</span>
-                <span className={complianceScore === 100 ? 'text-emerald-700' : 'text-amber-700'}>
+                <span className={complianceScore === 100 ? 'text-status-ok-text' : 'text-status-warning-text'}>
                   {complianceScore}%
                 </span>
               </div>
@@ -345,7 +345,7 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
               <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
                 <div 
                   className={`h-full transition-all duration-500 rounded-full ${
-                    complianceScore === 100 ? 'bg-emerald-600' : complianceScore > 60 ? 'bg-amber-500' : 'bg-rose-500'
+                    complianceScore === 100 ? 'bg-status-ok' : complianceScore > 60 ? 'bg-status-warning' : 'bg-status-urgent'
                   }`}
                   style={{ width: `${complianceScore}%` }}
                 />
@@ -378,7 +378,7 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
             onClick={() => setActiveCategory('ALL')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap ${
               activeCategory === 'ALL'
-                ? 'bg-[#00434A] text-white shadow-2xs'
+                ? 'bg-navy text-white shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
             }`}
           >
@@ -389,7 +389,7 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
             onClick={() => setActiveCategory('BAIL')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap ${
               activeCategory === 'BAIL'
-                ? 'bg-[#00434A] text-white shadow-2xs'
+                ? 'bg-navy text-white shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
             }`}
           >
@@ -400,7 +400,7 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
             onClick={() => setActiveCategory('TECHNIQUE')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap ${
               activeCategory === 'TECHNIQUE'
-                ? 'bg-[#00434A] text-white shadow-2xs'
+                ? 'bg-navy text-white shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
             }`}
           >
@@ -411,7 +411,7 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
             onClick={() => setActiveCategory('OBLIGATIONS')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap ${
               activeCategory === 'OBLIGATIONS'
-                ? 'bg-[#00434A] text-white shadow-2xs'
+                ? 'bg-navy text-white shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
             }`}
           >
@@ -427,7 +427,7 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
             placeholder="Filtrer une pièce..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[#00434A] focus:bg-white transition"
+            className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-navy focus:bg-white transition"
           />
         </div>
 
@@ -451,9 +451,9 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
               onDrop={(e) => handleFileDrop(e, docItem.key)}
               className={`rounded-2xl border p-5 transition-all flex flex-col justify-between ${
                 isDragOver
-                  ? 'border-[#00434A] bg-teal-50/50 scale-[1.01] ring-2 ring-teal-500/20'
+                  ? 'border-navy bg-navy-50 scale-[1.01] ring-2 ring-navy/20'
                   : isUploaded
-                  ? 'bg-white border-slate-200/90 shadow-2xs hover:border-teal-300'
+                  ? 'bg-white border-slate-200/90 shadow-2xs hover:border-navy-300'
                   : 'bg-slate-50/70 border-dashed border-slate-300 hover:bg-slate-50'
               }`}
             >
@@ -462,7 +462,7 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start space-x-3">
                     <div className={`p-2.5 rounded-xl flex-shrink-0 ${
-                      isUploaded ? 'bg-teal-50 text-teal-700' : 'bg-slate-200/70 text-slate-500'
+                      isUploaded ? 'bg-navy-50 text-navy' : 'bg-slate-200/70 text-slate-500'
                     }`}>
                       <Icon className="w-5 h-5" />
                     </div>
@@ -472,7 +472,7 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
                           {docItem.title}
                         </h4>
                         {docItem.mandatory && (
-                          <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">
+                          <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-status-warning-bg text-status-warning-text border border-status-warning-border">
                             Requis
                           </span>
                         )}
@@ -486,7 +486,7 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
                   {/* Status badge */}
                   <div>
                     {isUploaded ? (
-                      <span className="inline-flex items-center space-x-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 whitespace-nowrap">
+                      <span className="inline-flex items-center space-x-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-status-ok-bg text-status-ok-text border border-status-ok-border whitespace-nowrap">
                         <CheckCircle2 className="w-3 h-3" />
                         <span>Sécurisé</span>
                       </span>
@@ -510,7 +510,7 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
                 {isUploaded && docItem.data && (
                   <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs">
                     <div className="flex items-center space-x-2 min-w-0">
-                      <FileCheck className="w-4 h-4 text-teal-600 flex-shrink-0" />
+                      <FileCheck className="w-4 h-4 text-navy flex-shrink-0" />
                       <span className="font-bold text-slate-800 truncate max-w-[180px] sm:max-w-[220px]">
                         {docItem.data.name}
                       </span>
@@ -556,7 +556,7 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
 
                     <button
                       onClick={() => handleRemoveDoc(docItem.key)}
-                      className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer"
+                      className="p-1.5 text-slate-400 hover:text-status-urgent-text hover:bg-status-urgent-bg rounded-lg transition cursor-pointer"
                       title="Supprimer la pièce"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -572,11 +572,11 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
                             placeholder={docItem.defaultName}
                             value={tempFileName}
                             onChange={(e) => setTempFileName(e.target.value)}
-                            className="flex-1 text-xs p-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#00434A]"
+                            className="flex-1 text-xs p-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-1 focus:ring-navy"
                           />
                           <button
                             onClick={() => handleSaveDocument(docItem.key, tempFileName)}
-                            className="px-3 py-2 rounded-xl bg-[#00434A] text-white text-xs font-bold hover:bg-[#00343a] transition cursor-pointer"
+                            className="px-3 py-2 rounded-xl bg-navy text-white text-xs font-bold hover:bg-navy-800 transition cursor-pointer"
                           >
                             Valider
                           </button>
@@ -596,8 +596,8 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
                       </div>
                     ) : (
                       <div className="flex items-center space-x-2">
-                        <label className="flex-1 px-3.5 py-2 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs font-bold transition flex items-center justify-center space-x-1.5 shadow-2xs cursor-pointer active:scale-98">
-                          <Upload className="w-3.5 h-3.5 text-teal-300" />
+                        <label className="flex-1 px-3.5 py-2 rounded-xl bg-navy hover:bg-navy-800 text-white text-xs font-bold transition flex items-center justify-center space-x-1.5 shadow-2xs cursor-pointer active:scale-98">
+                          <Upload className="w-3.5 h-3.5 text-emerald-light" />
                           <span>Choisir un fichier (PDF, image)</span>
                           <input
                             type="file"
@@ -627,9 +627,9 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
       {previewDoc && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
           <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
-            <div className="p-5 bg-gradient-to-r from-[#00434A] to-[#005e68] text-white flex items-center justify-between">
+            <div className="p-5 bg-gradient-to-r from-navy to-navy-800 text-white flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <FileCheck className="w-5 h-5 text-teal-300" />
+                <FileCheck className="w-5 h-5 text-emerald-light" />
                 <h3 className="font-bold text-base">{previewDoc.title}</h3>
               </div>
               <button
@@ -652,12 +652,12 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
                 </div>
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-slate-500 font-medium">Chiffrement :</span>
-                  <span className="font-bold text-emerald-700">AES-256 (Intègre)</span>
+                  <span className="font-bold text-status-ok-text">AES-256 (Intègre)</span>
                 </div>
               </div>
 
               <div className="p-6 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center text-center space-y-2 bg-slate-50/50">
-                <FileText className="w-12 h-12 text-[#00434A]/40" />
+                <FileText className="w-12 h-12 text-navy/40" />
                 <p className="text-xs text-slate-600 font-medium">
                   Document numérique certifié conforme stocké dans votre espace privé.
                 </p>
@@ -673,9 +673,9 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
                   alert(`Téléchargement de « ${previewDoc.fileName} » en cours...`);
                   setPreviewDoc(null);
                 }}
-                className="px-4 py-2 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs font-bold transition flex items-center space-x-1.5"
+                className="px-4 py-2 rounded-xl bg-navy hover:bg-navy-800 text-white text-xs font-bold transition flex items-center space-x-1.5"
               >
-                <Download className="w-3.5 h-3.5 text-teal-300" />
+                <Download className="w-3.5 h-3.5 text-emerald-light" />
                 <span>Télécharger le document</span>
               </button>
               <button

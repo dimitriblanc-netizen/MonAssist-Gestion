@@ -411,10 +411,10 @@ export default function App() {
 
   if (loading && !authInitialized) {
     return (
-      <div className="min-h-screen bg-[#FBF7EE] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="text-center space-y-3">
-          <div className="w-12 h-12 border-4 border-[#00434A] border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-sm font-bold text-[#00434A]">Initialisation de Mon Assist'Gestion...</p>
+          <div className="w-12 h-12 border-4 border-navy border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-sm font-bold text-navy">Initialisation de Mon Assist'Gestion...</p>
         </div>
       </div>
     );
@@ -458,7 +458,7 @@ export default function App() {
 
   return (
     <PrivacyProvider>
-      <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans antialiased selection:bg-[#00434A] selection:text-white">
+      <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans antialiased selection:bg-navy selection:text-white">
         {/* Top Header */}
         <Header
           onOpenAgencyContact={() => setShowAgencyModal(true)}
@@ -492,22 +492,22 @@ export default function App() {
 
         {/* Client Impersonation / Preview Top Banner */}
         {previewingClient && (
-          <div className="bg-gradient-to-r from-purple-900 to-indigo-950 text-white px-4 py-3 sm:px-5 sm:py-4 rounded-3xl shadow-lg border border-purple-400/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in">
+          <div className="bg-navy-900 text-white px-4 py-3 sm:px-5 sm:py-4 rounded-3xl shadow-lg border border-navy-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-2xl bg-purple-500/30 border border-purple-400/30 flex items-center justify-center text-purple-200 shrink-0">
+              <div className="w-10 h-10 rounded-2xl bg-navy-800 border border-navy-700 flex items-center justify-center text-emerald-light shrink-0">
                 <Eye className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-purple-300">
+                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-light">
                     Mode Consultation Compte Client
                   </span>
-                  <span className="text-[10px] font-extrabold bg-purple-400/20 text-purple-200 px-2 py-0.5 rounded-md border border-purple-300/30">
+                  <span className="text-[10px] font-extrabold bg-navy-800 text-slate-200 px-2 py-0.5 rounded-md border border-navy-700">
                     {previewingClient.mandateType === 'MISE_EN_LOCATION' ? 'Mise en location DRYOS' : previewingClient.mandateType === 'GESTION_COMPLETE' ? 'Gestion Sérénité' : 'Autonome'}
                   </span>
                 </div>
                 <p className="text-sm font-bold text-white">
-                  {previewingClient.fullName} <span className="text-xs font-normal text-purple-200">({previewingClient.email})</span>
+                  {previewingClient.fullName} <span className="text-xs font-normal text-slate-300">({previewingClient.email})</span>
                 </p>
               </div>
             </div>
@@ -517,7 +517,7 @@ export default function App() {
                 setPreviewingClient(null);
                 setIsAdminView(true);
               }}
-              className="px-4 py-2.5 rounded-xl bg-white hover:bg-purple-100 text-purple-950 font-extrabold text-xs shadow-md transition cursor-pointer flex items-center space-x-2 self-start sm:self-auto"
+              className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-navy font-extrabold text-xs shadow-md transition cursor-pointer flex items-center space-x-2 self-start sm:self-auto"
             >
               <span>← Revenir à la console admin</span>
             </button>
@@ -526,19 +526,19 @@ export default function App() {
 
         {/* Admin Personal Workspace Top Banner */}
         {isAdmin && !previewingClient && !isAdminView && (
-          <div className="bg-gradient-to-r from-[#00343a] via-[#00434A] to-[#004f58] text-white px-4 py-3 sm:px-5 sm:py-3.5 rounded-2xl shadow-sm border border-teal-600/40 flex flex-col md:flex-row md:items-center justify-between gap-3 animate-in fade-in">
+          <div className="bg-navy-800 text-white px-4 py-3 sm:px-5 sm:py-3.5 rounded-2xl shadow-sm border border-navy-700 flex flex-col md:flex-row md:items-center justify-between gap-3 animate-in fade-in">
             <div className="flex items-start sm:items-center space-x-3">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0 animate-ping mt-1 sm:mt-0" />
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-brand shrink-0 animate-ping mt-1 sm:mt-0" />
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-black uppercase tracking-wider text-teal-300 text-xs">
+                  <span className="font-black uppercase tracking-wider text-emerald-light text-xs">
                     Mon Espace Bailleur Personnel • Dimitri Blanc
                   </span>
-                  <span className="text-[10px] bg-teal-800/90 text-teal-100 px-2 py-0.5 rounded-md font-bold border border-teal-600/40">
+                  <span className="text-[10px] bg-navy-900 text-slate-200 px-2 py-0.5 rounded-md font-bold border border-navy-700">
                     {properties.length} lot{properties.length > 1 ? 's' : ''} actif{properties.length > 1 ? 's' : ''}
                   </span>
                 </div>
-                <p className="text-xs text-teal-100/90 mt-0.5">
+                <p className="text-xs text-slate-300 mt-0.5">
                   Vous êtes sur votre espace bailleur dédié. Vous pouvez tester librement baux, quittances, impayés, régularisations et IRL.
                 </p>
               </div>
@@ -548,10 +548,10 @@ export default function App() {
               <button
                 id="btn-banner-load-test-data"
                 onClick={handleLoadTestData}
-                className="px-3 py-1.5 rounded-xl bg-teal-700/90 hover:bg-teal-600 text-teal-100 font-bold text-xs transition cursor-pointer border border-teal-500/30 flex items-center space-x-1.5 shadow-2xs"
+                className="px-3 py-1.5 rounded-xl bg-navy-700 hover:bg-navy-600 text-white font-bold text-xs transition cursor-pointer border border-navy-600 flex items-center space-x-1.5 shadow-2xs"
                 title="Charger 3 biens de test complets (à jour, impayé, passoire DPE)"
               >
-                <Sparkles className="w-3.5 h-3.5 text-teal-300" />
+                <Sparkles className="w-3.5 h-3.5 text-emerald-light" />
                 <span>Charger 3 tests</span>
               </button>
 
@@ -559,7 +559,7 @@ export default function App() {
                 <button
                   id="btn-banner-clear-test-data"
                   onClick={handleClearTestData}
-                  className="px-2.5 py-1.5 rounded-xl bg-rose-950/60 hover:bg-rose-900 text-rose-200 font-bold text-xs transition cursor-pointer border border-rose-800/40"
+                  className="px-2.5 py-1.5 rounded-xl bg-status-urgent-bg hover:bg-red-100 text-status-urgent-text font-bold text-xs transition cursor-pointer border border-status-urgent-border"
                   title="Vider les biens de mon compte personnel"
                 >
                   Vider
@@ -569,7 +569,7 @@ export default function App() {
               <button
                 id="btn-banner-back-to-admin"
                 onClick={() => setIsAdminView(true)}
-                className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-teal-50 text-[#00434A] font-black text-xs shadow-sm transition cursor-pointer flex items-center space-x-1.5"
+                className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-navy font-black text-xs shadow-sm transition cursor-pointer flex items-center space-x-1.5"
               >
                 <span>Console Agence</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -611,7 +611,7 @@ export default function App() {
                 <div className="flex justify-center mb-5">
                   <AppLogo className="h-16 w-auto object-contain" />
                 </div>
-                <h2 className="text-xl sm:text-2xl font-black text-[#00434A] tracking-tight mb-2">
+                <h2 className="text-xl sm:text-2xl font-black text-navy tracking-tight mb-2">
                   Connectez-vous à votre espace
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto mb-6 leading-relaxed">
@@ -621,7 +621,7 @@ export default function App() {
                   <button
                     id="btn-gate-google-login"
                     onClick={() => setShowAuthModal(true)}
-                    className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-[#00434A] hover:bg-[#00343a] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2 cursor-pointer"
+                    className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-navy hover:bg-navy-800 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2 cursor-pointer"
                   >
                     <span>Accéder à mon compte</span>
                     <ArrowRight className="w-4 h-4" />
@@ -663,11 +663,11 @@ export default function App() {
                   onClick={() => setActiveTab('ACTIONS')}
                   className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer whitespace-nowrap ${
                     activeTab === 'ACTIONS'
-                      ? 'bg-[#00434A] text-white shadow-xs'
+                      ? 'bg-navy text-white shadow-xs'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  <Sparkles className="w-4 h-4 text-teal-300" />
+                  <Sparkles className="w-4 h-4 text-emerald-light" />
                   <span>Flux d'actions (Accueil)</span>
                 </button>
 
@@ -676,11 +676,11 @@ export default function App() {
                   onClick={() => setActiveTab('RENTS')}
                   className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer whitespace-nowrap ${
                     activeTab === 'RENTS'
-                      ? 'bg-[#00434A] text-white shadow-xs'
+                      ? 'bg-navy text-white shadow-xs'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  <Receipt className="w-4 h-4 text-teal-300" />
+                  <Receipt className="w-4 h-4 text-emerald-light" />
                   <span>Loyers & Impayés</span>
                 </button>
 
@@ -689,11 +689,11 @@ export default function App() {
                   onClick={() => setActiveTab('VAULT')}
                   className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer whitespace-nowrap ${
                     activeTab === 'VAULT'
-                      ? 'bg-[#00434A] text-white shadow-xs'
+                      ? 'bg-navy text-white shadow-xs'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  <FolderLock className="w-4 h-4 text-teal-300" />
+                  <FolderLock className="w-4 h-4 text-emerald-light" />
                   <span>Dossiers & Coffre-fort</span>
                 </button>
 
@@ -702,11 +702,11 @@ export default function App() {
                   onClick={() => setActiveTab('LEGAL')}
                   className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer whitespace-nowrap ${
                     activeTab === 'LEGAL'
-                      ? 'bg-[#00434A] text-white shadow-xs'
+                      ? 'bg-navy text-white shadow-xs'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  <Scale className="w-4 h-4 text-teal-300" />
+                  <Scale className="w-4 h-4 text-emerald-light" />
                   <span>Rappels Légaux & IRL</span>
                 </button>
 
@@ -715,11 +715,11 @@ export default function App() {
                   onClick={() => setActiveTab('FINANCE')}
                   className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer whitespace-nowrap ${
                     activeTab === 'FINANCE'
-                      ? 'bg-[#00434A] text-white shadow-xs'
+                      ? 'bg-navy text-white shadow-xs'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  <Euro className="w-4 h-4 text-teal-300" />
+                  <Euro className="w-4 h-4 text-emerald-light" />
                   <span>Bilan Fiscal & Dépenses</span>
                 </button>
 
@@ -728,11 +728,11 @@ export default function App() {
                   onClick={() => setActiveTab('EXIT')}
                   className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer whitespace-nowrap ${
                     activeTab === 'EXIT'
-                      ? 'bg-[#00434A] text-white shadow-xs'
+                      ? 'bg-navy text-white shadow-xs'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  <LogOut className="w-4 h-4 text-teal-300" />
+                  <LogOut className="w-4 h-4 text-emerald-light" />
                   <span>Sortie Locataire & Relouer</span>
                 </button>
               </nav>
@@ -777,7 +777,7 @@ export default function App() {
                     <p className="text-xs text-slate-500">
                       <MaskedValue value={activeProperty.tenantPhone} /> • <MaskedValue value={activeProperty.tenantEmail} />
                     </p>
-                    <div className="pt-2 text-xs font-semibold text-teal-800">
+                    <div className="pt-2 text-xs font-semibold text-navy">
                       Garantie : {activeProperty.gliProvider || 'Visale'}
                     </div>
                   </div>
@@ -799,7 +799,7 @@ export default function App() {
                     <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400 block">DPE & Conformité</span>
                     <div className="flex items-center space-x-2">
                       <span className={`text-sm sm:text-lg font-black px-2.5 sm:px-3 py-0.5 rounded-lg text-white ${
-                        activeProperty.dpeRating === 'F' || activeProperty.dpeRating === 'G' ? 'bg-rose-600' : 'bg-emerald-600'
+                        activeProperty.dpeRating === 'F' || activeProperty.dpeRating === 'G' ? 'bg-status-urgent' : 'bg-status-ok'
                       }`}>
                         {activeProperty.dpeRating}
                       </span>
@@ -972,7 +972,7 @@ export default function App() {
       <footer className="bg-white border-t border-slate-200 py-6 text-xs text-slate-500 mt-12 pb-24 sm:pb-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-3">
-            <span className="font-black text-[#00434A]">MON ASSIST'GESTION</span>
+            <span className="font-black text-navy">MON ASSIST'GESTION</span>
             <span className="hidden sm:inline">•</span>
             <span>DRYOS Immobilier</span>
             <span className="hidden sm:inline">•</span>
@@ -991,10 +991,10 @@ export default function App() {
                   setIsAdminView(prev => !prev);
                 }
               }}
-              className="text-purple-700 hover:text-purple-900 font-bold flex items-center space-x-1 cursor-pointer bg-purple-50 hover:bg-purple-100 px-2.5 py-1 rounded-lg border border-purple-200"
+              className="text-navy hover:text-navy-900 font-bold flex items-center space-x-1 cursor-pointer bg-navy-50 hover:bg-navy-100 px-2.5 py-1 rounded-lg border border-navy-200"
               title="Console réservée agence DRYOS (dimitri.blanc@dryos.fr)"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-brand" />
               <span>Accès Agence DRYOS</span>
             </button>
 
@@ -1002,13 +1002,13 @@ export default function App() {
               onClick={() => setShowSecurityModal(true)}
               className="text-slate-500 hover:text-slate-800 flex items-center space-x-1 cursor-pointer"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-brand" />
               <span>Confidentialité & Sécurité</span>
             </button>
             <span className="text-slate-300 hidden sm:inline">•</span>
             <button
               onClick={() => setShowAgencyModal(true)}
-              className="font-bold text-[#00434A] hover:underline cursor-pointer"
+              className="font-bold text-navy hover:underline cursor-pointer"
             >
               Contact agence DRYOS
             </button>
@@ -1025,60 +1025,60 @@ export default function App() {
           <button
             onClick={() => setActiveTab('ACTIONS')}
             className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition cursor-pointer active:scale-95 ${
-              activeTab === 'ACTIONS' ? 'bg-[#00434A] text-white shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'
+              activeTab === 'ACTIONS' ? 'bg-navy text-white shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'
             }`}
           >
-            <Sparkles className={`w-4 h-4 ${activeTab === 'ACTIONS' ? 'text-teal-300' : 'text-slate-400'}`} />
+            <Sparkles className={`w-4 h-4 ${activeTab === 'ACTIONS' ? 'text-emerald-light' : 'text-slate-400'}`} />
             <span className="text-[9px] mt-0.5 font-medium">Actions</span>
           </button>
 
           <button
             onClick={() => setActiveTab('RENTS')}
             className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition cursor-pointer active:scale-95 ${
-              activeTab === 'RENTS' ? 'bg-[#00434A] text-white shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'
+              activeTab === 'RENTS' ? 'bg-navy text-white shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'
             }`}
           >
-            <Receipt className={`w-4 h-4 ${activeTab === 'RENTS' ? 'text-teal-300' : 'text-slate-400'}`} />
+            <Receipt className={`w-4 h-4 ${activeTab === 'RENTS' ? 'text-emerald-light' : 'text-slate-400'}`} />
             <span className="text-[9px] mt-0.5 font-medium">Loyers</span>
           </button>
 
           <button
             onClick={() => setActiveTab('VAULT')}
             className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition cursor-pointer active:scale-95 ${
-              activeTab === 'VAULT' ? 'bg-[#00434A] text-white shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'
+              activeTab === 'VAULT' ? 'bg-navy text-white shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'
             }`}
           >
-            <FolderLock className={`w-4 h-4 ${activeTab === 'VAULT' ? 'text-teal-300' : 'text-slate-400'}`} />
+            <FolderLock className={`w-4 h-4 ${activeTab === 'VAULT' ? 'text-emerald-light' : 'text-slate-400'}`} />
             <span className="text-[9px] mt-0.5 font-medium">Dossiers</span>
           </button>
 
           <button
             onClick={() => setActiveTab('LEGAL')}
             className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition cursor-pointer active:scale-95 ${
-              activeTab === 'LEGAL' ? 'bg-[#00434A] text-white shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'
+              activeTab === 'LEGAL' ? 'bg-navy text-white shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'
             }`}
           >
-            <Scale className={`w-4 h-4 ${activeTab === 'LEGAL' ? 'text-teal-300' : 'text-slate-400'}`} />
+            <Scale className={`w-4 h-4 ${activeTab === 'LEGAL' ? 'text-emerald-light' : 'text-slate-400'}`} />
             <span className="text-[9px] mt-0.5 font-medium">Légal</span>
           </button>
 
           <button
             onClick={() => setActiveTab('FINANCE')}
             className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition cursor-pointer active:scale-95 ${
-              activeTab === 'FINANCE' ? 'bg-[#00434A] text-white shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'
+              activeTab === 'FINANCE' ? 'bg-navy text-white shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'
             }`}
           >
-            <Euro className={`w-4 h-4 ${activeTab === 'FINANCE' ? 'text-teal-300' : 'text-slate-400'}`} />
+            <Euro className={`w-4 h-4 ${activeTab === 'FINANCE' ? 'text-emerald-light' : 'text-slate-400'}`} />
             <span className="text-[9px] mt-0.5 font-medium">Bilan</span>
           </button>
 
           <button
             onClick={() => setActiveTab('EXIT')}
             className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition cursor-pointer active:scale-95 ${
-              activeTab === 'EXIT' ? 'bg-[#00434A] text-white shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'
+              activeTab === 'EXIT' ? 'bg-navy text-white shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'
             }`}
           >
-            <LogOut className={`w-4 h-4 ${activeTab === 'EXIT' ? 'text-teal-300' : 'text-slate-400'}`} />
+            <LogOut className={`w-4 h-4 ${activeTab === 'EXIT' ? 'text-emerald-light' : 'text-slate-400'}`} />
             <span className="text-[9px] mt-0.5 font-medium">Sortie</span>
           </button>
         </nav>

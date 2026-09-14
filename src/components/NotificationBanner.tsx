@@ -187,20 +187,20 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
   return (
     <>
       {/* Sleek Mobile Push Banner */}
-      <div className="bg-[#00434A]/5 border border-[#00434A]/15 rounded-2xl p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+      <div className="bg-navy-50/50 border border-navy-100 rounded-2xl p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
         <div className="flex items-center space-x-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-[#00434A] text-white flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-navy text-white flex items-center justify-center flex-shrink-0">
             {permission === 'granted' ? (
-              <BellRing className="w-4 h-4 text-emerald-300" />
+              <BellRing className="w-4 h-4 text-emerald-light" />
             ) : (
-              <Bell className="w-4 h-4 text-teal-200" />
+              <Bell className="w-4 h-4 text-emerald-light" />
             )}
           </div>
           <div className="min-w-0">
             {permission === 'granted' ? (
               <div>
-                <p className="font-bold text-[#00434A] flex items-center">
-                  <CheckCircle className="w-3.5 h-3.5 text-emerald-600 inline mr-1" />
+                <p className="font-bold text-navy flex items-center">
+                  <CheckCircle className="w-3.5 h-3.5 text-status-ok inline mr-1" />
                   Rappels locaux & Service Worker actifs
                 </p>
                 <p className="text-[11px] text-slate-500 truncate">
@@ -228,7 +228,7 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
               className="px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 font-bold text-[11px] hover:bg-slate-50 transition flex items-center space-x-1 cursor-pointer"
               title="Installer sur votre smartphone ou PC"
             >
-              <Download className="w-3 h-3 text-[#00434A]" />
+              <Download className="w-3 h-3 text-navy" />
               <span className="hidden sm:inline">Installer l'app</span>
             </button>
           )}
@@ -237,20 +237,20 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
             <>
               <button
                 onClick={handleImmediateTest}
-                className="px-2.5 py-1.5 rounded-lg bg-white border border-[#00434A]/20 text-[#00434A] font-bold text-[11px] hover:bg-[#00434A]/5 transition flex items-center space-x-1 cursor-pointer"
+                className="px-2.5 py-1.5 rounded-lg bg-white border border-navy-200 text-navy font-bold text-[11px] hover:bg-navy-50 transition flex items-center space-x-1 cursor-pointer"
                 title="Tester l'affichage immédiat"
               >
-                <Send className="w-3 h-3 text-[#00434A]" />
+                <Send className="w-3 h-3 text-navy" />
                 <span>Tester direct</span>
               </button>
 
               <button
                 onClick={handleDelayedReminderTest}
                 disabled={countdown !== null}
-                className="px-2.5 py-1.5 rounded-lg bg-[#00434A] text-white font-bold text-[11px] hover:bg-[#00343a] transition flex items-center space-x-1.5 cursor-pointer shadow-xs disabled:opacity-60"
+                className="px-2.5 py-1.5 rounded-lg bg-navy text-white font-bold text-[11px] hover:bg-navy-800 transition flex items-center space-x-1.5 cursor-pointer shadow-xs disabled:opacity-60"
                 title="Programmer une alerte dans 8s pour tester avec l'onglet fermé"
               >
-                <Clock className="w-3 h-3 text-teal-200" />
+                <Clock className="w-3 h-3 text-emerald-light" />
                 <span>
                   {countdown !== null ? `Fermez l'onglet (${countdown}s)` : 'Tester onglet fermé (8s)'}
                 </span>
@@ -259,9 +259,9 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
           ) : (
             <button
               onClick={requestPushPermission}
-              className="px-3 py-1.5 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white font-bold text-[11px] shadow-xs transition cursor-pointer flex items-center space-x-1"
+              className="px-3 py-1.5 rounded-xl bg-navy hover:bg-navy-800 text-white font-bold text-[11px] shadow-xs transition cursor-pointer flex items-center space-x-1"
             >
-              <BellRing className="w-3 h-3 text-teal-300 mr-1" />
+              <BellRing className="w-3 h-3 text-emerald-light mr-1" />
               <span>Activer les rappels</span>
             </button>
           )}
@@ -269,7 +269,7 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
           <button
             onClick={() => setShowInfoModal(true)}
             title="Comment fonctionne le Service Worker et les rappels ?"
-            className="p-1.5 text-slate-400 hover:text-[#00434A] transition cursor-pointer"
+            className="p-1.5 text-slate-400 hover:text-navy transition cursor-pointer"
           >
             <Info className="w-4 h-4" />
           </button>
@@ -277,14 +277,14 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
       </div>
 
       {testSentMessage && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs px-3.5 py-2.5 rounded-xl flex items-center justify-between animate-fade-in">
+        <div className="bg-status-ok-bg border border-status-ok-border text-status-ok-text text-xs px-3.5 py-2.5 rounded-xl flex items-center justify-between animate-fade-in">
           <div className="flex items-center space-x-2">
-            <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+            <Check className="w-4 h-4 text-status-ok flex-shrink-0" />
             <span>{testSentMessage}</span>
           </div>
           <button 
             onClick={() => setTestSentMessage(null)} 
-            className="text-emerald-600 hover:text-emerald-900 cursor-pointer ml-2"
+            className="text-status-ok hover:text-green-900 cursor-pointer ml-2"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -294,14 +294,14 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
       {/* Info Modal : Fonctionnement du Service Worker et des alertes hors onglet */}
       {showInfoModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#FBF7EE] border border-slate-200 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-xl bg-[#00434A] text-white flex items-center justify-center">
-                  <Bell className="w-4 h-4 text-teal-300" />
+                <div className="w-8 h-8 rounded-xl bg-navy text-white flex items-center justify-center">
+                  <Bell className="w-4 h-4 text-emerald-light" />
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-[#00434A]">
+                  <h3 className="text-base font-black text-navy">
                     Rappels locaux & Service Worker
                   </h3>
                   <p className="text-[10px] text-slate-500">Fonctionnement en tâche de fond même onglet fermé</p>
@@ -320,11 +320,11 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
             </p>
 
             {/* Statut technique */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-2.5">
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-xs space-y-2.5">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-700">Moteur Service Worker :</span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                  <CheckCircle className="w-3 h-3 mr-1 text-emerald-600" />
+                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-status-ok-bg text-status-ok-text border border-status-ok-border">
+                  <CheckCircle className="w-3 h-3 mr-1 text-status-ok" />
                   Actif (/sw.js)
                 </span>
               </div>
@@ -335,7 +335,7 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-700">Permission Notifications :</span>
                 <span className={`text-[11px] font-bold ${
-                  permission === 'granted' ? 'text-emerald-700' : 'text-amber-700'
+                  permission === 'granted' ? 'text-status-ok-text' : 'text-status-warning-text'
                 }`}>
                   {permission === 'granted' ? 'Autorisée' : 'En attente d\'activation'}
                 </span>
@@ -343,13 +343,13 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
             </div>
 
             {/* Aperçu de l'icône sur l'écran d'accueil */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-3.5">
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-3.5">
               <AppLogo className="w-12 h-12 flex-shrink-0" />
               <div className="min-w-0">
-                <span className="text-[10px] uppercase font-extrabold tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md">
+                <span className="text-[10px] uppercase font-extrabold tracking-wider text-navy bg-navy-50 px-2 py-0.5 rounded-md">
                   PWA & Notifications Écran Verrouillé
                 </span>
-                <h4 className="text-sm font-black text-[#00434A] mt-1 truncate">
+                <h4 className="text-sm font-black text-navy mt-1 truncate">
                   Mon Assist'Gestion
                 </h4>
                 <p className="text-[11px] text-slate-500">
@@ -361,14 +361,14 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
             {deferredPrompt ? (
               <button
                 onClick={handleInstallClick}
-                className="w-full py-3 px-4 rounded-xl bg-teal-800 hover:bg-teal-900 text-white text-xs font-bold transition flex items-center justify-center space-x-2 cursor-pointer shadow-sm"
+                className="w-full py-3 px-4 rounded-xl bg-navy hover:bg-navy-800 text-white text-xs font-bold transition flex items-center justify-center space-x-2 cursor-pointer shadow-sm"
               >
                 <Download className="w-4 h-4" />
                 <span>Installer l'application sur cet appareil</span>
               </button>
             ) : isIos ? (
-              <div className="bg-amber-50/80 border border-amber-200/80 p-3.5 rounded-2xl text-xs text-amber-900 space-y-1.5">
-                <div className="font-bold flex items-center space-x-1.5 text-[#00434A]">
+              <div className="bg-status-warning-bg border border-status-warning-border p-3.5 rounded-2xl text-xs text-status-warning-text space-y-1.5">
+                <div className="font-bold flex items-center space-x-1.5 text-navy">
                   <Share className="w-4 h-4" />
                   <span>Installation sur iPhone / iPad (iOS 16.4+) :</span>
                 </div>
@@ -382,8 +382,8 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
 
             <div className="space-y-2.5">
               <div className="bg-white p-3.5 rounded-2xl border border-slate-200 space-y-1">
-                <div className="flex items-center space-x-2 text-xs font-bold text-[#00434A]">
-                  <Smartphone className="w-4 h-4 text-[#00434A]" />
+                <div className="flex items-center space-x-2 text-xs font-bold text-navy">
+                  <Smartphone className="w-4 h-4 text-navy" />
                   <span>1. Rappel du 5 du mois (Échéance de loyer)</span>
                 </div>
                 <p className="text-[11px] text-slate-500 pl-6 leading-normal">
@@ -403,7 +403,7 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
 
               <div className="bg-white p-3.5 rounded-2xl border border-slate-200 space-y-1">
                 <div className="flex items-center space-x-2 text-xs font-bold text-slate-800">
-                  <ShieldCheck className="w-4 h-4 text-teal-600" />
+                  <ShieldCheck className="w-4 h-4 text-navy" />
                   <span>3. Confidentialité & Sécurité totale</span>
                 </div>
                 <p className="text-[11px] text-slate-500 pl-6 leading-normal">
@@ -433,9 +433,9 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
                     handleImmediateTest();
                   }
                 }}
-                className="w-full sm:w-1/2 py-2.5 rounded-xl bg-[#00434A] text-white text-xs font-bold hover:bg-[#00343a] transition cursor-pointer flex items-center justify-center space-x-1.5"
+                className="w-full sm:w-1/2 py-2.5 rounded-xl bg-navy text-white text-xs font-bold hover:bg-navy-800 transition cursor-pointer flex items-center justify-center space-x-1.5"
               >
-                <BellRing className="w-3.5 h-3.5 text-teal-300" />
+                <BellRing className="w-3.5 h-3.5 text-emerald-light" />
                 <span>{permission === 'granted' ? 'Tester maintenant' : 'Activer maintenant'}</span>
               </button>
             </div>

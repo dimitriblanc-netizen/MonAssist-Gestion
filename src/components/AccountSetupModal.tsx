@@ -144,14 +144,14 @@ contact@dryos.fr`;
       <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         
         {/* Header */}
-        <div className="bg-[#00434A] text-white p-5 sm:p-6 flex items-center justify-between">
+        <div className="bg-navy text-white p-5 sm:p-6 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-2xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300">
+            <div className="w-10 h-10 rounded-2xl bg-navy-800 border border-navy-700 flex items-center justify-center text-emerald-light">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-lg font-bold">Mise en place de compte bailleur</h3>
-              <p className="text-xs text-teal-200/80">
+              <p className="text-xs text-slate-200">
                 Service agence DRYOS Immobilier • Pack Clé-en-main
               </p>
             </div>
@@ -167,29 +167,29 @@ contact@dryos.fr`;
         {/* Stepper (Steps 1 to 4) */}
         {step < 5 && (
           <div className="bg-slate-50 border-b border-slate-200 px-6 py-3 flex items-center justify-between text-xs font-semibold">
-            <div className={`flex items-center space-x-2 ${step >= 1 ? 'text-[#00434A]' : 'text-slate-400'}`}>
-              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step === 1 ? 'bg-[#00434A] text-white' : step > 1 ? 'bg-emerald-600 text-white' : 'bg-slate-200'}`}>
+            <div className={`flex items-center space-x-2 ${step >= 1 ? 'text-navy' : 'text-slate-400'}`}>
+              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step === 1 ? 'bg-navy text-white' : step > 1 ? 'bg-emerald-brand text-white' : 'bg-slate-200'}`}>
                 {step > 1 ? '✓' : '1'}
               </span>
               <span className="hidden sm:inline">1. Bailleur</span>
             </div>
             <div className="h-0.5 w-6 bg-slate-200" />
-            <div className={`flex items-center space-x-2 ${step >= 2 ? 'text-[#00434A]' : 'text-slate-400'}`}>
-              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step === 2 ? 'bg-[#00434A] text-white' : step > 2 ? 'bg-emerald-600 text-white' : 'bg-slate-200'}`}>
+            <div className={`flex items-center space-x-2 ${step >= 2 ? 'text-navy' : 'text-slate-400'}`}>
+              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step === 2 ? 'bg-navy text-white' : step > 2 ? 'bg-emerald-brand text-white' : 'bg-slate-200'}`}>
                 {step > 2 ? '✓' : '2'}
               </span>
               <span className="hidden sm:inline">2. Le Bien</span>
             </div>
             <div className="h-0.5 w-6 bg-slate-200" />
-            <div className={`flex items-center space-x-2 ${step >= 3 ? 'text-[#00434A]' : 'text-slate-400'}`}>
-              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step === 3 ? 'bg-[#00434A] text-white' : step > 3 ? 'bg-emerald-600 text-white' : 'bg-slate-200'}`}>
+            <div className={`flex items-center space-x-2 ${step >= 3 ? 'text-navy' : 'text-slate-400'}`}>
+              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step === 3 ? 'bg-navy text-white' : step > 3 ? 'bg-emerald-brand text-white' : 'bg-slate-200'}`}>
                 {step > 3 ? '✓' : '3'}
               </span>
               <span className="hidden sm:inline">3. Locataire</span>
             </div>
             <div className="h-0.5 w-6 bg-slate-200" />
-            <div className={`flex items-center space-x-2 ${step >= 4 ? 'text-[#00434A]' : 'text-slate-400'}`}>
-              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step === 4 ? 'bg-[#00434A] text-white' : 'bg-slate-200'}`}>
+            <div className={`flex items-center space-x-2 ${step >= 4 ? 'text-navy' : 'text-slate-400'}`}>
+              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step === 4 ? 'bg-navy text-white' : 'bg-slate-200'}`}>
                 4
               </span>
               <span className="hidden sm:inline">4. Dossier</span>
@@ -203,7 +203,7 @@ contact@dryos.fr`;
           {/* STEP 1: LE PROPRIÉTAIRE */}
           {step === 1 && (
             <div className="space-y-4 animate-in fade-in">
-              <div className="flex items-center space-x-2 text-[#00434A] font-bold text-sm">
+              <div className="flex items-center space-x-2 text-navy font-bold text-sm">
                 <UserPlus className="w-4 h-4" />
                 <span>Informations du propriétaire bailleur</span>
               </div>
@@ -219,7 +219,7 @@ contact@dryos.fr`;
                     placeholder="Ex: Jean Dupont"
                     value={formData.fullName}
                     onChange={e => handleChange('fullName', e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#00434A] text-sm focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-navy text-sm focus:outline-none"
                   />
                 </div>
 
@@ -233,7 +233,7 @@ contact@dryos.fr`;
                     placeholder="client@example.com"
                     value={formData.email}
                     onChange={e => handleChange('email', e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#00434A] text-sm focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-navy text-sm focus:outline-none"
                   />
                 </div>
 
@@ -246,7 +246,7 @@ contact@dryos.fr`;
                     placeholder="06 12 34 56 78"
                     value={formData.phone}
                     onChange={e => handleChange('phone', e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#00434A] text-sm focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-navy text-sm focus:outline-none"
                   />
                 </div>
 
@@ -257,7 +257,7 @@ contact@dryos.fr`;
                   <select
                     value={formData.mandateType}
                     onChange={e => handleChange('mandateType', e.target.value as MandateType)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#00434A] text-sm focus:outline-none bg-white font-medium"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-navy text-sm focus:outline-none bg-white font-medium"
                   >
                     <option value="MISE_EN_LOCATION">Mise en location DRYOS (Pack Sérénité)</option>
                     <option value="GESTION_COMPLETE">Gestion Déléguée Complète DRYOS</option>
@@ -275,12 +275,12 @@ contact@dryos.fr`;
                   value={formData.agencyNotes}
                   onChange={e => handleChange('agencyNotes', e.target.value)}
                   placeholder="Notes particulières sur le client, exigences..."
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 focus:border-[#00434A] text-xs focus:outline-none"
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 focus:border-navy text-xs focus:outline-none"
                 />
               </div>
 
-              <div className="bg-teal-50 border border-teal-200 rounded-2xl p-3 text-xs text-teal-900 flex items-start space-x-2">
-                <Sparkles className="w-4 h-4 text-teal-700 shrink-0 mt-0.5" />
+              <div className="bg-navy-50 border border-navy-200 rounded-2xl p-3 text-xs text-navy flex items-start space-x-2">
+                <Sparkles className="w-4 h-4 text-emerald-brand shrink-0 mt-0.5" />
                 <p>
                   En créant ce compte pour votre client, son espace sera immédiatement prêt avec le bien, le locataire, et le contrat déjà configurés.
                 </p>
@@ -291,7 +291,7 @@ contact@dryos.fr`;
           {/* STEP 2: LE BIEN */}
           {step === 2 && (
             <div className="space-y-4 animate-in fade-in">
-              <div className="flex items-center space-x-2 text-[#00434A] font-bold text-sm">
+              <div className="flex items-center space-x-2 text-navy font-bold text-sm">
                 <Building2 className="w-4 h-4" />
                 <span>Fiche du bien immobilier loué</span>
               </div>
@@ -307,7 +307,7 @@ contact@dryos.fr`;
                     placeholder="Ex: T2 République - Lyon 2e"
                     value={formData.propertyName}
                     onChange={e => handleChange('propertyName', e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#00434A] text-sm focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-navy text-sm focus:outline-none"
                   />
                 </div>
 
@@ -320,7 +320,7 @@ contact@dryos.fr`;
                     placeholder="12 rue de la République, 69002 Lyon"
                     value={formData.address}
                     onChange={e => handleChange('address', e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#00434A] text-sm focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-navy text-sm focus:outline-none"
                   />
                 </div>
 
@@ -336,7 +336,7 @@ contact@dryos.fr`;
                       handleChange('leaseDurationYears', lt === 'meuble' ? 1 : 3);
                       handleChange('chargesMode', lt === 'meuble' ? 'forfait' : 'provisions');
                     }}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#00434A] text-sm focus:outline-none bg-white font-medium"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-navy text-sm focus:outline-none bg-white font-medium"
                   >
                     <option value="meuble">Meublé (Bail 1 an renouvelable)</option>
                     <option value="vide">Non meublé / Nu (Bail 3 ans)</option>
@@ -350,7 +350,7 @@ contact@dryos.fr`;
                   <select
                     value={formData.dpeRating}
                     onChange={e => handleChange('dpeRating', e.target.value as DpeRating)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#00434A] text-sm focus:outline-none bg-white font-bold"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-navy text-sm focus:outline-none bg-white font-bold"
                   >
                     <option value="A">Classe A</option>
                     <option value="B">Classe B</option>
@@ -370,7 +370,7 @@ contact@dryos.fr`;
                     type="number"
                     value={formData.rentExcl}
                     onChange={e => handleChange('rentExcl', parseFloat(e.target.value) || 0)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#00434A] text-sm focus:outline-none font-bold"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-navy text-sm focus:outline-none font-bold"
                   />
                 </div>
 
@@ -382,7 +382,7 @@ contact@dryos.fr`;
                     type="number"
                     value={formData.charges}
                     onChange={e => handleChange('charges', parseFloat(e.target.value) || 0)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#00434A] text-sm focus:outline-none font-bold"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-navy text-sm focus:outline-none font-bold"
                   />
                 </div>
 
@@ -394,7 +394,7 @@ contact@dryos.fr`;
                     type="number"
                     value={formData.deposit}
                     onChange={e => handleChange('deposit', parseFloat(e.target.value) || 0)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#00434A] text-sm focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-navy text-sm focus:outline-none"
                   />
                 </div>
 
@@ -407,7 +407,7 @@ contact@dryos.fr`;
                     value={formData.irlBaseQuarter}
                     onChange={e => handleChange('irlBaseQuarter', e.target.value)}
                     placeholder="Ex: T3 2024 (144.51)"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#00434A] text-sm focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-navy text-sm focus:outline-none"
                   />
                 </div>
               </div>
@@ -417,7 +417,7 @@ contact@dryos.fr`;
           {/* STEP 3: LE LOCATAIRE */}
           {step === 3 && (
             <div className="space-y-4 animate-in fade-in">
-              <div className="flex items-center space-x-2 text-[#00434A] font-bold text-sm">
+              <div className="flex items-center space-x-2 text-navy font-bold text-sm">
                 <Home className="w-4 h-4" />
                 <span>Locataire mis en place par DRYOS</span>
               </div>
@@ -433,7 +433,7 @@ contact@dryos.fr`;
                     placeholder="Ex: Lucas Bernard"
                     value={formData.tenantName}
                     onChange={e => handleChange('tenantName', e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#00434A] text-sm focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-navy text-sm focus:outline-none"
                   />
                 </div>
 
@@ -446,7 +446,7 @@ contact@dryos.fr`;
                     placeholder="locataire@gmail.com"
                     value={formData.tenantEmail}
                     onChange={e => handleChange('tenantEmail', e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#00434A] text-sm focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-navy text-sm focus:outline-none"
                   />
                 </div>
 
@@ -459,7 +459,7 @@ contact@dryos.fr`;
                     placeholder="07 12 34 56 78"
                     value={formData.tenantPhone}
                     onChange={e => handleChange('tenantPhone', e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#00434A] text-sm focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-navy text-sm focus:outline-none"
                   />
                 </div>
 
@@ -471,7 +471,7 @@ contact@dryos.fr`;
                     type="date"
                     value={formData.leaseStartDate}
                     onChange={e => handleChange('leaseStartDate', e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#00434A] text-sm focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-navy text-sm focus:outline-none"
                   />
                 </div>
 
@@ -482,7 +482,7 @@ contact@dryos.fr`;
                   <select
                     value={formData.gliProvider}
                     onChange={e => handleChange('gliProvider', e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#00434A] text-sm focus:outline-none bg-white font-medium"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-navy text-sm focus:outline-none bg-white font-medium"
                   >
                     <option value="Visale">Garantie Visale (Action Logement)</option>
                     <option value="GLI DRYOS">Assurance Loyers Impayés (GLI DRYOS)</option>
@@ -497,7 +497,7 @@ contact@dryos.fr`;
           {/* STEP 4: DOSSIER & PIÈCES COFFRE-FORT */}
           {step === 4 && (
             <div className="space-y-4 animate-in fade-in">
-              <div className="flex items-center space-x-2 text-[#00434A] font-bold text-sm">
+              <div className="flex items-center space-x-2 text-navy font-bold text-sm">
                 <FileCheck2 className="w-4 h-4" />
                 <span>Dossier & Coffre-fort numérique initialisé par DRYOS</span>
               </div>
@@ -511,7 +511,7 @@ contact@dryos.fr`;
                     type="checkbox"
                     checked={formData.hasSignedLeaseDoc}
                     onChange={e => handleChange('hasSignedLeaseDoc', e.target.checked)}
-                    className="w-4 h-4 rounded text-[#00434A] focus:ring-[#00434A]"
+                    className="w-4 h-4 rounded text-navy focus:ring-navy"
                   />
                   <span>Contrat de bail d'habitation signé par les parties</span>
                 </label>
@@ -521,7 +521,7 @@ contact@dryos.fr`;
                     type="checkbox"
                     checked={formData.hasEdleDoc}
                     onChange={e => handleChange('hasEdleDoc', e.target.checked)}
-                    className="w-4 h-4 rounded text-[#00434A] focus:ring-[#00434A]"
+                    className="w-4 h-4 rounded text-navy focus:ring-navy"
                   />
                   <span>État des lieux d'entrée (EDLE) contradictoire + photos</span>
                 </label>
@@ -531,7 +531,7 @@ contact@dryos.fr`;
                     type="checkbox"
                     checked={formData.hasDdtDoc}
                     onChange={e => handleChange('hasDdtDoc', e.target.checked)}
-                    className="w-4 h-4 rounded text-[#00434A] focus:ring-[#00434A]"
+                    className="w-4 h-4 rounded text-navy focus:ring-navy"
                   />
                   <span>Dossier de Diagnostics Techniques (DDT, DPE, ERP, Plomb)</span>
                 </label>
@@ -541,7 +541,7 @@ contact@dryos.fr`;
                     type="checkbox"
                     checked={formData.hasInsuranceDoc}
                     onChange={e => handleChange('hasInsuranceDoc', e.target.checked)}
-                    className="w-4 h-4 rounded text-[#00434A] focus:ring-[#00434A]"
+                    className="w-4 h-4 rounded text-navy focus:ring-navy"
                   />
                   <span>Attestation d'assurance Multirisque Habitation (MRH) locataire</span>
                 </label>
@@ -551,14 +551,14 @@ contact@dryos.fr`;
                     type="checkbox"
                     checked={formData.hasAgencyInvoiceDoc}
                     onChange={e => handleChange('hasAgencyInvoiceDoc', e.target.checked)}
-                    className="w-4 h-4 rounded text-[#00434A] focus:ring-[#00434A]"
+                    className="w-4 h-4 rounded text-navy focus:ring-navy"
                   />
                   <span>Facture d'honoraires DRYOS (Déductible fiscalement à 100%)</span>
                 </label>
               </div>
 
-              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 text-xs text-amber-900 flex items-start space-x-2">
-                <AlertCircle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+              <div className="bg-status-warning-bg border border-status-warning-border rounded-2xl p-3 text-xs text-status-warning-text flex items-start space-x-2">
+                <AlertCircle className="w-4 h-4 text-status-warning-text shrink-0 mt-0.5" />
                 <p>
                   Le compte sera créé avec le premier mois de loyer déjà validé et la dépense d'honoraires DRYOS pré-remplie pour le bilan fiscal du propriétaire.
                 </p>
@@ -569,15 +569,15 @@ contact@dryos.fr`;
           {/* STEP 5: COMPTE CRÉÉ & MODÈLE D'EMAIL */}
           {step === 5 && createdAccount && (
             <div className="space-y-5 animate-in zoom-in-95 text-center sm:text-left">
-              <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4 bg-emerald-50 border border-emerald-200 p-4 sm:p-5 rounded-2xl">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
+              <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4 bg-status-ok-bg border border-status-ok-border p-4 sm:p-5 rounded-2xl">
+                <div className="w-12 h-12 rounded-2xl bg-status-ok text-white flex items-center justify-center shrink-0">
                   <CheckCircle2 className="w-7 h-7" />
                 </div>
                 <div>
-                  <h4 className="text-base font-bold text-emerald-950">
+                  <h4 className="text-base font-bold text-status-ok-text">
                     Compte client configuré avec succès !
                   </h4>
-                  <p className="text-xs text-emerald-800">
+                  <p className="text-xs text-status-ok-text">
                     Le compte pour <strong>{createdAccount.fullName}</strong> ({createdAccount.email}) a été initialisé avec le bien <strong>{formData.propertyName}</strong>.
                   </p>
                 </div>
@@ -591,7 +591,7 @@ contact@dryos.fr`;
                   </span>
                   <button
                     onClick={copyEmailText}
-                    className="text-xs font-bold text-[#00434A] hover:underline flex items-center space-x-1 cursor-pointer"
+                    className="text-xs font-bold text-navy hover:underline flex items-center space-x-1 cursor-pointer"
                   >
                     <Copy className="w-3.5 h-3.5" />
                     <span>{copiedEmail ? 'Copié !' : 'Copier le message'}</span>
@@ -605,7 +605,7 @@ contact@dryos.fr`;
               <div className="flex flex-col sm:flex-row gap-3">
                 <a
                   href={`mailto:${formData.email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`}
-                  className="flex-1 px-4 py-3 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center space-x-2"
+                  className="flex-1 px-4 py-3 rounded-xl bg-navy hover:bg-navy-800 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center space-x-2"
                 >
                   <Mail className="w-4 h-4" />
                   <span>Ouvrir dans mon logiciel de messagerie</span>
@@ -640,13 +640,13 @@ contact@dryos.fr`;
               type="button"
               onClick={handleNext}
               disabled={isSubmitting}
-              className="px-5 py-2.5 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition flex items-center space-x-2 cursor-pointer disabled:opacity-50"
+              className="px-5 py-2.5 rounded-xl bg-navy hover:bg-navy-800 text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition flex items-center space-x-2 cursor-pointer disabled:opacity-50"
             >
               {isSubmitting ? (
                 <span>Création en cours...</span>
               ) : step === 4 ? (
                 <>
-                  <Sparkles className="w-4 h-4 text-teal-300" />
+                  <Sparkles className="w-4 h-4 text-emerald-light" />
                   <span>Finaliser la mise en place du compte</span>
                 </>
               ) : (

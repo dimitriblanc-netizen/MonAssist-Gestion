@@ -103,7 +103,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top brand accent bar */}
-        <div className="h-2 bg-gradient-to-r from-[#00434A] via-teal-600 to-emerald-500" />
+        <div className="h-2 bg-gradient-to-r from-navy via-navy-700 to-emerald-brand" />
 
         {/* Close button */}
         <button
@@ -120,7 +120,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <div className="inline-flex items-center justify-center mb-3">
               <AppLogo className="w-14 h-14 shadow-sm rounded-2xl" />
             </div>
-            <h2 className="text-xl sm:text-2xl font-black text-[#00434A] tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-black text-navy tracking-tight">
               {isRegister ? 'Créer votre compte' : 'Accéder à votre espace'}
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
@@ -130,7 +130,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
           {/* Error notice */}
           {error && (
-            <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start space-x-2">
+            <div className="mb-4 p-3 rounded-xl bg-status-urgent-bg border border-status-urgent-border text-status-urgent-text text-xs flex items-start space-x-2">
               <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
               <div className="flex-1 font-medium">{error}</div>
             </div>
@@ -145,7 +145,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             className="w-full flex items-center justify-center space-x-3 py-3 px-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-sm font-bold shadow-xs hover:shadow-md transition-all duration-150 cursor-pointer disabled:opacity-60"
           >
             {googleLoading ? (
-              <div className="w-5 h-5 border-2 border-[#00434A] border-t-transparent rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-navy border-t-transparent rounded-full animate-spin" />
             ) : (
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -193,7 +193,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
                     placeholder="Ex: Dimitri Blanc"
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#00434A]/20 focus:border-[#00434A]"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-navy/20 focus:border-navy"
                   />
                 </div>
               </div>
@@ -211,7 +211,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="nom@exemple.fr"
-                  className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#00434A]/20 focus:border-[#00434A]"
+                  className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-navy/20 focus:border-navy"
                 />
               </div>
             </div>
@@ -228,7 +228,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Au moins 6 caractères"
-                  className="w-full pl-9 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#00434A]/20 focus:border-[#00434A]"
+                  className="w-full pl-9 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-navy/20 focus:border-navy"
                 />
                 <button
                   type="button"
@@ -244,7 +244,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               id="btn-submit-email-auth"
               type="submit"
               disabled={loading || googleLoading}
-              className="w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs sm:text-sm font-bold shadow-xs hover:shadow-md transition-all duration-150 cursor-pointer disabled:opacity-60"
+              className="w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-navy hover:bg-navy-800 text-white text-xs sm:text-sm font-bold shadow-xs hover:shadow-md transition-all duration-150 cursor-pointer disabled:opacity-60"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -265,7 +265,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 setIsRegister(!isRegister);
                 setError(null);
               }}
-              className="text-xs text-[#00434A] hover:underline font-semibold cursor-pointer"
+              className="text-xs text-navy hover:underline font-semibold cursor-pointer"
             >
               {isRegister ? (
                 'Déjà un compte ? Connectez-vous'
@@ -277,7 +277,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
           {/* Security note */}
           <div className="mt-4 flex items-center justify-center space-x-1.5 text-[11px] text-slate-400">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-brand" />
             <span>Données hébergées en France/UE • Chiffrement SSL</span>
           </div>
         </div>

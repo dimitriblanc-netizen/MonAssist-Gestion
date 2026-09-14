@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf';
 import { Property, RentRecord } from '../types';
+import { BRAND_COLORS } from '../theme/colors';
 
 export function generateQuittancePDF(property: Property, rent: RentRecord, landlordName = 'Propriétaire Bailleur') {
   const doc = new jsPDF({
@@ -10,7 +11,7 @@ export function generateQuittancePDF(property: Property, rent: RentRecord, landl
 
   // Colors
   const primaryColor = [15, 23, 42]; // Slate 900
-  const dryosColor = [13, 148, 136]; // Teal 600 / Dryos accent
+  const dryosNavy = BRAND_COLORS.navy.rgb; // Brand Navy #00434A
   const grayText = [100, 116, 139]; // Slate 500
 
   // Header
@@ -20,7 +21,7 @@ export function generateQuittancePDF(property: Property, rent: RentRecord, landl
   // Title
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(18);
-  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+  doc.setTextColor(dryosNavy[0], dryosNavy[1], dryosNavy[2]);
   doc.text('QUITTANCE DE LOYER', 20, 22);
 
   // Subtitle law reference
@@ -51,7 +52,7 @@ export function generateQuittancePDF(property: Property, rent: RentRecord, landl
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
-  doc.setTextColor(dryosColor[0], dryosColor[1], dryosColor[2]);
+  doc.setTextColor(dryosNavy[0], dryosNavy[1], dryosNavy[2]);
   doc.text('BAILLEUR (PROPRIÉTAIRE)', 25, 58);
 
   doc.setFont('helvetica', 'bold');
@@ -144,11 +145,11 @@ export function generateQuittancePDF(property: Property, rent: RentRecord, landl
 
   // Total Row
   y += 9;
-  doc.setFillColor(240, 253, 250); // Light teal
+  doc.setFillColor(BRAND_COLORS.navy.lightRgb[0], BRAND_COLORS.navy.lightRgb[1], BRAND_COLORS.navy.lightRgb[2]);
   doc.rect(20, y - 6, 170, 12, 'F');
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.setTextColor(dryosColor[0], dryosColor[1], dryosColor[2]);
+  doc.setTextColor(dryosNavy[0], dryosNavy[1], dryosNavy[2]);
   doc.text('TOTAL REÇU ET ACQUITTÉ', 25, y + 2);
   doc.text(`${rent.total.toFixed(2)} €`, 160, y + 2, { align: 'right' });
 

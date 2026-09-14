@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf';
 import { Property, RentRecord, ExpenseRecord } from '../types';
+import { BRAND_COLORS } from '../theme/colors';
 
 export function generateTaxReportPdf(
   property: Property,
@@ -13,8 +14,8 @@ export function generateTaxReportPdf(
     format: 'a4'
   });
 
-  const primaryTeal = [0, 67, 74]; // #00434A
-  const creamBg = [251, 247, 238]; // #FBF7EE
+  const primaryNavy = BRAND_COLORS.navy.rgb;
+  const creamBg = BRAND_COLORS.cream.rgb;
 
   // Header banner
   doc.setFillColor(creamBg[0], creamBg[1], creamBg[2]);
@@ -22,7 +23,7 @@ export function generateTaxReportPdf(
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(16);
-  doc.setTextColor(primaryTeal[0], primaryTeal[1], primaryTeal[2]);
+  doc.setTextColor(primaryNavy[0], primaryNavy[1], primaryNavy[2]);
   doc.text(`BILAN FISCAL & AIDE À LA DÉCLARATION ${year}`, 20, 20);
 
   doc.setFont('helvetica', 'normal');
@@ -40,7 +41,7 @@ export function generateTaxReportPdf(
   let y = 48;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
-  doc.setTextColor(primaryTeal[0], primaryTeal[1], primaryTeal[2]);
+  doc.setTextColor(primaryNavy[0], primaryNavy[1], primaryNavy[2]);
   doc.text('1. RECETTES ENCAISSÉES DANS L\'ANNÉE', 20, y);
 
   y += 6;
@@ -67,7 +68,7 @@ export function generateTaxReportPdf(
   y += 16;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
-  doc.setTextColor(primaryTeal[0], primaryTeal[1], primaryTeal[2]);
+  doc.setTextColor(primaryNavy[0], primaryNavy[1], primaryNavy[2]);
   doc.text('2. CHARGES & DÉPENSES DÉDUCTIBLES', 20, y);
 
   y += 6;
@@ -113,7 +114,7 @@ export function generateTaxReportPdf(
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.setTextColor(primaryTeal[0], primaryTeal[1], primaryTeal[2]);
+  doc.setTextColor(primaryNavy[0], primaryNavy[1], primaryNavy[2]);
   doc.text('3. SYNTHÈSE INDICATIVE PAR RÉGIME D\'IMPOSITION', 26, y + 8);
 
   doc.setFont('helvetica', 'normal');

@@ -275,9 +275,9 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
     <div id="action-feed-container" className="space-y-3 sm:space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg sm:text-xl font-black tracking-tight text-[#00434A] flex items-center space-x-2">
+          <h2 className="text-lg sm:text-xl font-black tracking-tight text-navy flex items-center space-x-2">
             <span>À faire aujourd'hui</span>
-            <span className="hidden sm:inline text-xs px-2.5 py-0.5 rounded-full bg-[#00434A]/10 text-[#00434A] font-semibold">
+            <span className="hidden sm:inline text-xs px-2.5 py-0.5 rounded-full bg-navy-50 text-navy font-semibold">
               Zero-Cognitive Load
             </span>
           </h2>
@@ -287,13 +287,13 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
         </div>
 
         {actions.length === 0 ? (
-          <div className="flex items-center space-x-1 text-emerald-700 bg-emerald-50 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg border border-emerald-200 text-[11px] sm:text-xs font-bold">
-            <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
+          <div className="flex items-center space-x-1 text-status-ok-text bg-status-ok-bg px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg border border-status-ok-border text-[11px] sm:text-xs font-bold">
+            <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-status-ok" />
             <span>À jour</span>
           </div>
         ) : (
-          <div className="flex items-center space-x-1 text-amber-800 bg-amber-50 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg border border-amber-200 text-[11px] sm:text-xs font-bold">
-            <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
+          <div className="flex items-center space-x-1 text-status-warning-text bg-status-warning-bg px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg border border-status-warning-border text-[11px] sm:text-xs font-bold">
+            <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-status-warning" />
             <span>{actions.length} action{actions.length > 1 ? 's' : ''}</span>
           </div>
         )}
@@ -301,7 +301,7 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
 
       {actions.length === 0 ? (
         <div className="bg-white rounded-2xl p-8 border border-slate-200/80 shadow-xs text-center space-y-3">
-          <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-700">
+          <div className="w-12 h-12 bg-status-ok-bg border border-status-ok-border rounded-full flex items-center justify-center mx-auto text-status-ok-text">
             <ShieldCheck className="w-6 h-6" />
           </div>
           <h3 className="font-bold text-slate-900 text-base">Aucune démarche urgente en attente</h3>
@@ -321,15 +321,15 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
                 id={`action-item-${act.id}`}
                 className={`rounded-2xl p-4 sm:p-5 border transition-all duration-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 ${
                   isRed
-                    ? 'bg-rose-50/80 border-rose-200'
+                    ? 'bg-status-urgent-bg border-status-urgent-border'
                     : isOrange
-                    ? 'bg-amber-50/80 border-amber-200'
-                    : 'bg-emerald-50/80 border-emerald-200'
+                    ? 'bg-status-warning-bg border-status-warning-border'
+                    : 'bg-status-ok-bg border-status-ok-border'
                 }`}
               >
                 <div className="flex items-start space-x-3 sm:space-x-3.5">
                   <div className={`p-2 sm:p-2.5 rounded-xl mt-0.5 flex-shrink-0 ${
-                    isRed ? 'bg-rose-100 text-rose-700' : isOrange ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'
+                    isRed ? 'bg-status-urgent-bg text-status-urgent-text border border-status-urgent-border' : isOrange ? 'bg-status-warning-bg text-status-warning-text border border-status-warning-border' : 'bg-status-ok-bg text-status-ok-text border border-status-ok-border'
                   }`}>
                     {isRed ? <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5" /> : <Clock className="w-4 h-4 sm:w-5 sm:h-5" />}
                   </div>
@@ -337,7 +337,7 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
                   <div className="space-y-1">
                     <div className="flex items-center space-x-2">
                       <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                        isRed ? 'bg-rose-200 text-rose-800' : isOrange ? 'bg-amber-200 text-amber-800' : 'bg-emerald-200 text-emerald-800'
+                        isRed ? 'bg-status-urgent text-white' : isOrange ? 'bg-status-warning text-white' : 'bg-status-ok text-white'
                       }`}>
                         {isRed ? 'Urgent' : 'Échéance ≤ 30j'}
                       </span>
@@ -353,9 +353,9 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
                       <button
                         id="btn-validate-rent-action"
                         onClick={() => onValidateRent(currentRent.id)}
-                        className="flex-1 sm:flex-initial min-h-[46px] px-4 sm:px-5 py-3 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs sm:text-sm font-bold transition shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer active:scale-98"
+                        className="flex-1 sm:flex-initial min-h-[46px] px-4 sm:px-5 py-3 rounded-xl bg-navy hover:bg-navy-800 text-white text-xs sm:text-sm font-bold transition shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer active:scale-98"
                       >
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-light" />
                         <span>Oui, encaissé</span>
                       </button>
                       <button
@@ -367,7 +367,7 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
                             onOpenReminderModal(property, currentRent);
                           }
                         }}
-                        className="flex-1 sm:flex-initial min-h-[46px] px-3.5 sm:px-4 py-3 rounded-xl bg-white hover:bg-rose-50 border border-rose-300 text-rose-700 text-xs sm:text-sm font-bold transition shadow-xs flex items-center justify-center space-x-1 cursor-pointer active:scale-98"
+                        className="flex-1 sm:flex-initial min-h-[46px] px-3.5 sm:px-4 py-3 rounded-xl bg-white hover:bg-status-urgent-bg border border-status-urgent-border text-status-urgent-text text-xs sm:text-sm font-bold transition shadow-xs flex items-center justify-center space-x-1 cursor-pointer active:scale-98"
                       >
                         <span>Non (impayé)</span>
                       </button>
@@ -377,7 +377,7 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
                   {act.type === 'UNPAID_J10' && currentRent && (
                     <button
                       onClick={() => onOpenReminderModal(property, currentRent)}
-                      className="w-full sm:w-auto px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
+                      className="w-full sm:w-auto px-4 py-2 rounded-xl bg-status-urgent hover:bg-red-700 text-white text-xs font-bold transition shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
                     >
                       <Send className="w-4 h-4" />
                       <span>{act.actionLabel}</span>
@@ -387,7 +387,7 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
                   {act.type === 'UNPAID_J20' && currentRent && (
                     <button
                       onClick={() => onGenerateLrar(property, currentRent)}
-                      className="w-full sm:w-auto px-4 py-2 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold transition shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
+                      className="w-full sm:w-auto px-4 py-2 rounded-xl bg-status-urgent hover:bg-red-700 text-white text-xs font-bold transition shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
                     >
                       <FileText className="w-4 h-4" />
                       <span>{act.actionLabel}</span>
@@ -397,9 +397,9 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
                   {act.type === 'IRL_ANNIVERSARY' && (
                     <button
                       onClick={() => onOpenIrlModal(property)}
-                      className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs font-bold transition shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
+                      className="w-full sm:w-auto px-4 py-2 rounded-xl bg-navy hover:bg-navy-800 text-white text-xs font-bold transition shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
                     >
-                      <TrendingUp className="w-4 h-4 text-teal-300" />
+                      <TrendingUp className="w-4 h-4 text-emerald-light" />
                       <span>{act.actionLabel}</span>
                     </button>
                   )}
@@ -407,7 +407,7 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
                   {act.type === 'IRL_BLOCKED_DPE' && (
                     <button
                       onClick={onOpenDryosContact}
-                      className="w-full sm:w-auto px-4 py-2 rounded-xl bg-amber-700 hover:bg-amber-800 text-white text-xs font-bold transition shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
+                      className="w-full sm:w-auto px-4 py-2 rounded-xl bg-status-warning hover:bg-amber-600 text-white text-xs font-bold transition shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
                     >
                       <span>Conseil Dryos</span>
                     </button>
@@ -416,9 +416,9 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
                   {act.id === 'act_charges_regul' && (
                     <button
                       onClick={() => onOpenChargesModal && onOpenChargesModal(property)}
-                      className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs font-bold transition shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
+                      className="w-full sm:w-auto px-4 py-2 rounded-xl bg-navy hover:bg-navy-800 text-white text-xs font-bold transition shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
                     >
-                      <Receipt className="w-4 h-4 text-teal-300" />
+                      <Receipt className="w-4 h-4 text-emerald-light" />
                       <span>{act.actionLabel}</span>
                     </button>
                   )}
@@ -426,9 +426,9 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
                   {act.id === 'act_vault_missing' && (
                     <button
                       onClick={() => onOpenVaultModal && onOpenVaultModal(property)}
-                      className="w-full sm:w-auto px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
+                      className="w-full sm:w-auto px-4 py-2 rounded-xl bg-emerald-brand hover:bg-emerald-600 text-white text-xs font-bold transition shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
                     >
-                      <FolderLock className="w-4 h-4 text-emerald-200" />
+                      <FolderLock className="w-4 h-4 text-emerald-light" />
                       <span>{act.actionLabel}</span>
                     </button>
                   )}
@@ -453,7 +453,7 @@ export const ActionFeed: React.FC<ActionFeedProps> = ({
                         className="flex-1 sm:flex-initial px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
                         title="Envoyer un rappel par email ou SMS"
                       >
-                        <Send className="w-3.5 h-3.5 text-teal-400" />
+                        <Send className="w-3.5 h-3.5 text-emerald-light" />
                         <span>Relancer le locataire</span>
                       </button>
 

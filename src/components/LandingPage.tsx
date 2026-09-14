@@ -34,7 +34,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onOpenAgencyContact
 }) => {
   return (
-    <div className="min-h-screen bg-[#FBF7EE] text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-cream text-slate-900 flex flex-col font-sans">
       
       {/* Top Navbar */}
       <header className="bg-white/95 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-40 shadow-xs">
@@ -43,10 +43,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <AppLogo className="h-10 sm:h-12 w-auto max-w-[130px]" />
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-base sm:text-lg font-black tracking-tight text-[#00434A]">
+                <span className="text-base sm:text-lg font-black tracking-tight text-navy">
                   MON ASSIST'GESTION
                 </span>
-                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-[#00434A]/10 text-[#00434A]">
+                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-navy-50 text-navy">
                   DRYOS
                 </span>
               </div>
@@ -59,7 +59,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="flex items-center space-x-2 sm:space-x-3">
             <button
               onClick={onNavigateToApp}
-              className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center space-x-2 cursor-pointer"
+              className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-navy hover:bg-navy-800 text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center space-x-2 cursor-pointer"
             >
               <span>Accéder à l'application</span>
               <ArrowRight className="w-4 h-4" />
@@ -73,14 +73,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <section className="relative overflow-hidden pt-10 pb-16 sm:pt-16 sm:pb-24 px-4 sm:px-6 lg:px-8">
           <div className="max-w-5xl mx-auto text-center">
             
-            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300/60 text-xs sm:text-sm font-semibold mb-6">
-              <Sparkles className="w-4 h-4 text-emerald-700" />
+            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-status-ok-bg text-status-ok-text border border-status-ok-border text-xs sm:text-sm font-semibold mb-6">
+              <Sparkles className="w-4 h-4 text-status-ok" />
               <span>Version 2.0 • Gestion locative Zero-Cognitive Load</span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-[#00434A] tracking-tight leading-tight sm:leading-none mb-6">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-navy tracking-tight leading-tight sm:leading-none mb-6">
               Gérez vos locations sans stress <br className="hidden sm:inline" />
-              <span className="text-teal-700">en 30 secondes par mois.</span>
+              <span className="text-navy-600">en 30 secondes par mois.</span>
             </h1>
 
             <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-600 leading-relaxed mb-8">
@@ -92,7 +92,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <button
                 id="btn-hero-launch-app"
                 onClick={onNavigateToApp}
-                className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white font-bold text-sm sm:text-base shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center space-x-2.5 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-navy hover:bg-navy-800 text-white font-bold text-sm sm:text-base shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center space-x-2.5 cursor-pointer"
               >
                 <span>Lancer l'application</span>
                 <ArrowRight className="w-5 h-5" />
@@ -103,7 +103,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 onClick={onInstallClick}
                 className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-300 font-bold text-sm sm:text-base shadow-sm hover:shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer"
               >
-                <Download className="w-5 h-5 text-emerald-600" />
+                <Download className="w-5 h-5 text-emerald-brand" />
                 <span>Installer sur mon smartphone</span>
               </button>
             </div>
@@ -131,10 +131,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <section className="py-12 bg-white border-y border-slate-200/80 px-4 sm:px-6 lg:px-8">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
-              <span className="text-xs font-black tracking-wider uppercase text-teal-800 bg-teal-50 px-3 py-1 rounded-full">
+              <span className="text-xs font-black tracking-wider uppercase text-navy bg-navy-50 px-3 py-1 rounded-full">
                 Fonctionnalités Clés
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-[#00434A] mt-3">
+              <h2 className="text-2xl sm:text-3xl font-black text-navy mt-3">
                 Tout ce dont un propriétaire a besoin, rien de superflu.
               </h2>
             </div>
@@ -142,8 +142,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               
               {/* Feature 1 */}
-              <div className="p-6 rounded-2xl bg-[#FBF7EE]/60 border border-slate-200/80 hover:border-teal-600/30 transition-all">
-                <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center mb-4 font-bold">
+              <div className="p-6 rounded-2xl bg-cream/60 border border-slate-200/80 hover:border-navy/30 transition-all">
+                <div className="w-12 h-12 rounded-xl bg-status-ok-bg border border-status-ok-border text-status-ok flex items-center justify-center mb-4 font-bold">
                   <Zap className="w-6 h-6" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -155,8 +155,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
 
               {/* Feature 2 */}
-              <div className="p-6 rounded-2xl bg-[#FBF7EE]/60 border border-slate-200/80 hover:border-teal-600/30 transition-all">
-                <div className="w-12 h-12 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center mb-4 font-bold">
+              <div className="p-6 rounded-2xl bg-cream/60 border border-slate-200/80 hover:border-navy/30 transition-all">
+                <div className="w-12 h-12 rounded-xl bg-navy-50 text-navy flex items-center justify-center mb-4 font-bold">
                   <FileText className="w-6 h-6" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -168,8 +168,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
 
               {/* Feature 3 */}
-              <div className="p-6 rounded-2xl bg-[#FBF7EE]/60 border border-slate-200/80 hover:border-teal-600/30 transition-all">
-                <div className="w-12 h-12 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center mb-4 font-bold">
+              <div className="p-6 rounded-2xl bg-cream/60 border border-slate-200/80 hover:border-navy/30 transition-all">
+                <div className="w-12 h-12 rounded-xl bg-status-warning-bg border border-status-warning-border text-status-warning flex items-center justify-center mb-4 font-bold">
                   <TrendingUp className="w-6 h-6" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -185,14 +185,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </section>
 
         {/* Installation Guide Section */}
-        <section id="installation" className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#FBF7EE] to-slate-100/70">
+        <section id="installation" className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-cream to-slate-100/70">
           <div className="max-w-4xl mx-auto">
             
             <div className="text-center mb-10">
-              <span className="text-xs font-black tracking-wider uppercase text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
+              <span className="text-xs font-black tracking-wider uppercase text-status-ok-text bg-status-ok-bg border border-status-ok-border px-3 py-1 rounded-full">
                 Installation Simple & Rapide
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-[#00434A] mt-3">
+              <h2 className="text-2xl sm:text-3xl font-black text-navy mt-3">
                 Comment installer l'application sur votre écran d'accueil ?
               </h2>
               <p className="text-sm text-slate-600 mt-2 max-w-xl mx-auto">
@@ -290,10 +290,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </section>
 
         {/* DRYOS Agency Support Banner */}
-        <section className="py-12 px-4 sm:px-6 lg:px-8 bg-[#00434A] text-white">
+        <section className="py-12 px-4 sm:px-6 lg:px-8 bg-navy text-white">
           <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="text-center sm:text-left">
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-300">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-light">
                 Accompagnement Premium
               </span>
               <h3 className="text-xl sm:text-2xl font-black mt-1">
@@ -306,9 +306,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             <button
               onClick={onOpenAgencyContact}
-              className="px-5 py-3 rounded-xl bg-white hover:bg-slate-100 text-[#00434A] text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center space-x-2 flex-shrink-0 cursor-pointer"
+              className="px-5 py-3 rounded-xl bg-white hover:bg-slate-100 text-navy text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center space-x-2 flex-shrink-0 cursor-pointer"
             >
-              <PhoneCall className="w-4 h-4 text-[#00434A]" />
+              <PhoneCall className="w-4 h-4 text-navy" />
               <span>Contacter l'agence DRYOS</span>
             </button>
           </div>
@@ -327,7 +327,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="flex items-center space-x-4">
             <button 
               onClick={onNavigateToApp} 
-              className="font-bold text-[#00434A] hover:underline cursor-pointer"
+              className="font-bold text-navy hover:underline cursor-pointer"
             >
               Lancer l'application
             </button>

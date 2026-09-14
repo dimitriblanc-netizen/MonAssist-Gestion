@@ -110,15 +110,15 @@ Votre Propriétaire Bailleur
       <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-6">
         
         {/* Header */}
-        <div className="p-5 sm:p-6 bg-[#00434A] text-white flex items-center justify-between">
+        <div className="p-5 sm:p-6 bg-navy text-white flex items-center justify-between">
           <div className="space-y-1">
             <div className="flex items-center space-x-2">
-              <Receipt className="w-6 h-6 text-teal-300" />
+              <Receipt className="w-6 h-6 text-emerald-light" />
               <h3 className="font-black text-lg sm:text-xl tracking-tight">
                 Régularisation annuelle des charges
               </h3>
             </div>
-            <p className="text-xs text-teal-100/90">
+            <p className="text-xs text-navy-100">
               {property.name} • Décompte annuel légal (Loi du 6 juillet 1989 art. 23)
             </p>
           </div>
@@ -134,8 +134,8 @@ Votre Propriétaire Bailleur
           
           {/* Info Mode forfait vs provisions */}
           {property.chargesMode === 'forfait' && (
-            <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start space-x-2">
-              <Info className="w-4 h-4 text-amber-700 flex-shrink-0 mt-0.5" />
+            <div className="p-3.5 rounded-xl bg-status-warning-bg border border-status-warning-border text-status-warning-text text-xs flex items-start space-x-2">
+              <Info className="w-4 h-4 text-status-warning flex-shrink-0 mt-0.5" />
               <div>
                 <strong>Bail au forfait de charges :</strong> Votre bail est enregistré avec des charges forfaitaires. En meublé au forfait, aucune régularisation n'est légalement due, sauf clause contraire expresse ou bascule en provisions.
               </div>
@@ -145,7 +145,7 @@ Votre Propriétaire Bailleur
           {/* Saisie simplifiée en 2 chiffres */}
           <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-4">
             <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center space-x-1.5">
-              <Calculator className="w-4 h-4 text-[#00434A]" />
+              <Calculator className="w-4 h-4 text-navy" />
               <span>Saisie express (2 chiffres reçus de votre syndic)</span>
             </h4>
 
@@ -187,9 +187,9 @@ Votre Propriétaire Bailleur
                   value={actualChargesStr}
                   onChange={(e) => setActualChargesStr(e.target.value)}
                   placeholder="Ex : 1380"
-                  className="w-full text-xs p-2.5 rounded-lg border border-slate-300 bg-white font-bold text-slate-900 focus:ring-1 focus:ring-[#00434A]"
+                  className="w-full text-xs p-2.5 rounded-lg border border-slate-300 bg-white font-bold text-slate-900 focus:ring-1 focus:ring-navy"
                 />
-                <span className="text-[10px] text-teal-700 font-medium">Relevé de décompte syndic</span>
+                <span className="text-[10px] text-navy font-medium">Relevé de décompte syndic</span>
               </div>
             </div>
           </div>
@@ -197,9 +197,9 @@ Votre Propriétaire Bailleur
           {/* Résultat visuel immédiat */}
           <div className={`p-4 rounded-xl border flex flex-col sm:flex-row items-center justify-between gap-3 ${
             isComplement 
-              ? 'bg-rose-50 border-rose-200 text-rose-900' 
+              ? 'bg-status-urgent-bg border-status-urgent-border text-status-urgent-text' 
               : isRefund 
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-900' 
+              ? 'bg-status-ok-bg border-status-ok-border text-status-ok-text' 
               : 'bg-slate-50 border-slate-200 text-slate-900'
           }`}>
             <div className="space-y-0.5 text-center sm:text-left">
@@ -227,14 +227,14 @@ Votre Propriétaire Bailleur
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <h4 className="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
-                <FileText className="w-4 h-4 text-[#00434A]" />
+                <FileText className="w-4 h-4 text-navy" />
                 <span>Courrier / Décompte explicatif prêt à l'envoi</span>
               </h4>
               <button
                 onClick={handleCopy}
-                className="text-xs text-[#00434A] hover:text-[#00343a] font-bold flex items-center space-x-1 cursor-pointer"
+                className="text-xs text-navy hover:text-navy-800 font-bold flex items-center space-x-1 cursor-pointer"
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? <Check className="w-3.5 h-3.5 text-status-ok" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copied ? 'Copié dans le presse-papier !' : 'Copier le texte'}</span>
               </button>
             </div>
@@ -272,9 +272,9 @@ Votre Propriétaire Bailleur
             </button>
             <button
               onClick={handleApply}
-              className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs font-bold transition cursor-pointer shadow-xs flex items-center justify-center space-x-1.5"
+              className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl bg-navy hover:bg-navy-800 text-white text-xs font-bold transition cursor-pointer shadow-xs flex items-center justify-center space-x-1.5"
             >
-              <CheckCircle2 className="w-4 h-4 text-teal-300" />
+              <CheckCircle2 className="w-4 h-4 text-emerald-light" />
               <span>{isSaved ? 'Enregistré !' : 'Valider ce décompte'}</span>
             </button>
           </div>

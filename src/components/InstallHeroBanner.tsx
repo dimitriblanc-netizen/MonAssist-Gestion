@@ -25,10 +25,10 @@ export const InstallHeroBanner: React.FC<InstallHeroBannerProps> = ({
   }
 
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#00434A] via-[#00525b] to-[#01353b] text-white p-4 sm:p-5 shadow-lg border border-teal-800/60 transition-all">
+    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-navy via-navy-800 to-navy-900 text-white p-4 sm:p-5 shadow-lg border border-navy-700/60 transition-all">
       {/* Subtle background light effect */}
-      <div className="absolute -right-12 -top-12 w-48 h-48 bg-teal-400/10 rounded-full blur-2xl pointer-events-none" />
-      <div className="absolute -left-12 -bottom-12 w-48 h-48 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute -right-12 -top-12 w-48 h-48 bg-emerald-light/10 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute -left-12 -bottom-12 w-48 h-48 bg-emerald-brand/10 rounded-full blur-2xl pointer-events-none" />
 
       {/* Dismiss button */}
       <button
@@ -47,11 +47,11 @@ export const InstallHeroBanner: React.FC<InstallHeroBannerProps> = ({
           
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-400 text-[#00434A]">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-light text-navy">
                 Page d'accueil : gestion.dryos.fr
               </span>
-              <span className="text-[10px] text-teal-200 font-semibold flex items-center">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block mr-1 animate-ping" />
+              <span className="text-[10px] text-emerald-light font-semibold flex items-center">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-light inline-block mr-1 animate-ping" />
                 Version installable
               </span>
             </div>
@@ -60,7 +60,7 @@ export const InstallHeroBanner: React.FC<InstallHeroBannerProps> = ({
               Installez l'application sur votre smartphone ou PC
             </h2>
 
-            <p className="text-xs text-teal-100/90 max-w-xl line-clamp-2 sm:line-clamp-none">
+            <p className="text-xs text-navy-100 max-w-xl line-clamp-2 sm:line-clamp-none">
               Recevez les notifications de pointage directes le 5 du mois et générez vos quittances en 1 clic sans passer par l'App Store.
             </p>
           </div>
@@ -81,11 +81,11 @@ export const InstallHeroBanner: React.FC<InstallHeroBannerProps> = ({
                 onOpenInstallModal();
               }
             }}
-            className="w-full sm:w-auto relative group px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 text-[#00434A] font-black text-sm transition-all duration-200 shadow-lg shadow-emerald-950/30 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center space-x-2 cursor-pointer ring-4 ring-emerald-400/20"
+            className="w-full sm:w-auto relative group px-5 py-3 rounded-2xl bg-emerald-brand hover:bg-emerald-brand/90 text-white font-black text-sm transition-all duration-200 shadow-lg shadow-navy-950/30 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center space-x-2 cursor-pointer ring-4 ring-emerald-brand/20"
           >
-            <Download className="w-4 h-4 text-[#00434A] animate-bounce" />
+            <Download className="w-4 h-4 text-white animate-bounce" />
             <span className="tracking-wide">Télécharger l'app ici</span>
-            <ChevronRight className="w-4 h-4 text-[#00434A]/70 group-hover:translate-x-0.5 transition-transform" />
+            <ChevronRight className="w-4 h-4 text-white/80 group-hover:translate-x-0.5 transition-transform" />
           </button>
 
           <button
@@ -93,7 +93,7 @@ export const InstallHeroBanner: React.FC<InstallHeroBannerProps> = ({
             className="w-full sm:w-auto px-3.5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition flex items-center justify-center space-x-1.5 cursor-pointer border border-white/10"
             title="Guide d'installation et QR code"
           >
-            <QrCode className="w-3.5 h-3.5 text-teal-200" />
+            <QrCode className="w-3.5 h-3.5 text-emerald-light" />
             <span className="hidden lg:inline">QR Code</span>
           </button>
 

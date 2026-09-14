@@ -48,7 +48,7 @@ export const RentSection: React.FC<RentSectionProps> = ({
       <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2.5">
-            <div className="p-2 rounded-xl bg-[#00434A]/10 text-[#00434A]">
+            <div className="p-2 rounded-xl bg-navy-50 text-navy">
               <ShieldAlert className="w-5 h-5" />
             </div>
             <div>
@@ -69,7 +69,7 @@ export const RentSection: React.FC<RentSectionProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-2">
           {/* Step 1: Le 5 */}
           <div className="p-3 rounded-xl border border-slate-200 bg-slate-50/70 text-xs space-y-1">
-            <span className="font-bold text-[#00434A] block">1. Le 5 du mois</span>
+            <span className="font-bold text-navy block">1. Le 5 du mois</span>
             <p className="font-medium text-slate-800">Échéance normale</p>
             <p className="text-[11px] text-slate-500">
               Vérification bancaire. Si reçu : validation 1-clic et quittance immédiate.
@@ -77,8 +77,8 @@ export const RentSection: React.FC<RentSectionProps> = ({
           </div>
 
           {/* Step 2: J+10 */}
-          <div className="p-3 rounded-xl border border-amber-200 bg-amber-50/50 text-xs space-y-1">
-            <span className="font-bold text-amber-800 block">2. J+10 (Le 15)</span>
+          <div className="p-3 rounded-xl border border-status-warning-border bg-status-warning-bg text-xs space-y-1">
+            <span className="font-bold text-status-warning-text block">2. J+10 (Le 15)</span>
             <p className="font-medium text-slate-800">Relance amiable</p>
             <p className="text-[11px] text-slate-600">
               Envoi d'un SMS ou email de rappel courtois pour acter la démarche.
@@ -86,8 +86,8 @@ export const RentSection: React.FC<RentSectionProps> = ({
           </div>
 
           {/* Step 3: J+20 */}
-          <div className="p-3 rounded-xl border border-rose-200 bg-rose-50/50 text-xs space-y-1">
-            <span className="font-bold text-rose-800 block">3. J+20 (Le 25)</span>
+          <div className="p-3 rounded-xl border border-status-urgent-border bg-status-urgent-bg text-xs space-y-1">
+            <span className="font-bold text-status-urgent-text block">3. J+20 (Le 25)</span>
             <p className="font-medium text-slate-800">Mise en demeure LRAR</p>
             <p className="text-[11px] text-slate-600">
               Notification recommandée avec AR sous huitaine. Déclenche la clause résolutoire.
@@ -95,8 +95,8 @@ export const RentSection: React.FC<RentSectionProps> = ({
           </div>
 
           {/* Step 4: J+35 */}
-          <div className="p-3 rounded-xl border border-red-300 bg-red-100/50 text-xs space-y-1">
-            <span className="font-bold text-red-900 block">4. J+35 (Le 10 suivant)</span>
+          <div className="p-3 rounded-xl border border-status-urgent-border bg-status-urgent-bg text-xs space-y-1">
+            <span className="font-bold text-status-urgent-text block">4. J+35 (Le 10 suivant)</span>
             <p className="font-medium text-slate-800">Déclaration Sinistre</p>
             <p className="text-[11px] text-slate-700">
               Alerte critique : transmission du dossier à Visale / GLI pour indemnisation.
@@ -110,7 +110,7 @@ export const RentSection: React.FC<RentSectionProps> = ({
         <div className="bg-slate-50/90 rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center space-x-2">
-              <span className="text-xs uppercase tracking-wider font-bold text-[#00434A]">
+              <span className="text-xs uppercase tracking-wider font-bold text-navy">
                 Échéance en cours
               </span>
               <span className="text-slate-400">•</span>
@@ -127,15 +127,15 @@ export const RentSection: React.FC<RentSectionProps> = ({
           <div className="flex flex-wrap items-center gap-2.5">
             {currentRent.status === 'PAID' ? (
               <div className="flex items-center space-x-2">
-                <span className="inline-flex items-center text-xs font-bold px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-300">
-                  <CheckCircle2 className="w-4 h-4 mr-1.5 text-emerald-600" />
+                <span className="inline-flex items-center text-xs font-bold px-3 py-1.5 rounded-xl bg-status-ok-bg text-status-ok-text border border-status-ok-border">
+                  <CheckCircle2 className="w-4 h-4 mr-1.5 text-status-ok" />
                   Encaissé le {currentRent.paidDate}
                 </span>
 
                 <button
                   id="btn-download-receipt"
                   onClick={() => generateQuittancePDF(property, currentRent)}
-                  className="px-3.5 py-2 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer shadow-xs"
+                  className="px-3.5 py-2 rounded-xl bg-navy hover:bg-navy-800 text-white text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer shadow-xs"
                 >
                   <FileDown className="w-4 h-4" />
                   <span>Télécharger la quittance</span>
@@ -146,9 +146,9 @@ export const RentSection: React.FC<RentSectionProps> = ({
                 <button
                   id="btn-confirm-payment-one-click"
                   onClick={() => onValidateRent(currentRent.id)}
-                  className="px-4 py-2.5 rounded-xl bg-[#00434A] hover:bg-[#00343a] text-white text-xs font-bold transition flex items-center space-x-2 shadow-xs cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl bg-navy hover:bg-navy-800 text-white text-xs font-bold transition flex items-center space-x-2 shadow-xs cursor-pointer"
                 >
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-light" />
                   <span>Valider l'encaissement (1-clic)</span>
                 </button>
 
@@ -158,7 +158,7 @@ export const RentSection: React.FC<RentSectionProps> = ({
                     onSetLateStatus(currentRent.id, 'LATE_J10');
                     onOpenReminderModal(property, currentRent);
                   }}
-                  className="px-3.5 py-2.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer"
+                  className="px-3.5 py-2.5 rounded-xl bg-status-warning-bg hover:bg-amber-100 border border-status-warning-border text-status-warning-text text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>J+10 Relance amiable</span>
@@ -170,7 +170,7 @@ export const RentSection: React.FC<RentSectionProps> = ({
                     onSetLateStatus(currentRent.id, 'LATE_J20');
                     generateLrarMiseEnDemeure(property, currentRent);
                   }}
-                  className="px-3.5 py-2.5 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-900 text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer"
+                  className="px-3.5 py-2.5 rounded-xl bg-status-urgent-bg hover:bg-red-100 border border-status-urgent-border text-status-urgent-text text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer"
                 >
                   <FileText className="w-3.5 h-3.5" />
                   <span>J+20 LRAR</span>
@@ -191,7 +191,7 @@ export const RentSection: React.FC<RentSectionProps> = ({
 
           <button
             onClick={() => onGenerateNextMonth('Avril', 2025)}
-            className="px-3 py-1.5 rounded-xl border border-slate-300 hover:border-[#00434A] text-xs font-semibold text-[#00434A] transition flex items-center space-x-1.5 cursor-pointer"
+            className="px-3 py-1.5 rounded-xl border border-slate-300 hover:border-navy text-xs font-semibold text-navy transition flex items-center space-x-1.5 cursor-pointer"
           >
             <PlusCircle className="w-3.5 h-3.5" />
             <span>Créer appel Avril 2025</span>
@@ -222,15 +222,15 @@ export const RentSection: React.FC<RentSectionProps> = ({
                   <td className="py-3 px-4 font-bold text-slate-900"><MaskedValue value={`${r.total.toFixed(2)} €`} /></td>
                   <td className="py-3 px-4">
                     {r.status === 'PAID' ? (
-                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800">
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-status-ok-bg text-status-ok-text border border-status-ok-border">
                         Payé le {r.paidDate || 'Terme'}
                       </span>
                     ) : r.status === 'PENDING' ? (
-                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800">
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-status-warning-bg text-status-warning-text border border-status-warning-border">
                         En attente virement
                       </span>
                     ) : (
-                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-100 text-rose-800 animate-pulse">
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-status-urgent-bg text-status-urgent-text border border-status-urgent-border animate-pulse">
                         {r.status === 'LATE_J10' ? 'Impayé J+10' : r.status === 'LATE_J20' ? 'Impayé J+20 (LRAR)' : 'Impayé J+35 (Sinistre)'}
                       </span>
                     )}
@@ -247,7 +247,7 @@ export const RentSection: React.FC<RentSectionProps> = ({
                       )}
                       <button
                         onClick={() => generateQuittancePDF(property, r)}
-                        className="px-2.5 py-1 rounded-lg bg-[#00434A]/10 hover:bg-[#00434A]/20 text-[#00434A] font-semibold flex items-center space-x-1 cursor-pointer"
+                        className="px-2.5 py-1 rounded-lg bg-navy-50 hover:bg-navy-100 text-navy font-semibold flex items-center space-x-1 cursor-pointer"
                       >
                         <FileDown className="w-3.5 h-3.5" />
                         <span>Quittance</span>
